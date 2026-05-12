@@ -111,9 +111,9 @@
 
     .right_side {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        position:relative;
+        justify-content: space-evenly;
+        // position:relative;
+        flex-direction: column;
     }
 
     .right_container {
@@ -124,6 +124,7 @@
     .lisence {
         bottom: 10px;
         font-size: 12px;
+        position: static;
     }
 }
 
