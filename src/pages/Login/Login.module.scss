@@ -1,6 +1,7 @@
 .container {
     display: grid;
     grid-template-columns: repeat(2 , 1fr);
+    min-height: 100dvh;
     height: 100vh;
 }
 
@@ -117,14 +118,6 @@
 @media (max-width:640px) {
     .right_container {
         padding: 0 40px;
-    }
-    
-    .container {
-        height: 92vh;
-    }
-
-    .right_container {
-        position: absolute;
     }
 }
 
