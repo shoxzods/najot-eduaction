@@ -8,7 +8,7 @@ import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 
 export default function Header() {
     return (
-        <header className={styles.header}>
+        <header className={styles.header} style={{color:'red'}}>
             <div className={styles.left}>
                 <button className={styles.iconBtn}>
                     <CalendarTodayRoundedIcon fontSize="small" />
