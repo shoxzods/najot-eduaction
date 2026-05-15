@@ -18,7 +18,7 @@ const menuItems = [
     { label: "Boshqarish", icon: <SettingsRoundedIcon />, path: "/settings" },
 ];
 
-export default function Sidebar({ isCollapsed, toggleSidebar }) {
+export default function Sidebar({ isCollapsed, toggleSidebar, onToggleSubSidebar, isSubSidebarOpen }) {
     return (
         <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
             <div className={styles.logo}>
@@ -33,19 +33,40 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
             </div>
 
             <nav className={styles.nav}>
-                {menuItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            `${styles.item}${isActive ? ` ${styles.itemActive}` : ""}`
-                        }
-                        end={item.path === "/dashboard"}
-                    >
-                        <span className={styles.itemIcon}>{item.icon}</span>
-                        {!isCollapsed && <span className={styles.itemLabel}>{item.label}</span>}
-                    </NavLink>
-                ))}
+                {menuItems.map((item) => {
+                    const isManagement = item.label === "Boshqarish";
+                    
+                    if (isManagement) {
+                        return (
+                            <button
+                                key={item.label}
+                                className={`${styles.item} ${isSubSidebarOpen ? styles.itemActive : ""}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onToggleSubSidebar();
+                                }}
+                            >
+                                <span className={styles.itemIcon}>{item.icon}</span>
+                                {!isCollapsed && <span className={styles.itemLabel}>{item.label}</span>}
+                            </button>
+                        );
+                    }
+
+                    return (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => onToggleSubSidebar(false)}
+                            className={({ isActive }) =>
+                                `${styles.item}${isActive && !isSubSidebarOpen ? ` ${styles.itemActive}` : ""}`
+                            }
+                            end={item.path === "/dashboard"}
+                        >
+                            <span className={styles.itemIcon}>{item.icon}</span>
+                            {!isCollapsed && <span className={styles.itemLabel}>{item.label}</span>}
+                        </NavLink>
+                    );
+                })}
             </nav>
 
             <div className={styles.subscription}>

@@ -16,6 +16,14 @@
     margin-left: 80px;
 }
 
+.mainWithSubSidebar {
+    margin-left: 520px; /* 240 + 280 */
+}
+
+.mainCollapsed.mainWithSubSidebar {
+    margin-left: 360px; /* 80 + 280 */
+}
+
 .content {
     padding: 32px;
     flex: 1;
