@@ -8,6 +8,7 @@ import Courses from "../pages/management/Courses/Courses";
 import Rooms from "../pages/management/Rooms/Rooms";
 import Staff from "../pages/management/Staff/Staff";
 import Teachers from "../pages/Teachers/Teachers";
+import Students from "../pages/Students/Students";
 
 export const router = createBrowserRouter([
     {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
             {
                 path: '/teachers',
                 element: <Teachers />
+            },
+            {
+                path: '/students',
+                element: <Students />
             },
             {
                 path: '/management',
