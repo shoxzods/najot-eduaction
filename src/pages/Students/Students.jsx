@@ -7,6 +7,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import StudentModal from "../../components/UI/StudentModal/StudentModal";
 
 const studentsData = [
     {
@@ -126,7 +127,7 @@ export default function Students() {
                 <div className={styles.titleSection}>
                     <h1 className={styles.title}>Talabalar</h1>
                     <p className={styles.subtitle}>
-                        Ushbu sahifada siz Talabalar ro'yxatini va ularning ma'lumotlarini topasiz. 
+                        Ushbu sahifada siz Talabalar ro'yxatini va ularning ma'lumotlarini topasiz.
                         Har bir Talaba ismi, fanlari va aloqa ma'lumotlari keltirilgan.
                     </p>
                 </div>
@@ -228,6 +229,15 @@ export default function Students() {
                     <button className={styles.pageArrow}>Next →</button>
                 </div>
             </div>
+
+            <StudentModal 
+                isOpen={isModalOpen} 
+                onClose={toggleModal} 
+                onSave={() => {
+                    console.log("Student saved");
+                    toggleModal();
+                }}
+            />
         </div>
     );
 }
