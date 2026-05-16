@@ -8,11 +8,11 @@ import MonetizationOnRoundedIcon from '@mui/icons-material/MonetizationOnRounded
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
 const subMenuItems = [
-    { label: "Kurslar", icon: <SchoolRoundedIcon /> },
-    { label: "Xonalar", icon: <MeetingRoomRoundedIcon /> },
-    { label: "Xodimlar", icon: <BadgeRoundedIcon /> },
-    { label: "Coin", icon: <MonetizationOnRoundedIcon /> },
-    { label: "Xabar Yuborish", icon: <SendRoundedIcon /> },
+    { label: "Kurslar", slug: "courses", icon: <SchoolRoundedIcon /> },
+    { label: "Xonalar", slug: "rooms", icon: <MeetingRoomRoundedIcon /> },
+    { label: "Xodimlar", slug: "staff", icon: <BadgeRoundedIcon /> },
+    { label: "Coin", slug: "coin", icon: <MonetizationOnRoundedIcon /> },
+    { label: "Xabar Yuborish", slug: "send-message", icon: <SendRoundedIcon /> },
 ];
 
 export default function ManagementSidebar({ isOpen, isCollapsed, onClose }) {
@@ -26,15 +26,13 @@ export default function ManagementSidebar({ isOpen, isCollapsed, onClose }) {
             </div>
             <div className={styles.content}>
                 {subMenuItems.map((item, index) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className={`${styles.item} ${activeIndex === index ? styles.itemActive : ""}`}
                         onClick={() => {
                             setActiveIndex(index);
-                            if (item.label !== "Coin" && item.label !== "Xabar Yuborish") {
-                                onClose();
-                                navigate(`/management/content?tab=${item.label}`);
-                            }
+                            onClose();
+                            navigate(`/management/${item.slug}`);
                         }}
                     >
                         <span className={styles.icon}>{item.icon}</span>

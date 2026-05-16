@@ -5,6 +5,92 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+
+    input,
+    select,
+    textarea {
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #1a1a2e;
+        transition: border-color 0.2s, box-shadow 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: rgba(108, 53, 222, 0.5);
+            box-shadow: 0 0 0 3px rgba(108, 53, 222, 0.1);
+        }
+
+        &::placeholder {
+            color: #b0b0c0;
+        }
+    }
+
+    textarea {
+        resize: none;
+        min-height: 120px;
+    }
+}
+
+.hint {
+    font-size: 12px;
+    color: #8a8a9a;
+    margin: 4px 0 0 0;
+}
+
+.cancelBtn {
+    background: #f5f5f7;
+    color: #4a4a6a;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #ebebee;
+    }
+}
+
+.saveBtn {
+    background: #6c35de;
+    color: #ffffff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+
+    &:hover {
+        background: #5a2cc0;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -54,11 +140,14 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: rgba(74, 74, 106, 0.04);
+    border: 1px solid rgba(74, 74, 106, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 
     &:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        filter: grayscale(0%);
     }
 }
 
@@ -93,7 +182,7 @@
     transition: background 0.2s, color 0.2s;
 
     &:hover {
-        background: rgba(0, 0, 0, 0.05);
+        background: #f3f4f6;
         color: #1a1a2e;
     }
 

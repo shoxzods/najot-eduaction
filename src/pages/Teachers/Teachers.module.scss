@@ -1,0 +1,271 @@
+.container {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.titleSection {
+    max-width: 800px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #8a8a9a;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #6c35de;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+
+    &:hover {
+        background: #5a2cc0;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+.tableCard {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tableHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tableActions {
+    display: flex;
+    gap: 12px;
+}
+
+.filterBtn, .archiveBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a4a6a;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #e9ecef;
+    }
+}
+
+.searchWrapper {
+    position: relative;
+    width: 280px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 8px 12px 8px 38px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a1a2e;
+    outline: none;
+
+    &:focus {
+        border-color: #6c35de;
+    }
+
+    &::placeholder {
+        color: #adb5bd;
+    }
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a4a6a;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    td {
+        padding: 16px;
+        font-size: 14px;
+        color: #1a1a2e;
+        border-bottom: 1px solid #f1f3f5;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.userName {
+    font-weight: 500;
+}
+
+.groups {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.groupTag {
+    background: #f1f3f5;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a4a6a;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.actionBtn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 6px;
+    color: #adb5bd;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+        background: #f8f9fa;
+        color: #6c35de;
+    }
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.pageArrow {
+    background: none;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a4a6a;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #f8f9fa;
+    }
+}
+
+.pageNumbers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pageBtn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a4a6a;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+        background: #f8f9fa;
+    }
+
+    &.active {
+        background: #6c35de;
+        color: #ffffff;
+    }
+}
+
+.dots {
+    color: #adb5bd;
+    padding: 0 4px;
+}

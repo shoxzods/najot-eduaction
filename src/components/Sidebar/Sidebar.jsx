@@ -38,18 +38,20 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                 {menuItems.map((item) => (
                     <NavLink
                         key={item.path}
-                        to={item.label === "Boshqarish" ? "/management" : item.path}
-                        onClick={(e) => {
+                        to={item.path}
+                        onClick={() => {
                             if (item.label === "Boshqarish") {
                                 toggleSubSidebar();
+                            } else {
+                                // Close sub-sidebar when navigating to other sections
+                                if (isSubSidebarOpen) toggleSubSidebar();
                             }
                         }}
                         className={({ isActive }) => {
                             const isManagement = item.label === "Boshqarish";
-                            const isDashboard = item.path === "/dashboard";
-                            // Highlight Boshqarish if subsidebar is open
-                            // Highlight Dashboard if we are on dashboard AND subsidebar is closed
-                            const shouldBeActive = isManagement ? isSubSidebarOpen : (isActive && !isSubSidebarOpen);
+                            // Boshqarish is active if sub-sidebar is open
+                            // Other items are active based on their route
+                            const shouldBeActive = isManagement ? isSubSidebarOpen : isActive;
                             return `${styles.item}${shouldBeActive ? ` ${styles.itemActive}` : ""}`;
                         }}
                         end={item.path === "/dashboard"}

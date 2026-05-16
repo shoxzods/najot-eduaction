@@ -4,6 +4,10 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Management from "../pages/management/Management";
 import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layout/MainLayout";
+import Courses from "../pages/management/Courses/Courses";
+import Rooms from "../pages/management/Rooms/Rooms";
+import Staff from "../pages/management/Staff/Staff";
+import Teachers from "../pages/Teachers/Teachers";
 
 export const router = createBrowserRouter([
     {
@@ -22,12 +26,30 @@ export const router = createBrowserRouter([
                 element: <Dashboard />
             },
             {
-                path: '/management',
-                element: <Dashboard />
+                path: '/teachers',
+                element: <Teachers />
             },
             {
-                path: '/management/content',
-                element: <Management />
+                path: '/management',
+                element: <Management />,
+                children: [
+                    {
+                        path: 'courses',
+                        element: <Courses />
+                    },
+                    {
+                        path: 'rooms',
+                        element: <Rooms />
+                    },
+                    {
+                        path: 'staff',
+                        element: <Staff />
+                    },
+                    {
+                        path: '',
+                        element: <Dashboard />
+                    }
+                ]
             },
             // Siz bu yerga boshqa sahifalarni ham qo'shishingiz mumkin
         ]
