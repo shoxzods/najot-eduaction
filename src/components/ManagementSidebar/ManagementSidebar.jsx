@@ -28,7 +28,7 @@ export default function ManagementSidebar({ isOpen, isCollapsed, onClose }) {
                 {subMenuItems.map((item, index) => (
                     <div
                         key={index}
-                        className={`${styles.item} ${activeIndex === index ? styles.itemActive : ""}`}
+                        className={`${styles.item}`}
                         onClick={() => {
                             setActiveIndex(index);
                             onClose();

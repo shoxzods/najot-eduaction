@@ -64,7 +64,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
 
             <div className={styles.subscription}>
                 <div className={styles.subInfo}>
-                    <img className={styles.alarm} src="/alarm.webp" alt="" />
+                    <img className={styles.alarm} src="/alarm.png" alt="" />
                     {!isCollapsed && (
                         <div>
                             <p className={styles.subTitle}>Obuna</p>
