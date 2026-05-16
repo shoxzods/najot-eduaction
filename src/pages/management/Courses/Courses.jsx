@@ -3,7 +3,6 @@ import styles from "./Courses.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import CourseModal from "../../../components/UI/CourseModal/CourseModal";
 
 const coursesData = [
@@ -53,8 +52,6 @@ const coursesData = [
         color: "#FCE4EC"
     }
 ];
-
-const colors = ["#2D3748", "#6B46C1", "#E53E3E", "#C05621", "#38A169", "#3182CE", "#2B6CB0", "#553C9A", "#D53F8C"];
 
 export default function Courses() {
     const [isModalOpen, setIsModalOpen] = useState(false);

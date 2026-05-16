@@ -1,6 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "../pages/Login/Login";
-import Dashboard from "../pages/dashboard/Dashboard";
 import Management from "../pages/management/Management";
 import NotFound from "../pages/NotFound/NotFound";
 import MainLayout from "../layout/MainLayout";
@@ -11,6 +10,9 @@ import Teachers from "../pages/Teachers/Teachers";
 import Students from "../pages/Students/Students";
 import Groups from "../pages/Groups/Groups";
 import Gifts from "../pages/Gifts/Gifts";
+import Default from "../pages/management/default/Default";
+import Dashboard from '../pages/dashboard/Dashboard';
+
 
 export const router = createBrowserRouter([
     {
@@ -64,7 +66,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: '',
-                        element: <Dashboard />
+                        element: <Default />
                     },
                 ]
             },
