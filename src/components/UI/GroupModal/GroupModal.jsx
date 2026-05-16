@@ -4,6 +4,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { createPortal } from "react-dom";
 import AddStudentModal from "./AddStudentModal/AddStudentModal";
+import AddTeacherModal from "./AddTeacherModal/AddTeacherModal";
 
 const DAYS = [
     { id: 'mon', label: 'Dushanba' },
@@ -18,8 +19,10 @@ const DAYS = [
 export default function GroupModal({ isOpen, onClose, onSave }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
     const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
+    const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
 
     const toggleAddStudentModal = () => setIsAddStudentModalOpen(!isAddStudentModalOpen);
+    const toggleAddTeacherModal = () => setIsAddTeacherModalOpen(!isAddTeacherModalOpen);
 
     useEffect(() => {
         if (isOpen) {
@@ -108,7 +111,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
 
                     <div className={styles.formGroup}>
                         <label>O'qituvchilar</label>
-                        <button className={styles.addOptionBtn}>
+                        <button className={styles.addOptionBtn} onClick={toggleAddTeacherModal}>
                             <AddRoundedIcon fontSize="small" />
                             <span>Qo'shish</span>
                         </button>
@@ -135,6 +138,15 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                         </svg>
                     </div>
                 </div>
+
+                <AddTeacherModal 
+                    isOpen={isAddTeacherModalOpen} 
+                    onClose={toggleAddTeacherModal} 
+                    onAdd={() => {
+                        console.log("Teachers added to group");
+                        toggleAddTeacherModal();
+                    }}
+                />
 
                 <AddStudentModal 
                     isOpen={isAddStudentModalOpen} 
