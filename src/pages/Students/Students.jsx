@@ -17,7 +17,6 @@ export default function Students() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentData, setStudentData] = useState([]);
     const [page, setPage] = useState(1);
-    // const [ active , setActive ] = useState('');
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
     function increment() {
@@ -34,18 +33,21 @@ export default function Students() {
     }
 
 
-    useEffect(
-        () => {
-            api(`/students?page=${page}&limit=3`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-                }
-            }).then(
-                res => {
-                    setStudentData(res.data.data);
-                }
-            )
-        }, [page]);
+    const fetchStudents = () => {
+        api(`/students?page=${page}&limit=3`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            }
+        }).then(
+            res => {
+                setStudentData(res.data.data);
+            }
+        );
+    };
+
+    useEffect(() => {
+        fetchStudents();
+    }, [page]);
 
     return (
         <div className={styles.container}>
@@ -160,8 +162,7 @@ export default function Students() {
                 isOpen={isModalOpen}
                 onClose={toggleModal}
                 onSave={() => {
-                    console.log("Student saved");
-                    toggleModal();
+                    fetchStudents();
                 }}
             />
         </div>

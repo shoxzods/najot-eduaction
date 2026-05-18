@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AddTeacherModal.module.scss";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { createPortal } from "react-dom";
-
-const TEACHERS_LIST = [
-    { id: 1, name: "Mohirbek" },
-    { id: 2, name: "Jasur" },
-    { id: 3, name: "Aziz" },
-    { id: 4, name: "Sardor" }
-];
+import { api } from '../../../../api/api';
 
 export default function AddTeacherModal({ isOpen, onClose, onAdd }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
+    const [teacherData, setTeacherData] = useState([]);
+
+    const [selectedIds, setSelectedIds] = useState([]);
 
     useEffect(() => {
         if (isOpen) {
@@ -23,6 +20,28 @@ export default function AddTeacherModal({ isOpen, onClose, onAdd }) {
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        api.get('/teachers', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            }
+        }).then(
+            res => {
+                setTeacherData(res.data.data)
+            }
+        ).catch(
+            err => console.log(err.message)
+        )
+    }, [])
+
+    const handleCheckboxChange = (id) => {
+        setSelectedIds(prev => 
+            prev.includes(id) 
+                ? prev.filter(item => item !== id) 
+                : [...prev, id]
+        );
+    };
 
     if (!shouldRender) return null;
 
@@ -53,10 +72,14 @@ export default function AddTeacherModal({ isOpen, onClose, onAdd }) {
                     />
                     
                     <div className={styles.listContainer}>
-                        {TEACHERS_LIST.map((teacher) => (
+                        {teacherData.map((teacher) => (
                             <label key={teacher.id} className={styles.listItem}>
-                                <input type="checkbox" />
-                                <span>{teacher.name}</span>
+                                <input 
+                                    type="checkbox" 
+                                    checked={selectedIds.includes(teacher.id)}
+                                    onChange={() => handleCheckboxChange(teacher.id)}
+                                />
+                                <span>{teacher.full_name}</span>
                             </label>
                         ))}
                     </div>
@@ -64,7 +87,7 @@ export default function AddTeacherModal({ isOpen, onClose, onAdd }) {
 
                 <div className={styles.footer}>
                     <button className={styles.cancelBtn} onClick={onClose}>Bekor qilish</button>
-                    <button className={styles.saveBtn} onClick={onAdd}>Saqlash</button>
+                    <button className={styles.saveBtn} onClick={() => onAdd(selectedIds)}>Saqlash</button>
                 </div>
             </div>
         </div>,

@@ -20,7 +20,7 @@ export default function Teachers() {
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
 
-    useEffect(() => {
+    const fetchTeachers = () => {
         api.get('/teachers', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
@@ -32,7 +32,11 @@ export default function Teachers() {
         ).catch(
             err => console.log(err.message)
         )
-    }, [])
+    };
+
+    useEffect(() => {
+        fetchTeachers();
+    }, []);
 
     return (
         <div className={styles.container}>
@@ -139,8 +143,7 @@ export default function Teachers() {
                 isOpen={isModalOpen}
                 onClose={toggleModal}
                 onSave={() => {
-                    console.log("Teacher saved");
-                    toggleModal();
+                    fetchTeachers();
                 }}
             />
         </div>

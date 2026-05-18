@@ -1,22 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Rooms.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import RoomModal from "../../../components/UI/RoomModal/RoomModal";
-
-const roomsData = [
-    { id: 1, name: "Autodesk", capacity: 20 },
-    { id: 2, name: "Cisco", capacity: 15 },
-    { id: 3, name: "Intel", capacity: 25 },
-    { id: 4, name: "Microsoft", capacity: 18 },
-];
+import { api } from "../../../api/api";
 
 export default function Rooms() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const toggleModal = () => setIsModalOpen(!isModalOpen);
+    const [rooms, setRooms] = useState([]);
+    const fetchRooms = () => {
+        api.get('/rooms', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        }).then(
+            res => {
+                setRooms(res.data.data)
+            }
+        ).catch(
+            err => console.log(err.message)
+        )
+    };
+
+    useEffect(() => {
+        fetchRooms();
+    }, []);
+
+    const [roomData, setRoomData] = useState({
+        name: "",
+        capacity: "",
+    });
+
+    function dataSubmit(e) {
+        setRoomData(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }))
+    }
 
     return (
         <div className={styles.roomsContainer}>
@@ -32,7 +55,7 @@ export default function Rooms() {
             </div>
 
             <div className={styles.grid}>
-                {roomsData.map((room) => (
+                {rooms.map((room) => (
                     <div key={room.id} className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h3 className={styles.roomName}>{room.name}</h3>
@@ -57,21 +80,46 @@ export default function Rooms() {
                 footer={
                     <>
                         <button className={styles.cancelBtn} onClick={toggleModal}>Bekor qilish</button>
-                        <button className={styles.saveBtn}>Saqlash</button>
+                        <button type="submit" form="roomForm" className={styles.saveBtn}>Saqlash</button>
                     </>
                 }
             >
-                <div className={styles.form}>
+
+                <form id="roomForm" onSubmit={(e) => {
+                    e.preventDefault();
+
+                    api.post('/rooms', {
+                        name: roomData.name,
+                        capacity: Number(roomData.capacity)
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+                        }
+                    }).then(
+                        res => {
+                            console.log(res.status);
+                            fetchRooms();
+                            setIsModalOpen(false);
+                            setRoomData({
+                                name: "",
+                                capacity: "",
+                            });
+                        }
+                    ).catch(
+                        err => console.log(err.message)
+                    )
+
+                }} className={styles.form}>
                     <div className={styles.formGroup}>
                         <label>Nomi <span>*</span></label>
-                        <input type="text" placeholder="Xona nomi" />
+                        <input onChange={dataSubmit} name="name" type="text" placeholder="Xona nomi" />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label>Sig'imi <span>*</span></label>
-                        <input type="text" placeholder="Masalan: 20" />
+                        <input onChange={dataSubmit} name="capacity" type="number" placeholder="Masalan: 20" />
                     </div>
-                </div>
+                </form>
             </RoomModal>
         </div>
     );

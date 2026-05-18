@@ -1,62 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Courses.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CourseModal from "../../../components/UI/CourseModal/CourseModal";
-
-const coursesData = [
-    {
-        id: 1,
-        name: "NodeJs",
-        description: "Juda zo'r kurs",
-        durationMin: 300,
-        durationMonth: 8,
-        price: "2 400 000",
-        color: "#E3F2FD"
-    },
-    {
-        id: 2,
-        name: "React",
-        description: "hgdvchgsdvhcsdf",
-        durationMin: 120,
-        durationMonth: 6,
-        price: "9 000 000",
-        color: "#F3E5F5"
-    },
-    {
-        id: 3,
-        name: "Web Praktikum",
-        description: "yaxshi",
-        durationMin: 60,
-        durationMonth: 3,
-        price: "1 000 000",
-        color: "#FFF9C4"
-    },
-    {
-        id: 4,
-        name: "dcsd",
-        description: "dscsd",
-        durationMin: 60,
-        durationMonth: 1,
-        price: "23 432 5435",
-        color: "#E8F5E9"
-    },
-    {
-        id: 5,
-        name: "Full stack",
-        description: "yaxshi kurs o'qinglar",
-        durationMin: 120,
-        durationMonth: 3,
-        price: "200 000 000",
-        color: "#FCE4EC"
-    }
-];
+import { api } from "../../../api/api";
+import { lightGreen } from "@mui/material/colors";
 
 export default function Courses() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [courses, setCourses] = useState([]);
+    const [courseData, setCourseData] = useState({
+        name: "",
+        description: "",
+        duration_hours: "",
+        duration_month: "",
+        price: "",
+    })
+
+    const fetchCourses = () => {
+        api.get('/courses', {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        }).then(
+            res => {
+                setCourses(res.data.data);
+            }
+        ).catch(
+            err => console.log(err.message)
+        )
+    };
+
+    function dataSubmit(e) {
+        e.preventDefault();
+
+        console.log(courseData)
+        api.post('/courses', courseData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        }).then(
+            res => {
+                console.log(res.status);
+                fetchCourses();
+                setIsModalOpen(false);
+                setCourseData({
+                    name: "",
+                    description: "",
+                    duration_hours: "",
+                    duration_month: "",
+                    price: "",
+                });
+            }
+        ).catch(
+            err => console.log(err.message)
+        )
+    }
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+    useEffect(() => {
+        fetchCourses();
+    }, []);
 
     return (
         <div className={styles.coursesContainer}>
@@ -69,7 +75,7 @@ export default function Courses() {
             </div>
 
             <div className={styles.grid}>
-                {coursesData.map((course) => (
+                {courses.map((course) => (
                     <div
                         key={course.id}
                         className={styles.card}
@@ -85,9 +91,9 @@ export default function Courses() {
                         <p className={styles.description}>{course.description}</p>
 
                         <div className={styles.details}>
-                            <span className={styles.tag}>{course.durationMin} min</span>
-                            <span className={styles.tag}>{course.durationMonth} oy</span>
-                            <span className={styles.tag}>{course.price}</span>
+                            <span className={styles.tag}>{course.duration_hours} min</span>
+                            <span className={styles.tag}>{course.duration_month} oy</span>
+                            <span className={styles.tag}>{course.price} so'm</span>
                         </div>
                     </div>
                 ))}
@@ -101,19 +107,19 @@ export default function Courses() {
                 footer={
                     <>
                         <button className={styles.cancelBtn} onClick={toggleModal}>Bekor qilish</button>
-                        <button className={styles.saveBtn}>Saqlash</button>
+                        <button type="submit" form="courseForm" className={styles.saveBtn}>Saqlash</button>
                     </>
                 }
             >
-                <div className={styles.form}>
+                <form id="courseForm" onSubmit={dataSubmit} className={styles.form}>
                     <div className={styles.formGroup}>
                         <label>Nomi</label>
-                        <input type="text" placeholder="HR Manager..." />
+                        <input name="name" onChange={(e) => setCourseData((prev) => ({ ...prev, [e.target.name]: e.target.value }))} type="text" placeholder="HR Manager..." />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label>Dars davomiyligi</label>
-                        <select defaultValue="">
+                        <select name="duration_hours" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} defaultValue="">
                             <option value="" disabled>Tanlang</option>
                             <option value="60">60 min</option>
                             <option value="120">120 min</option>
@@ -122,7 +128,7 @@ export default function Courses() {
 
                     <div className={styles.formGroup}>
                         <label>Kurs davomiyligi (oylarda)</label>
-                        <select defaultValue="">
+                        <select name="duration_month" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} defaultValue="">
                             <option value="" disabled>Tanlang</option>
                             <option value="1">1 oy</option>
                             <option value="3">3 oy</option>
@@ -132,15 +138,15 @@ export default function Courses() {
 
                     <div className={styles.formGroup}>
                         <label>Narx</label>
-                        <input type="text" placeholder="Narxini kiriting" />
+                        <input name="price" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" placeholder="Narxini kiriting" />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label>Description</label>
-                        <textarea placeholder="A little about the company and the team that you'll be working with."></textarea>
+                        <textarea name="description" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} placeholder="A little about the company and the team that you'll be working with."></textarea>
                         <p className={styles.hint}>This is a hint text to help user.</p>
                     </div>
-                </div>
+                </form>
             </CourseModal>
         </div>
     );

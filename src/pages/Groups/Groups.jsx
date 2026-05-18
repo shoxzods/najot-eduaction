@@ -19,7 +19,7 @@ export default function Groups() {
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-    useEffect(() => {
+    const fetchGroups = () => {
         api.get(`/groups/all`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("accessToken")}`
@@ -28,11 +28,14 @@ export default function Groups() {
             res => {
                 setGroup(res.data.data)
             }
-
         ).catch(
             err => console.log(err.message)
-        )
-    }, [])
+        );
+    };
+
+    useEffect(() => {
+        fetchGroups();
+    }, []);
 
     return (
         <div className={styles.container}>
@@ -179,8 +182,7 @@ export default function Groups() {
                 isOpen={isModalOpen}
                 onClose={toggleModal}
                 onSave={() => {
-                    console.log("Group saved");
-                    toggleModal();
+                    fetchGroups();
                 }}
             />
         </div>
