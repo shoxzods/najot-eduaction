@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import styles from "./Students.module.scss";
 import { api } from '../../api/api';
 
@@ -11,43 +11,88 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import StudentModal from "../../components/UI/StudentModal/StudentModal";
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 export default function Students() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentData, setStudentData] = useState([]);
     const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(10); // Default to 10 to match design if API doesn't provide
+    const [isPending, startTransition] = useTransition();
+    const [isLoading, setIsLoading] = useState(false);
+
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-    function increment() {
-        setPage(page + 1);
-    }
-
-    function decrement() {
-        if (page <= 0) {
-            setPage(1)
-            return
-        }
-
-        setPage(page - 1)
-    }
-
-
-    const fetchStudents = () => {
-        api(`/students?page=${page}&limit=3`, {
+    const fetchStudents = (targetPage) => {
+        setIsLoading(true);
+        return api(`/students?page=${targetPage}&limit=3`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
             }
         }).then(
             res => {
-                setStudentData(res.data.data);
+                const data = res.data.data || [];
+
+                if (data.length > 0 || targetPage === 1) {
+                    setStudentData(data);
+                    setPage(targetPage);
+                }
+
+                if (res.data.meta && res.data.meta.last_page) {
+                    setTotalPages(res.data.meta.last_page);
+                } else if (res.data.totalPages) {
+                    setTotalPages(res.data.totalPages);
+                } else if (data.length < 3 && targetPage >= totalPages) {
+                    setTotalPages(targetPage);
+                }
+                setIsLoading(false);
+            }
+        ).catch(
+            err => {
+                console.log(err.message);
+                setIsLoading(false);
             }
         );
     };
 
+    function increment() {
+        if (studentData.length === 3) {
+            startTransition(async () => {
+                await fetchStudents(page + 1);
+            });
+        }
+    }
+
+    function decrement() {
+        if (page > 1) {
+            startTransition(async () => {
+                await fetchStudents(page - 1);
+            });
+        }
+    }
+
     useEffect(() => {
-        fetchStudents();
-    }, [page]);
+        startTransition(async () => {
+            await fetchStudents(1);
+        });
+    }, []);
+
+    const getPaginationGroup = () => {
+        let pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            if (page <= 4) {
+                pages = [1, 2, 3, 4, 5, '...', totalPages];
+            } else if (page >= totalPages - 3) {
+                pages = [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+            } else {
+                pages = [1, '...', page - 1, page, page + 1, '...', totalPages];
+            }
+        }
+        return pages;
+    };
 
     return (
         <div className={styles.container}>
@@ -83,7 +128,23 @@ export default function Students() {
                     </div>
                 </div>
 
-                <div className={styles.tableWrapper}>
+                <div className={styles.tableWrapper} style={{ position: 'relative', opacity: (isPending || isLoading) ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+                    {(isPending || isLoading) && (
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                            zIndex: 10
+                        }}>
+                            <CircularProgress sx={{ color: '#6c35de' }} />
+                        </Box>
+                    )}
                     <table className={styles.table}>
                         <thead>
                             <tr>
@@ -108,13 +169,6 @@ export default function Students() {
                                     </td>
                                     <td>
                                         <div className={styles.userInfo}>
-                                            {/* {student.avatar ? (
-                                                <img src={student.avatar} alt={student.name} className={styles.avatar} />
-                                            ) : (
-                                                <div className={styles.initialAvatar} style={{ backgroundColor: student.color }}>
-                                                    {student.initial}
-                                                </div>
-                                            )} */}
                                             <span className={styles.userName}>{student.full_name}</span>
                                         </div>
                                     </td>
@@ -144,17 +198,43 @@ export default function Students() {
                 </div>
 
                 <div className={styles.pagination}>
-                    <button onClick={decrement} className={styles.pageArrow}>← Previous</button>
+                    <button
+                        onClick={decrement}
+                        className={`${styles.pageArrow} ${(page === 1 || isPending || isLoading) ? styles.disabled : ''}`}
+                        disabled={page === 1 || isPending || isLoading}
+                    >
+                        ← Previous
+                    </button>
                     <div className={styles.pageNumbers}>
-                        <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                        <button className={styles.pageBtn}>2</button>
-                        <button className={styles.pageBtn}>3</button>
-                        <span className={styles.dots}>...</span>
-                        <button className={styles.pageBtn}>8</button>
-                        <button className={styles.pageBtn}>9</button>
-                        <button className={styles.pageBtn}>10</button>
+                        {getPaginationGroup().map((item, index) => {
+                            if (item === '...') {
+                                return <span key={`dots-${index}`} className={styles.dots}>...</span>;
+                            }
+                            return (
+                                <button
+                                    key={index}
+                                    className={`${styles.pageBtn} ${page === item ? styles.active : ''}`}
+                                    onClick={() => {
+                                        if (page !== item) {
+                                            startTransition(async () => {
+                                                await fetchStudents(item);
+                                            });
+                                        }
+                                    }}
+                                    disabled={isPending || isLoading}
+                                >
+                                    {item}
+                                </button>
+                            );
+                        })}
                     </div>
-                    <button onClick={increment} className={styles.pageArrow}>Next →</button>
+                    <button
+                        onClick={increment}
+                        className={`${styles.pageArrow} ${(studentData.length < 3 || isPending || isLoading) ? styles.disabled : ''}`}
+                        disabled={studentData.length < 3 || isPending || isLoading}
+                    >
+                        Next →
+                    </button>
                 </div>
             </div>
 
@@ -162,7 +242,7 @@ export default function Students() {
                 isOpen={isModalOpen}
                 onClose={toggleModal}
                 onSave={() => {
-                    fetchStudents();
+                    fetchStudents(page);
                 }}
             />
         </div>

@@ -1,4 +1,6 @@
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { Suspense } from "react";
+import Loader from "../../components/UI/Loader/Loader";
 import styles from "./Management.module.scss";
 
 const tabs = [
@@ -37,7 +39,9 @@ export default function Management() {
             )}
 
             <div className={styles.content}>
-                <Outlet />
+                <Suspense fallback={<Loader fullScreen={false} />}>
+                    <Outlet />
+                </Suspense>
             </div>
         </div>
     );

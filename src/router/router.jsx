@@ -1,18 +1,22 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import Login from "../pages/Login/Login";
-import Management from "../pages/management/Management";
-import NotFound from "../pages/NotFound/NotFound";
-import MainLayout from "../layout/MainLayout";
-import Courses from "../pages/management/Courses/Courses";
-import Rooms from "../pages/management/Rooms/Rooms";
-import Staff from "../pages/management/Staff/Staff";
-import Teachers from "../pages/Teachers/Teachers";
-import Students from "../pages/Students/Students";
-import Groups from "../pages/Groups/Groups";
-import Gifts from "../pages/Gifts/Gifts";
-import Default from "../pages/management/default/Default";
-import Dashboard from '../pages/dashboard/Dashboard';
+import { lazy, Suspense } from "react";
+import Loader from "../components/UI/Loader/Loader";
+import ProtectRouter from "../components/protect/ProtectRouter";
 
+// Lazy Loaded Components
+const Login = lazy(() => import("../pages/Login/Login"));
+const Management = lazy(() => import("../pages/management/Management"));
+const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
+const MainLayout = lazy(() => import("../layout/MainLayout"));
+const Courses = lazy(() => import("../pages/management/Courses/Courses"));
+const Rooms = lazy(() => import("../pages/management/Rooms/Rooms"));
+const Staff = lazy(() => import("../pages/management/Staff/Staff"));
+const Teachers = lazy(() => import("../pages/Teachers/Teachers"));
+const Students = lazy(() => import("../pages/Students/Students"));
+const Groups = lazy(() => import("../pages/Groups/Groups"));
+const Gifts = lazy(() => import("../pages/Gifts/Gifts"));
+const Default = lazy(() => import("../pages/management/default/Default"));
+const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
 
 export const router = createBrowserRouter([
     {
@@ -21,10 +25,20 @@ export const router = createBrowserRouter([
     },
     {
         path: '/login',
-        element: <Login />
+        element: (
+            <Suspense fallback={<Loader />}>
+                <Login />
+            </Suspense>
+        )
     },
     {
-        element: <MainLayout />,
+        element: (
+            <ProtectRouter>
+                <Suspense fallback={<Loader />}>
+                    <MainLayout />
+                </Suspense>
+            </ProtectRouter>
+        ),
         children: [
             {
                 path: '/dashboard',
@@ -66,16 +80,19 @@ export const router = createBrowserRouter([
                         element: <Staff />
                     },
                     {
-                        path: '',
+                        index: true,
                         element: <Default />
                     },
                 ]
             },
-            // Siz bu yerga boshqa sahifalarni ham qo'shishingiz mumkin
         ]
     },
     {
         path: '*',
-        element: <NotFound />
+        element: (
+            <Suspense fallback={<Loader />}>
+                <NotFound />
+            </Suspense>
+        )
     }
-])
+]);

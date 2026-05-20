@@ -6,12 +6,17 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import RoomModal from "../../../components/UI/RoomModal/RoomModal";
 import { api } from "../../../api/api";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 export default function Rooms() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const toggleModal = () => setIsModalOpen(!isModalOpen);
     const [rooms, setRooms] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
     const fetchRooms = () => {
+        setIsLoading(true);
         api.get('/rooms', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("accessToken")}`
@@ -19,9 +24,13 @@ export default function Rooms() {
         }).then(
             res => {
                 setRooms(res.data.data)
+                setIsLoading(false);
             }
         ).catch(
-            err => console.log(err.message)
+            err => {
+                console.log(err.message);
+                setIsLoading(false);
+            }
         )
     };
 
@@ -54,7 +63,23 @@ export default function Rooms() {
                 </button>
             </div>
 
-            <div className={styles.grid}>
+            <div className={styles.grid} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px' }}>
+                {isLoading && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                        zIndex: 10
+                    }}>
+                        <CircularProgress sx={{ color: '#6c35de' }} />
+                    </Box>
+                )}
                 {rooms.map((room) => (
                     <div key={room.id} className={styles.card}>
                         <div className={styles.cardHeader}>

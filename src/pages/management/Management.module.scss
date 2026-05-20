@@ -57,6 +57,8 @@
 
 .content {
     flex: 1;
+    position: relative;
+    min-height: 400px;
 }
 
 .placeholder {

@@ -11,15 +11,19 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import Switch from '@mui/material/Switch';
 import GroupModal from "../../components/UI/GroupModal/GroupModal";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 export default function Groups() {
     const [activeTab, setActiveTab] = useState("groups");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groups, setGroup] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
     const fetchGroups = () => {
+        setIsLoading(true);
         api.get(`/groups/all`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("accessToken")}`
@@ -27,9 +31,13 @@ export default function Groups() {
         }).then(
             res => {
                 setGroup(res.data.data)
+                setIsLoading(false);
             }
         ).catch(
-            err => console.log(err.message)
+            err => {
+                console.log(err.message);
+                setIsLoading(false);
+            }
         );
     };
 
@@ -112,7 +120,23 @@ export default function Groups() {
             </div>
 
             <div className={styles.tableCard}>
-                <div className={styles.tableWrapper}>
+                <div className={styles.tableWrapper} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px' }}>
+                    {isLoading && (
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                            zIndex: 10
+                        }}>
+                            <CircularProgress sx={{ color: '#6c35de' }} />
+                        </Box>
+                    )}
                     <table className={styles.table}>
                         <thead>
                             <tr>

@@ -5,18 +5,22 @@
     width: 210px;
     height: 100vh;
     background: #ffffff;
-    border-right: 1px solid #f0f0f0;
-    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.02);
+    border-right: 1px solid #f1f5f9;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.02);
     z-index: 90;
-    transform: translateX(-10%);
+    transform: translateX(-10px);
     opacity: 0;
     visibility: hidden;
-    transition: transform 0.3s ease, left 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    padding: 20px 10px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+    padding: 9px 12px 20px 12px;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
     overflow: hidden;
 }
 
@@ -30,22 +34,23 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 2px 15px 24px;
-    margin-bottom: 12px;
-    border-bottom: 3px solid #f0f0f0;
+    padding: 16px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 16px;
 }
 
 .title {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #1a1a2e;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.3px;
 }
 
 .content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     overflow-y: auto;
 }
 
@@ -53,20 +58,20 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 0 10px 12px;
-    border-radius: 10px;
-    color: #4a4a6a;
-    font-size: 15px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.12s ease;
 
     &:hover {
-        background: #f3f0ff;
-        color: #6c35de;
+        background: #f8fafc;
+        color: #0f172a;
 
         .icon {
-            color: #6c35de;
+            color: #0f172a;
         }
     }
 }
@@ -74,7 +79,7 @@
 .itemActive {
     background: #6c35de;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(108, 53, 222, 0.2);
+    font-weight: 700;
 
     .icon {
         color: #ffffff;
@@ -92,11 +97,10 @@
 
 .icon {
     font-size: 18px;
-    width: 24px;
+    color: inherit;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4a4a6a;
     transition: color 0.2s ease;
 }
 

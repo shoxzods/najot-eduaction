@@ -1,6 +1,8 @@
 .layout {
     display: flex;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     background: #f8f9fa;
 }
 
@@ -10,10 +12,31 @@
     flex-direction: column;
     transition: margin-left 0.3s ease;
     padding: 0 34px 0 25px ;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .content {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
     padding: 0 0 0 9px;
+    position: relative;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 85;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.backdropVisible {
+    opacity: 1;
+    visibility: visible;
 }

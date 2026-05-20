@@ -7,7 +7,7 @@ import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AddGroupModal from "../../TeacherModal/AddGroupModal/AddGroupModal";
 import { api } from "../../../../api/api";
 
-export default function AddStudentModal({ onClose, onSave }) {
+export default function AddStudentModal({ isOpen, onClose, onSave }) {
     const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
 
     const [studentData, setStudentData] = useState({
@@ -126,7 +126,7 @@ export default function AddStudentModal({ onClose, onSave }) {
     };
 
     return (
-        <form className={styles.modal} onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
+        <form className={`${styles.modal} ${!isOpen ? styles.slideOut : ""}`} onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
             <div className={styles.header}>
                 <div className={styles.headerText}>
                     <h2 className={styles.title}>Talaba qo'shish</h2>

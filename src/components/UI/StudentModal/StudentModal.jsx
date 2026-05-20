@@ -31,6 +31,7 @@ export default function StudentModal({
             onClick={onClose}
         >
             <AddStudentModal 
+                isOpen={isOpen}
                 onClose={onClose} 
                 onSave={onSave} 
             />

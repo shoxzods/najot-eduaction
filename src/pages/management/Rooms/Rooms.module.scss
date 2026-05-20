@@ -63,7 +63,48 @@
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    gap: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 8px;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #e2e8f0;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        border-radius: 5px;
+        
+        &:hover {
+            background-color: #cbd5e1;
+        }
+    }
+
+    &::-webkit-scrollbar-button:single-button {
+        background-color: transparent;
+        display: block;
+        background-size: 8px;
+        background-repeat: no-repeat;
+        background-position: center;
+        height: 14px;
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-button:single-button:vertical:decrement {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23e2e8f0'><polygon points='50,20 15,80 85,80'/></svg>");
+    }
+
+    &::-webkit-scrollbar-button:single-button:vertical:increment {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23e2e8f0'><polygon points='50,80 15,20 85,20'/></svg>");
+    }
 }
 
 .card {

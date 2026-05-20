@@ -11,16 +11,19 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 export default function Teachers() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [teacherData, setTeacherData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
 
     const fetchTeachers = () => {
+        setIsLoading(true);
         api.get('/teachers', {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
@@ -28,9 +31,13 @@ export default function Teachers() {
         }).then(
             res => {
                 setTeacherData(res.data.data)
+                setIsLoading(false);
             }
         ).catch(
-            err => console.log(err.message)
+            err => {
+                console.log(err.message);
+                setIsLoading(false);
+            }
         )
     };
 
@@ -72,7 +79,23 @@ export default function Teachers() {
                     </div>
                 </div>
 
-                <div className={styles.tableWrapper}>
+                <div className={styles.tableWrapper} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+                    {isLoading && (
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                            zIndex: 10
+                        }}>
+                            <CircularProgress sx={{ color: '#6c35de' }} />
+                        </Box>
+                    )}
                     <table className={styles.table}>
                         <thead>
                             <tr>
@@ -96,7 +119,17 @@ export default function Teachers() {
                                     </td>
                                     <td>
                                         <div className={styles.userInfo}>
-                                            <img alt={teacher.photo} className={styles.avatar} />
+                                            {teacher.photo ? (
+                                                <img
+                                                    src={teacher.photo.startsWith('http') ? teacher.photo : `https://najot-edu.softwareengineer.uz/${teacher.photo.replace(/^\//, '')}`}
+                                                    alt={teacher.full_name}
+                                                    className={styles.avatar}
+                                                />
+                                            ) : (
+                                                <div className={styles.initialAvatar}>
+                                                    {teacher.full_name ? teacher.full_name.charAt(0).toUpperCase() : 'T'}
+                                                </div>
+                                            )}
                                             <span className={styles.userName}>{teacher.full_name}</span>
                                         </div>
                                     </td>

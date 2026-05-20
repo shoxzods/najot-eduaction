@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Sidebar.module.scss";
 import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -20,6 +20,7 @@ const menuItems = [
 
 export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, toggleSubSidebar }) {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
 
     return (
         <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
@@ -49,15 +50,15 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                         }}
                         className={({ isActive }) => {
                             const isManagement = item.label === "Boshqarish";
-                            // Boshqarish is active if sub-sidebar is open
-                            // Other items are active based on their route
-                            const shouldBeActive = isManagement ? isSubSidebarOpen : isActive;
+                            // Boshqarish is active when on any /management route
+                            const shouldBeActive = isManagement ? pathname.startsWith("/management") : isActive;
                             return `${styles.item}${shouldBeActive ? ` ${styles.itemActive}` : ""}`;
                         }}
                         end={item.path === "/dashboard"}
                     >
                         <span className={styles.itemIcon}>{item.icon}</span>
                         {!isCollapsed && <span className={styles.itemLabel}>{item.label}</span>}
+                        {isCollapsed && <span className={styles.tooltip}>{item.label}</span>}
                     </NavLink>
                 ))}
             </nav>

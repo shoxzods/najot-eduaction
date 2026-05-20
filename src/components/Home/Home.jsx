@@ -10,12 +10,12 @@ import ArchiveRoundedIcon from '@mui/icons-material/ArchiveRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 
 const stats = [
-    { label: "Faol talabalar", value: "52", icon: <SchoolRoundedIcon />, iconColor: "#6C5CE7" },
-    { label: "Guruhlar", value: "23", icon: <GroupRoundedIcon />, iconColor: "#6C5CE7" },
-    { label: "Joriy oy to'lovlar", value: "0", icon: <CreditCardRoundedIcon />, iconColor: "#6C5CE7" },
-    { label: "Qarzdorlar", value: "104", icon: <WarningRoundedIcon />, iconColor: "#6C5CE7" },
-    { label: "Muzlatilganlar", value: "0", icon: <AcUnitRoundedIcon />, iconColor: "#6C5CE7" },
-    { label: "Arxivdagilar", value: "23", icon: <ArchiveRoundedIcon />, iconColor: "#6C5CE7" },
+    { label: "Faol talabalar", value: "52", icon: <SchoolRoundedIcon /> },
+    { label: "Guruhlar", value: "23", icon: <GroupRoundedIcon /> },
+    { label: "Joriy oy to'lovlar", value: "0", icon: <CreditCardRoundedIcon /> },
+    { label: "Qarzdorlar", value: "104", icon: <WarningRoundedIcon /> },
+    { label: "Muzlatilganlar", value: "0", icon: <AcUnitRoundedIcon /> },
+    { label: "Arxivdagilar", value: "23", icon: <ArchiveRoundedIcon /> },
 ];
 
 export default function Home() {
@@ -35,11 +35,13 @@ export default function Home() {
             <div className={styles.statsGrid}>
                 {stats.map((stat, index) => (
                     <div key={index} className={styles.statCard}>
-                        <div className={styles.statIcon} style={{ color: stat.iconColor }}>
+                        <div className={styles.statIcon}>
                             {stat.icon}
                         </div>
-                        <div className={styles.statLabel}>{stat.label}</div>
-                        <div className={styles.statValue}>{stat.value}</div>
+                        <div className={styles.statInfo}>
+                            <div className={styles.statLabel}>{stat.label}</div>
+                            <div className={styles.statValue}>{stat.value}</div>
+                        </div>
                     </div>
                 ))}
             </div>

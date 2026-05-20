@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { useState, Suspense } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Header from "../components/header/Header";
 import ManagementSidebar from "../components/ManagementSidebar/ManagementSidebar";
+import Loader from "../components/UI/Loader/Loader";
 import styles from "./MainLayout.module.scss";
 
 export default function MainLayout() {
@@ -21,27 +22,29 @@ export default function MainLayout() {
         setIsSubSidebarVisible(false);
     };
 
-    const auth = localStorage.getItem('accessToken');
-    if ( !auth )
-        return <Navigate to='/login' />
-
     return (
         <div className={styles.layout}>
-            <Sidebar 
-                isCollapsed={isCollapsed} 
-                toggleSidebar={toggleSidebar} 
+            <Sidebar
+                isCollapsed={isCollapsed}
+                toggleSidebar={toggleSidebar}
                 isSubSidebarOpen={isSubSidebarVisible}
                 toggleSubSidebar={toggleSubSidebar}
             />
-            <ManagementSidebar 
-                isOpen={isSubSidebarVisible} 
+            <ManagementSidebar
+                isOpen={isSubSidebarVisible}
                 isCollapsed={isCollapsed}
                 onClose={closeSubSidebar}
+            />
+            <div 
+                className={`${styles.backdrop} ${isSubSidebarVisible ? styles.backdropVisible : ""}`} 
+                onClick={closeSubSidebar} 
             />
             <div className={`${styles.main} ${isCollapsed ? styles.mainCollapsed : ""} ${isSubSidebarVisible ? styles.mainWithSubSidebar : ""}`}>
                 <Header />
                 <main className={styles.content}>
-                    <Outlet />
+                    <Suspense fallback={<Loader fullScreen={false} />}>
+                        <Outlet />
+                    </Suspense>
                 </main>
             </div>
         </div>
