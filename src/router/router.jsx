@@ -15,6 +15,8 @@ const Staff = lazy(() => import("../pages/management/Staff/Staff"));
 const Teachers = lazy(() => import("../pages/Teachers/Teachers"));
 const Students = lazy(() => import("../pages/Students/Students"));
 const Groups = lazy(() => import("../pages/Groups/Groups"));
+const GroupDetail = lazy(() => import("../pages/Groups/GroupDetail"));
+const CreateHomework = lazy(() => import("../pages/Groups/CreateHomework"));
 const Gifts = lazy(() => import("../pages/Gifts/Gifts"));
 const Default = lazy(() => import("../pages/management/default/Default"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
@@ -59,6 +61,14 @@ export const router = createBrowserRouter([
             {
                 path: '/dashboard/groups',
                 element: <Groups />
+            },
+            {
+                path: '/dashboard/groups/:id',
+                element: <GroupDetail />
+            },
+            {
+                path: '/dashboard/groups/:id/homework/create',
+                element: <CreateHomework />
             },
 
             {

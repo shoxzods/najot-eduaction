@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from '../../api/api';
 
 import styles from "./Groups.module.scss";
@@ -15,6 +16,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
 export default function Groups() {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("groups");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groups, setGroup] = useState([]);
@@ -156,7 +158,7 @@ export default function Groups() {
                         </thead>
                         <tbody>
                             {groups.slice(5 , 7).map((group) => (
-                                <tr key={group.id}>
+                                <tr key={group.id} onClick={() => navigate(`/dashboard/groups/${group.id}`)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                                     <td>
                                         <div className={styles.statusCell}>
                                             <Switch
