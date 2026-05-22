@@ -13,25 +13,21 @@ import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
-const mockTeachers = [
-    {
-        id: 1,
-        full_name: "Mohirbek",
-        photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
-        groups: ["N26", "n105"],
-        phone: "+998944481309",
-        email: "moxirbek@gmail.com",
-        address: "Tashkent",
-        created_at: "2026-05-12T12:00:00Z"
-    }
-];
-
 export default function Teachers() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [teacherData, setTeacherData] = useState(mockTeachers);
+    const [teacherData, setTeacherData] = useState([]);
+    const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
+    const openTeacherModal = (teacher = null) => {
+        setSelectedTeacher(teacher);
+        setIsModalOpen(true);
+    };
+
+    const closeTeacherModal = () => {
+        setSelectedTeacher(null);
+        setIsModalOpen(false);
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
@@ -47,32 +43,107 @@ export default function Teachers() {
         setIsLoading(true);
         api.get('/teachers').then(
             res => {
-                if (res.data && res.data.data && res.data.data.length > 0) {
-                    setTeacherData(res.data.data);
-                } else {
-                    setTeacherData(mockTeachers);
-                }
+                setTeacherData(res.data.data);
                 setIsLoading(false);
             }
         ).catch(
             err => {
                 console.log(err.message);
-                setTeacherData(mockTeachers);
                 setIsLoading(false);
             }
-        )
+        );
     };
 
     useEffect(() => {
         fetchTeachers();
     }, []);
 
+    const handleTeacherSubmit = (payload, teacherToEdit) => {
+        setIsLoading(true);
+
+        const request = teacherToEdit?.id
+            ? api.patch(`/teachers/${teacherToEdit.id}`, payload)
+            : api.post('/teachers', payload);
+
+        request.then((res) => {
+            console.log(teacherToEdit?.id ? "Teacher updated successfully" : "Teacher created successfully");
+            fetchTeachers();
+            closeTeacherModal();
+        }).catch((err) => {
+            const responseData = err.response?.data;
+            console.log('Error response from server:', responseData);
+
+            let errorMsg = err.message;
+            if (responseData) {
+                if (responseData.errors && typeof responseData.errors === 'object') {
+                    const messages = [];
+                    for (const key in responseData.errors) {
+                        if (Array.isArray(responseData.errors[key])) {
+                            messages.push(`${key}: ${responseData.errors[key].join(", ")}`);
+                        } else {
+                            messages.push(`${key}: ${responseData.errors[key]}`);
+                        }
+                    }
+                    errorMsg = messages.join(" | ");
+                } else if (Array.isArray(responseData.message)) {
+                    errorMsg = responseData.message.join(", ");
+                } else if (responseData.message) {
+                    errorMsg = responseData.message;
+                } else if (responseData.error) {
+                    errorMsg = responseData.error;
+                } else {
+                    errorMsg = JSON.stringify(responseData);
+                }
+            }
+            alert("Xatolik yuz berdi: " + errorMsg);
+        }).finally(() => setIsLoading(false));
+    };
+
+    const openTeacherEditModal = (teacherOrId) => {
+        if (teacherOrId && typeof teacherOrId === 'object') {
+            openTeacherModal(teacherOrId);
+            return;
+        }
+
+        const teacher = teacherData.find((item) => item.id === teacherOrId);
+        if (teacher) {
+            openTeacherModal(teacher);
+        } else {
+            console.warn('Teacher not found for edit:', teacherOrId);
+        }
+    };
+
+    function deleteTeachers(id) {
+        if (!window.confirm("O'qituvchini o'chirmoqchimisiz?")) return;
+        setIsLoading(true);
+        api.delete(`/teachers/${id}`)
+            .then((res) => {
+                if (res.status === 200 || res.status === 204) {
+                    setTeacherData(prev => prev.filter(item => item.id !== id));
+                } else {
+                    console.warn('Unexpected delete response', res);
+                }
+            })
+            .catch((err) => {
+                const responseData = err.response?.data;
+                console.error('Error deleting teacher:', responseData || err.message);
+                let errorMsg = err.message;
+                if (responseData?.message) {
+                    errorMsg = responseData.message;
+                } else if (responseData?.error) {
+                    errorMsg = responseData.error;
+                }
+                alert("Xatolik yuz berdi: " + errorMsg);
+            })
+            .finally(() => setIsLoading(false));
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTop}>
                     <h1 className={styles.title}>O'qituvchilar</h1>
-                    <button className={styles.addBtn} onClick={toggleModal}>
+                    <button className={styles.addBtn} onClick={() => openTeacherModal()}>
                         <AddRoundedIcon fontSize="small" />
                         <span className={styles.addBtnText}>O'qituvchi qo'shish</span>
                     </button>
@@ -133,8 +204,8 @@ export default function Teachers() {
                             </tr>
                         </thead>
                         <tbody>
-                            {teacherData.slice(5, 7).map((teacher) => (
-                                <tr className={styles.tdata} key={teacher.id}>
+                            {teacherData.map((teacher, index) => (
+                                <tr className={styles.tdata} key={teacher.id ?? teacher.email ?? index}>
                                     <td>
                                         <input type="checkbox" />
                                     </td>
@@ -156,9 +227,13 @@ export default function Teachers() {
                                     </td>
                                     <td>
                                         <div className={styles.groups}>
-                                            {teacher.groups && teacher.groups.map((group, index) => (
-                                                <span key={index} className={styles.groupTag}>{group}</span>
-                                            ))}
+                                            {teacher.groups && teacher.groups.map((group, index) => {
+                                                const key = group?.id ?? `${group?.name ?? String(group)}-${index}`;
+                                                const label = group?.name ?? group?.title ?? String(group);
+                                                return (
+                                                    <span key={key} className={styles.groupTag}>{label}</span>
+                                                );
+                                            })}
                                         </div>
                                     </td>
                                     <td>{teacher.phone}</td>
@@ -170,10 +245,10 @@ export default function Teachers() {
                                             <button className={`${styles.actionBtn} ${styles.viewBtn}`}>
                                                 <VisibilityOutlinedIcon fontSize="small" />
                                             </button>
-                                            <button className={`${styles.actionBtn}`}>
+                                            <button onClick={() => deleteTeachers(teacher.id)} className={`${styles.actionBtn}`}>
                                                 <DeleteOutlineRoundedIcon fontSize="small" />
                                             </button>
-                                            <button className={`${styles.actionBtn}`}>
+                                            <button onClick={() => openTeacherEditModal(teacher)} className={`${styles.actionBtn}`}>
                                                 <EditOutlinedIcon fontSize="small" />
                                             </button>
                                         </div>
@@ -201,10 +276,9 @@ export default function Teachers() {
 
             <TeacherModal
                 isOpen={isModalOpen}
-                onClose={toggleModal}
-                onSave={() => {
-                    fetchTeachers();
-                }}
+                onClose={closeTeacherModal}
+                onSubmit={handleTeacherSubmit}
+                teacherToEdit={selectedTeacher}
             />
         </div>
     );

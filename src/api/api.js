@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const api = axios.create({
   baseURL: 'https://najot-edu.softwareengineer.uz/api/v1',
-  timeout: 10000, // increased timeout to 10s for better resilience under slow networks
+  timeout: 10000,
 })
 
 api.interceptors.request.use(
@@ -16,4 +16,4 @@ api.interceptors.request.use(
   (error) => {
     return Promise.reject(error);
   }
-);
+);

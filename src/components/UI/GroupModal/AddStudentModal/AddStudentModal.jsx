@@ -4,10 +4,8 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { createPortal } from "react-dom";
 import { api } from '../../../../api/api';
 
-export default function AddStudentModal({ isOpen, onClose, onAdd }) {
+export default function AddStudentModal({ isOpen, onClose, onAdd, items = [] }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
-    const [studentData, setStudentData] = useState([]);
-
     const [selectedIds, setSelectedIds] = useState([]);
 
     useEffect(() => {
@@ -20,15 +18,6 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
-
-    useEffect(
-        () => {
-            api(`/students`).then(
-                res => {
-                    setStudentData(res.data.data);
-                }
-            )
-        }, []);
 
     const handleCheckboxChange = (id) => {
         setSelectedIds(prev => 
@@ -67,7 +56,7 @@ export default function AddStudentModal({ isOpen, onClose, onAdd }) {
                     />
                     
                     <div className={styles.listContainer}>
-                        {studentData.map((student) => (
+                        {items.map((student) => (
                             <label key={student.id} className={styles.listItem}>
                                 <input 
                                     type="checkbox" 

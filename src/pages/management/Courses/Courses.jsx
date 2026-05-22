@@ -13,13 +13,15 @@ export default function Courses() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [courseData, setCourseData] = useState({
+    const [selectedCourse, setSelectedCourse] = useState(null);
+    const defaultCourseData = {
         name: "",
         description: "",
         duration_hours: "",
         duration_month: "",
         price: "",
-    })
+    };
+    const [courseData, setCourseData] = useState(defaultCourseData);
 
     const fetchCourses = () => {
         setIsLoading(true);
@@ -39,26 +41,44 @@ export default function Courses() {
     function dataSubmit(e) {
         e.preventDefault();
 
-        console.log(courseData)
-        api.post('/courses', courseData).then(
+        const request = selectedCourse?.id
+            ? api.patch(`/courses/${selectedCourse.id}`, courseData)
+            : api.post('/courses', courseData);
+
+        request.then(
             res => {
                 console.log(res.status);
                 fetchCourses();
-                setIsModalOpen(false);
-                setCourseData({
-                    name: "",
-                    description: "",
-                    duration_hours: "",
-                    duration_month: "",
-                    price: "",
-                });
+                closeModal();
             }
         ).catch(
             err => console.log(err.message)
         )
     }
 
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
+    const openAddCourseModal = () => {
+        setSelectedCourse(null);
+        setCourseData(defaultCourseData);
+        setIsModalOpen(true);
+    };
+
+    const openEditCourseModal = (course) => {
+        setSelectedCourse(course);
+        setCourseData({
+            name: course.name || "",
+            description: course.description || "",
+            duration_hours: course.duration_hours || "",
+            duration_month: course.duration_month || "",
+            price: course.price || "",
+        });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedCourse(null);
+        setCourseData(defaultCourseData);
+    };
 
     useEffect(() => {
         fetchCourses();
@@ -68,7 +88,7 @@ export default function Courses() {
         <div className={styles.coursesContainer}>
             <div className={styles.header}>
                 <h2 className={styles.title}>Kurslar</h2>
-                <button className={styles.addBtn} onClick={toggleModal}>
+                <button className={styles.addBtn} onClick={openAddCourseModal}>
                     <AddRoundedIcon fontSize="small" />
                     Kurslar qo'shish
                 </button>
@@ -91,7 +111,7 @@ export default function Courses() {
                         <CircularProgress sx={{ color: '#6c35de' }} />
                     </Box>
                 )}
-                {courses.slice(6 , 7).map((course) => (
+                {courses.map((course) => (
                     <div
                         key={course.id}
                         className={styles.card}
@@ -100,8 +120,21 @@ export default function Courses() {
                         <div className={styles.cardHeader}>
                             <h3 className={styles.courseName}>{course.name}</h3>
                             <div className={styles.actions}>
-                                <button className={styles.actionBtn}><DeleteOutlineRoundedIcon /></button>
-                                <button className={styles.actionBtn}><EditOutlinedIcon /></button>
+                                <button onClick={() => {
+                                    const confirmDelete = window.confirm('Haqiqatan ham kursni o‘chirilsinmi?');
+                                    if (!confirmDelete) return;
+
+                                    api.delete(`/courses/${course.id}`).then(
+                                        () => {
+                                            setCourses(prev => prev.filter(
+                                                item => item.id !== course.id
+                                            ));
+                                        }
+                                    ).catch(
+                                        err => console.log(err.message)
+                                    );
+                                }} className={styles.actionBtn}><DeleteOutlineRoundedIcon /></button>
+                                <button onClick={() => openEditCourseModal(course)} className={styles.actionBtn}><EditOutlinedIcon /></button>
                             </div>
                         </div>
                         <p className={styles.description}>{course.description}</p>
@@ -117,25 +150,35 @@ export default function Courses() {
 
             <CourseModal
                 isOpen={isModalOpen}
-                onClose={toggleModal}
-                title="Kurs qo'shish"
-                subtitle="Bu yerda siz yangi kurs qo'shishingiz mumkin."
+                onClose={closeModal}
+                title={selectedCourse ? "Kursni tahrirlash" : "Kurs qo'shish"}
+                subtitle={selectedCourse ? "Kurs ma'lumotlarini yangilang." : "Bu yerda siz yangi kurs qo'shishingiz mumkin."}
                 footer={
                     <>
-                        <button className={styles.cancelBtn} onClick={toggleModal}>Bekor qilish</button>
-                        <button type="submit" form="courseForm" className={styles.saveBtn}>Saqlash</button>
+                        <button type="button" className={styles.cancelBtn} onClick={closeModal}>Bekor qilish</button>
+                        <button type="submit" form="courseForm" className={styles.saveBtn}>{selectedCourse ? "Saqlash" : "Saqlash"}</button>
                     </>
                 }
             >
                 <form id="courseForm" onSubmit={dataSubmit} className={styles.form}>
                     <div className={styles.formGroup}>
                         <label>Nomi</label>
-                        <input name="name" onChange={(e) => setCourseData((prev) => ({ ...prev, [e.target.name]: e.target.value }))} type="text" placeholder="HR Manager..." />
+                        <input
+                            name="name"
+                            value={courseData.name}
+                            onChange={(e) => setCourseData((prev) => ({ ...prev, [e.target.name]: e.target.value }))}
+                            type="text"
+                            placeholder="HR Manager..."
+                        />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label>Dars davomiyligi</label>
-                        <select name="duration_hours" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} defaultValue="">
+                        <select
+                            name="duration_hours"
+                            value={courseData.duration_hours}
+                            onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                        >
                             <option value="" disabled>Tanlang</option>
                             <option value="60">60 min</option>
                             <option value="120">120 min</option>
@@ -144,7 +187,11 @@ export default function Courses() {
 
                     <div className={styles.formGroup}>
                         <label>Kurs davomiyligi (oylarda)</label>
-                        <select name="duration_month" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} defaultValue="">
+                        <select
+                            name="duration_month"
+                            value={courseData.duration_month}
+                            onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                        >
                             <option value="" disabled>Tanlang</option>
                             <option value="1">1 oy</option>
                             <option value="3">3 oy</option>
@@ -154,12 +201,23 @@ export default function Courses() {
 
                     <div className={styles.formGroup}>
                         <label>Narx</label>
-                        <input name="price" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" placeholder="Narxini kiriting" />
+                        <input
+                            name="price"
+                            value={courseData.price}
+                            onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                            type="text"
+                            placeholder="Narxini kiriting"
+                        />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label>Description</label>
-                        <textarea name="description" onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))} placeholder="A little about the company and the team that you'll be working with."></textarea>
+                        <textarea
+                            name="description"
+                            value={courseData.description}
+                            onChange={(e) => setCourseData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
+                            placeholder="A little about the company and the team that you'll be working with."
+                        ></textarea>
                         <p className={styles.hint}>This is a hint text to help user.</p>
                     </div>
                 </form>

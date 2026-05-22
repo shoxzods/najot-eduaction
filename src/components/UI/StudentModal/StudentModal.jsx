@@ -6,7 +6,8 @@ import AddStudentModal from "./AddStudentModal/AddStudentModal";
 export default function StudentModal({
     isOpen,
     onClose,
-    onSave
+    onSave,
+    studentToEdit
 }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
 
@@ -33,7 +34,8 @@ export default function StudentModal({
             <AddStudentModal 
                 isOpen={isOpen}
                 onClose={onClose} 
-                onSave={onSave} 
+                onSave={onSave}
+                studentToEdit={studentToEdit}
             />
         </div>,
         document.body

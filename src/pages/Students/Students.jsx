@@ -17,21 +17,32 @@ import Box from '@mui/material/Box';
 export default function Students() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentData, setStudentData] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(10); // Default to 10 to match design if API doesn't provide
     const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
 
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
+    const openAddStudentModal = () => {
+        setSelectedStudent(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditStudentModal = (student) => {
+        setSelectedStudent(student);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedStudent(null);
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return "-";
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return "-";
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+        return date.toLocaleDateString("ru-RU");
     };
 
     const fetchStudents = (targetPage) => {
@@ -100,12 +111,28 @@ export default function Students() {
         return pages;
     };
 
+
+    function deleteStudent(id) {
+        if (!window.confirm("Talabani o'chirmoqchimisiz?")) return;
+        setIsLoading(true);
+        api.delete(`/students/${id}`)
+            .then(res => {
+                if (res.status === 200 || res.status === 204) {
+                    setStudentData(prev => prev.filter(s => s.id !== id));
+                } else {
+                    console.warn('Unexpected delete response', res);
+                }
+            })
+            .catch(err => console.error(err.message))
+            .finally(() => setIsLoading(false));
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTop}>
                     <h1 className={styles.title}>Talabalar</h1>
-                    <button className={styles.addBtn} onClick={toggleModal}>
+                    <button className={styles.addBtn} onClick={openAddStudentModal}>
                         <AddRoundedIcon fontSize="small" />
                         Talaba qo'shish
                     </button>
@@ -166,7 +193,7 @@ export default function Students() {
                             </tr>
                         </thead>
                         <tbody className={styles.tbody}>
-                            {studentData.slice(1).map((student) => (
+                            {studentData.map((student) => (
                                 <tr key={student.id}>
                                     <td>
                                         <input type="checkbox" />
@@ -191,8 +218,8 @@ export default function Students() {
                                     <td style={{ textAlign: 'right' }}>
                                         <div className={styles.actions}>
                                             <button className={styles.actionBtn}><VisibilityOutlinedIcon fontSize="small" /></button>
-                                            <button className={styles.actionBtn}><DeleteOutlineRoundedIcon fontSize="small" /></button>
-                                            <button className={styles.actionBtn}><EditOutlinedIcon fontSize="small" /></button>
+                                            <button onClick={() => deleteStudent(student.id)} className={styles.actionBtn}><DeleteOutlineRoundedIcon fontSize="small" /></button>
+                                            <button onClick={() => openEditStudentModal(student)} className={styles.actionBtn}><EditOutlinedIcon fontSize="small" /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -244,10 +271,11 @@ export default function Students() {
 
             <StudentModal
                 isOpen={isModalOpen}
-                onClose={toggleModal}
+                onClose={closeModal}
                 onSave={() => {
                     fetchStudents(page);
                 }}
+                studentToEdit={selectedStudent}
             />
         </div>
     );

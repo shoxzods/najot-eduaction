@@ -5,17 +5,17 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { createPortal } from "react-dom";
 import AddGroupModal from "./AddGroupModal/AddGroupModal";
-import { api } from "../../../api/api";
 
 export default function TeacherModal({
     isOpen,
     onClose,
-    onSave
+    onSubmit,
+    teacherToEdit
 }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
     const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
 
-    const [teacherData, setTeacherData] = useState({
+    const defaultTeacherData = {
         phone: "+998",
         email: "",
         fullName: "",
@@ -23,20 +23,24 @@ export default function TeacherModal({
         password: "",
         photo: null,
         groups: []
-    });
+    };
+
+    const [teacherData, setTeacherData] = useState(defaultTeacherData);
+
+    const normalizeGroups = (groups = []) => {
+        if (!Array.isArray(groups)) return [];
+        return groups.map((group) => {
+            if (group && typeof group === 'object') {
+                return group;
+            }
+            return { id: group, name: String(group) };
+        });
+    };
 
     const toggleAddGroupModal = () => setIsAddGroupModalOpen(!isAddGroupModalOpen);
 
     const resetForm = () => {
-        setTeacherData({
-            phone: "+998",
-            email: "",
-            fullName: "",
-            address: "",
-            password: "",
-            photo: null,
-            groups: []
-        });
+        setTeacherData(defaultTeacherData);
     };
 
     const handleInputChange = (e) => {
@@ -51,6 +55,19 @@ export default function TeacherModal({
         if (isOpen) {
             setShouldRender(true);
             document.body.style.overflow = 'hidden';
+            if (teacherToEdit) {
+                setTeacherData({
+                    phone: teacherToEdit.phone || "+998",
+                    email: teacherToEdit.email || "",
+                    fullName: teacherToEdit.full_name || teacherToEdit.fullName || "",
+                    address: teacherToEdit.address || "",
+                    password: "",
+                    photo: null,
+                    groups: normalizeGroups(teacherToEdit.groups || [])
+                });
+            } else {
+                resetForm();
+            }
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
@@ -59,84 +76,66 @@ export default function TeacherModal({
             }, 300);
             return () => clearTimeout(timer);
         }
-    }, [isOpen]);
+    }, [isOpen, teacherToEdit]);
 
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
 
         const { fullName, email, password, phone, address, photo, groups } = teacherData;
+        const isEditing = Boolean(teacherToEdit?.id);
 
-        if (!fullName || !email || !password || !phone) {
+        if (!fullName || !email || !phone) {
             alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
             return;
         }
 
+        if (!isEditing && !password) {
+            alert("Iltimos, parolni kiriting!");
+            return;
+        }
+
         // Clean phone number (format strictly as E.164 international phone number: +998XXXXXXXXX)
-        let cleanPhone = phone.replace(/[^\d+]/g, "").trim();
+        const phoneValue = phone || "";
+        let cleanPhone = String(phoneValue).replace(/[^\d+]/g, "").trim();
         if (!cleanPhone.startsWith("+")) {
             cleanPhone = "+" + cleanPhone;
         }
 
-        const formData = new FormData();
-        formData.append("full_name", fullName);
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("phone", cleanPhone);
-        formData.append("address", address);
-        
-        if (photo) {
-            formData.append("photo", photo);
+        const payload = {
+            full_name: fullName,
+            email,
+            phone: cleanPhone,
+            address: address || "",
+            groups: normalizeGroups(groups)
+                .map(group => typeof group === 'object' ? group.id : group)
+                .filter(groupId => groupId != null && groupId !== "")
+                .map(Number)
+        };
+
+        if (password) {
+            payload.password = password;
         }
 
-        // Send group IDs matching Swagger specification exactly
-        groups.forEach(group => {
-            formData.append("groups", Number(group.id));
-        });
+        if (photo) {
+            const formData = new FormData();
+            formData.append("full_name", payload.full_name);
+            formData.append("email", payload.email);
+            formData.append("phone", payload.phone);
+            formData.append("address", payload.address);
+            if (payload.password) {
+                formData.append("password", payload.password);
+            }
+            formData.append("photo", photo);
+            payload.groups.forEach(groupId => formData.append("groups", groupId));
 
-        api.post('/teachers', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
+            if (onSubmit) {
+                onSubmit(formData, teacherToEdit);
             }
-        }).then(
-            res => {
-                console.log("Teacher created successfully:", res.status);
-                if (onSave) {
-                    onSave();
-                }
-                onClose();
+        } else {
+            if (onSubmit) {
+                onSubmit(payload, teacherToEdit);
             }
-        ).catch(
-            err => {
-                const responseData = err.response?.data;
-                console.log("Error response from server:", responseData);
-                
-                // Extract detailed error messages
-                let errorMsg = err.message;
-                if (responseData) {
-                    if (responseData.errors && typeof responseData.errors === 'object') {
-                        const messages = [];
-                        for (const key in responseData.errors) {
-                            if (Array.isArray(responseData.errors[key])) {
-                                messages.push(`${key}: ${responseData.errors[key].join(", ")}`);
-                            } else {
-                                messages.push(`${key}: ${responseData.errors[key]}`);
-                            }
-                        }
-                        errorMsg = messages.join(" | ");
-                    } else if (Array.isArray(responseData.message)) {
-                        errorMsg = responseData.message.join(", ");
-                    } else if (responseData.message) {
-                        errorMsg = responseData.message;
-                    } else if (responseData.error) {
-                        errorMsg = responseData.error;
-                    } else {
-                        errorMsg = JSON.stringify(responseData);
-                    }
-                }
-                
-                alert("Xatolik yuz berdi: " + errorMsg);
-            }
-        );
+        }
     };
 
     if (!shouldRender) return null;
@@ -153,8 +152,8 @@ export default function TeacherModal({
             >
                 <div className={styles.header}>
                     <div className={styles.headerTop}>
-                        <h2 className={styles.title}>O'qituvchi qo'shish</h2>
-                        <button className={styles.closeBtn} onClick={onClose}>
+                        <h2 className={styles.title}>{teacherToEdit?.id ? "O'qituvchini tahrirlash" : "O'qituvchi qo'shish"}</h2>
+                        <button type="button" className={styles.closeBtn} onClick={onClose}>
                             <CloseRoundedIcon />
                         </button>
                     </div>
@@ -183,21 +182,25 @@ export default function TeacherModal({
                         <div className={styles.groupsInputContainer}>
                             {teacherData.groups.length > 0 && (
                                 <div className={styles.groupTags}>
-                                    {teacherData.groups.map(group => (
-                                        <span key={group.id} className={styles.groupTag}>
-                                            {group.name}
-                                            <button 
-                                                type="button"
-                                                className={styles.removeGroupBtn}
-                                                onClick={() => setTeacherData(prev => ({
-                                                    ...prev,
-                                                    groups: prev.groups.filter(g => g.id !== group.id)
-                                                }))}
-                                            >
-                                                ×
-                                            </button>
-                                        </span>
-                                    ))}
+                                    {teacherData.groups.map((group, index) => {
+                                        const key = group?.id ?? `${group?.name ?? group}-${index}`;
+                                        const label = group?.name ?? group?.title ?? String(group);
+                                        return (
+                                            <span key={key} className={styles.groupTag}>
+                                                {label}
+                                                <button 
+                                                    type="button"
+                                                    className={styles.removeGroupBtn}
+                                                    onClick={() => setTeacherData(prev => ({
+                                                        ...prev,
+                                                        groups: prev.groups.filter((g, i) => i !== index)
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
                                 </div>
                             )}
                             <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddGroupModal}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./AddStudentModal.module.scss";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
@@ -7,10 +7,10 @@ import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AddGroupModal from "../../TeacherModal/AddGroupModal/AddGroupModal";
 import { api } from "../../../../api/api";
 
-export default function AddStudentModal({ isOpen, onClose, onSave }) {
+export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit }) {
     const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
 
-    const [studentData, setStudentData] = useState({
+    const defaultStudentData = {
         phone: "+998",
         email: "",
         fullName: "",
@@ -19,21 +19,21 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
         password: "",
         photo: null,
         groups: []
-    });
+    };
+
+    const formatDateForInput = (dateValue) => {
+        if (!dateValue) return "";
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) return "";
+        return date.toISOString().split("T")[0];
+    };
+
+    const [studentData, setStudentData] = useState(defaultStudentData);
 
     const toggleAddGroupModal = () => setIsAddGroupModalOpen(!isAddGroupModalOpen);
 
     const resetForm = () => {
-        setStudentData({
-            phone: "+998",
-            email: "",
-            full_name: "",
-            birth_date: "",
-            address: "",
-            password: "",
-            photo: null,
-            groups: []
-        });
+        setStudentData(defaultStudentData);
     };
 
     const handleInputChange = (e) => {
@@ -44,13 +44,36 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
         }));
     };
 
+    useEffect(() => {
+        if (studentToEdit) {
+            setStudentData({
+                phone: studentToEdit.phone || "+998",
+                email: studentToEdit.email || "",
+                fullName: studentToEdit.full_name || studentToEdit.fullName || "",
+                birthDate: formatDateForInput(studentToEdit.birth_date || studentToEdit.birthDate || ""),
+                address: studentToEdit.address || "",
+                password: "",
+                photo: null,
+                groups: studentToEdit.groups || []
+            });
+        } else if (isOpen) {
+            resetForm();
+        }
+    }, [studentToEdit, isOpen]);
+
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
 
         const { fullName, email, password, phone, address, birthDate, photo, groups } = studentData;
+        const isEditing = Boolean(studentToEdit?.id);
 
-        if (!fullName || !email || !password || !phone || !birthDate) {
+        if (!fullName || !email || !phone || !birthDate) {
             alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+            return;
+        }
+
+        if (!isEditing && !password) {
+            alert("Iltimos, parolni kiriting!");
             return;
         }
 
@@ -63,7 +86,6 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
         const formData = new FormData();
         formData.append("full_name", fullName);
         formData.append("email", email);
-        formData.append("password", password);
         formData.append("phone", cleanPhone);
         formData.append("address", address);
         formData.append("birth_date", birthDate);
@@ -72,18 +94,29 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
             formData.append("photo", photo);
         }
 
-        // Send group IDs matching Swagger specification exactly
+        if (password) {
+            formData.append("password", password);
+        }
+
         groups.forEach(group => {
             formData.append("groups", Number(group.id));
         });
 
-        api.post('/students', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        }).then(
+        const request = isEditing
+            ? api.patch(`/students/${studentToEdit.id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            })
+            : api.post('/students', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+
+        request.then(
             res => {
-                console.log("Student created successfully:", res.status);
+                console.log(isEditing ? "Student updated successfully:" : "Student created successfully:", res.status);
                 if (onSave) {
                     onSave();
                 }
@@ -95,7 +128,6 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
                 const responseData = err.response?.data;
                 console.log("Error response from server:", responseData);
 
-                // Extract detailed error messages
                 let errorMsg = err.message;
                 if (responseData) {
                     if (responseData.errors && typeof responseData.errors === 'object') {
@@ -128,8 +160,8 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
         <form className={`${styles.modal} ${!isOpen ? styles.slideOut : ""}`} onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
             <div className={styles.header}>
                 <div className={styles.headerText}>
-                    <h2 className={styles.title}>Talaba qo'shish</h2>
-                    <p className={styles.subtitle}>Bu yerda siz yangi Talaba qo'shishingiz mumkin.</p>
+                    <h2 className={styles.title}>{studentToEdit ? "Talabani tahrirlash" : "Talaba qo'shish"}</h2>
+                    <p className={styles.subtitle}>{studentToEdit ? "Bu yerda talabani yangilashingiz mumkin." : "Bu yerda siz yangi Talaba qo'shishingiz mumkin."}</p>
                 </div>
                 <button type="button" className={styles.closeBtn} onClick={onClose}>
                     <CloseRoundedIcon />
@@ -174,15 +206,10 @@ export default function AddStudentModal({ isOpen, onClose, onSave }) {
                     <label>Tug'ilgan sanasi</label>
                     <div className={styles.dateInputWrapper}>
                         <input
-                            type="text"
+                            type="date"
                             name="birthDate"
-                            placeholder="dd/mm/yyyy"
                             value={studentData.birthDate}
                             onChange={handleInputChange}
-                            onFocus={(e) => e.target.type = 'date'}
-                            onBlur={(e) => {
-                                if (!e.target.value) e.target.type = 'text';
-                            }}
                         />
                         <CalendarTodayRoundedIcon className={styles.calendarIcon} />
                     </div>

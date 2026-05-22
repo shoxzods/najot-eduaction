@@ -22,6 +22,8 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
     const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
     const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
+    const [teachersOptions, setTeachersOptions] = useState([]);
+    const [studentsOptions, setStudentsOptions] = useState([]);
     
     const [courses, setCourses] = useState([]);
     const [rooms, setRooms] = useState([]);
@@ -39,8 +41,37 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
         students: []
     });
 
-    const toggleAddStudentModal = () => setIsAddStudentModalOpen(!isAddStudentModalOpen);
-    const toggleAddTeacherModal = () => setIsAddTeacherModalOpen(!isAddTeacherModalOpen);
+    const toggleAddStudentModal = () => {
+        if (!isAddStudentModalOpen) {
+            console.log('GroupModal: fetching students for modal');
+            api.get('/students').then(res => {
+                const list = res.data?.data || res.data || [];
+                setStudentsOptions(list);
+                setIsAddStudentModalOpen(true);
+            }).catch(err => {
+                console.error('Error fetching students for modal:', err);
+                setIsAddStudentModalOpen(true);
+            });
+        } else {
+            setIsAddStudentModalOpen(false);
+        }
+    };
+
+    const toggleAddTeacherModal = () => {
+        if (!isAddTeacherModalOpen) {
+            console.log('GroupModal: fetching teachers for modal');
+            api.get('/teachers').then(res => {
+                const list = res.data?.data || res.data || [];
+                setTeachersOptions(list);
+                setIsAddTeacherModalOpen(true);
+            }).catch(err => {
+                console.error('Error fetching teachers for modal:', err);
+                setIsAddTeacherModalOpen(true);
+            });
+        } else {
+            setIsAddTeacherModalOpen(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -77,26 +108,34 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
         });
     };
 
+    const fetchCourses = () => {
+        if (courses.length > 0) return;
+        api.get('/courses')
+            .then(res => {
+                const coursesList = res.data?.data || res.data || [];
+                setCourses(coursesList);
+            })
+            .catch(err => {
+                console.error("Error fetching courses for select:", err);
+            });
+    };
+
+    const fetchRooms = () => {
+        if (rooms.length > 0) return;
+        api.get('/rooms')
+            .then(res => {
+                const roomsList = res.data?.data || res.data || [];
+                setRooms(roomsList);
+            })
+            .catch(err => {
+                console.error("Error fetching rooms for select:", err);
+            });
+    };
+
     useEffect(() => {
         if (isOpen) {
             setShouldRender(true);
             document.body.style.overflow = 'hidden';
-            
-            // Fetch courses dynamically for the Kurs dropdown select
-            api.get('/courses').then(res => {
-                const coursesList = res.data?.data || res.data || [];
-                setCourses(coursesList);
-            }).catch(err => {
-                console.error("Error fetching courses for select:", err);
-            });
-
-            // Fetch rooms dynamically for the Xona dropdown select
-            api.get('/rooms').then(res => {
-                const roomsList = res.data?.data || res.data || [];
-                setRooms(roomsList);
-            }).catch(err => {
-                console.error("Error fetching rooms for select:", err);
-            });
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
@@ -230,25 +269,43 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
 
                     <div className={styles.formGroup}>
                         <label>Kurs <span>*</span></label>
-                        <select name="courseId" value={groupData.courseId} onChange={handleInputChange}>
+                        <select
+                            name="courseId"
+                            value={groupData.courseId}
+                            onChange={handleInputChange}
+                            onFocus={fetchCourses}
+                        >
                             <option value="" disabled>Tanlang</option>
-                            {courses.map(course => (
-                                <option key={course.id} value={course.id}>
-                                    {course.name}
-                                </option>
-                            ))}
+                            {courses.length === 0 ? (
+                                <option disabled>Ma'lumot yuklanmoqda yoki topilmadi</option>
+                            ) : (
+                                courses.map(course => (
+                                    <option key={course.id} value={course.id}>
+                                        {course.name}
+                                    </option>
+                                ))
+                            )}
                         </select>
                     </div>
 
                     <div className={styles.formGroup}>
                         <label>Xona <span>*</span></label>
-                        <select name="roomId" value={groupData.roomId} onChange={handleInputChange}>
+                        <select
+                            name="roomId"
+                            value={groupData.roomId}
+                            onChange={handleInputChange}
+                            onFocus={fetchRooms}
+                        >
                             <option value="" disabled>Tanlang</option>
-                            {rooms.map(room => (
-                                <option key={room.id} value={room.id}>
-                                    {room.name}
-                                </option>
-                            ))}
+                            {rooms.length === 0 ? (
+                                <option disabled>Ma'lumot yuklanmoqda yoki topilmadi</option>
+                            ) : (
+                                rooms.map(room => (
+                                    <option key={room.id} value={room.id}>
+                                        {room.name}
+                                    </option>
+                                ))
+                            )}
                         </select>
                     </div>
 
@@ -346,9 +403,10 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                     </div>
                 </div>
 
-                <AddTeacherModal 
-                    isOpen={isAddTeacherModalOpen} 
-                    onClose={toggleAddTeacherModal} 
+                <AddTeacherModal
+                    isOpen={isAddTeacherModalOpen}
+                    onClose={toggleAddTeacherModal}
+                    items={teachersOptions}
                     onAdd={(selected) => {
                         setGroupData(prev => ({
                             ...prev,
@@ -358,9 +416,10 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                     }}
                 />
 
-                <AddStudentModal 
-                    isOpen={isAddStudentModalOpen} 
-                    onClose={toggleAddStudentModal} 
+                <AddStudentModal
+                    isOpen={isAddStudentModalOpen}
+                    onClose={toggleAddStudentModal}
+                    items={studentsOptions}
                     onAdd={(selected) => {
                         setGroupData(prev => ({
                             ...prev,

@@ -157,7 +157,7 @@ export default function Groups() {
                             </tr>
                         </thead>
                         <tbody>
-                            {groups.slice(5 , 7).map((group) => (
+                            {groups.map((group) => (
                                 <tr key={group.id} onClick={() => navigate(`/dashboard/groups/${group.id}`)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                                     <td>
                                         <div className={styles.statusCell}>
