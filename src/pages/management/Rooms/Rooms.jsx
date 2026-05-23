@@ -94,7 +94,7 @@ export default function Rooms() {
                 </button>
             </div>
 
-            <div className={styles.grid} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px' }}>
+            <div className={styles.grid} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '100px' }}>
                 {isLoading && (
                     <Box sx={{
                         position: 'absolute',

@@ -59,18 +59,19 @@ export default function GroupDetail() {
             { id: 5, day: 12, month: "May", active: true },
             { id: 6, day: 14, month: "May", active: true },
             { id: 7, day: 16, month: "May", active: true },
-            { id: 8, day: 19, month: "May", active: false },
-            { id: 9, day: 21, month: "May", active: false },
-            { id: 10, day: 23, month: "May", active: false },
-            { id: 11, day: 26, month: "May", active: false },
-            { id: 12, day: 28, month: "May", active: false },
-            { id: 13, day: 30, month: "May", active: false },
+            { id: 8, day: 19, month: "May", active: true },
+            { id: 9, day: 21, month: "May", active: true },
+            { id: 10, day: 23, month: "May", active: true },
+            { id: 11, day: 26, month: "May", active: true },
+            { id: 12, day: 28, month: "May", active: true },
+            { id: 13, day: 30, month: "May", active: true }
         ],
         lessons: [
-            { id: 1, title: "Html asoslari", studentsCount: 5, timerCount: 0, checkCount: 0, givenTime: "13 May, 2026 10:00", endTime: "14 May, 2026 06:00", lessonDate: "12 May, 2026" },
-            { id: 2, title: "Kirish", studentsCount: 5, timerCount: 0, checkCount: 0, givenTime: "13 May, 2026 11:52", endTime: "14 May, 2026 07:52", lessonDate: "9 May, 2026" },
-            { id: 3, title: "Nodejs", studentsCount: 5, timerCount: 0, checkCount: 3, givenTime: "14 May, 2026 09:47", endTime: "15 May, 2026 05:47", lessonDate: "14 May, 2026" },
-            { id: 4, title: "takrorlash", studentsCount: 5, timerCount: 0, checkCount: 0, givenTime: "19 May, 2026 16:22", endTime: "20 May, 2026 12:22", lessonDate: "19 May, 2026" },
+            { id: 1, number: 1, title: "HTML elementlari va teglari", type: "Dars", date: "15 Yan, 2026 // 09:30" },
+            { id: 2, number: 2, title: "CSS selectors", type: "Dars", date: "17 Yan, 2026 // 09:30" },
+            { id: 3, number: 3, title: "Flexbox layout model", type: "Dars", date: "20 Yan, 2026 // 09:30" },
+            { id: 4, number: 4, title: "Git and Github", type: "Dars", date: "22 Yan, 2026 // 09:30" },
+            { id: 5, number: 5, title: "Javascript basics", type: "Dars", date: "25 Yan, 2026 // 09:30" }
         ]
     };
 
@@ -78,7 +79,7 @@ export default function GroupDetail() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTitle}>
-                    <button className={styles.backBtn} onClick={() => navigate(-1)}>
+                    <button className={styles.backBtn} onClick={() => navigate("/dashboard/groups")}>
                         <ArrowBackIosNewRoundedIcon fontSize="small" />
                     </button>
                     <h1>{fakeGroupData.name}</h1>
@@ -92,19 +93,19 @@ export default function GroupDetail() {
 
             <div className={styles.tabs}>
                 <button 
-                    className={`${styles.tab} ${activeTab === "Ma'lumotlar" ? styles.activeTab : ''}`}
+                    className={`${styles.tab} ${activeTab === "Ma'lumotlar" ? styles.activeTab : ""}`}
                     onClick={() => handleTabChange("0")}
                 >
                     Ma'lumotlar
                 </button>
                 <button 
-                    className={`${styles.tab} ${activeTab === "Guruh darsliklari" ? styles.activeTab : ''}`}
+                    className={`${styles.tab} ${activeTab === "Guruh darsliklari" ? styles.activeTab : ""}`}
                     onClick={() => handleTabChange("1")}
                 >
                     Guruh darsliklari
                 </button>
                 <button 
-                    className={`${styles.tab} ${activeTab === "Akademik davomati" ? styles.activeTab : ''}`}
+                    className={`${styles.tab} ${activeTab === "Akademik davomati" ? styles.activeTab : ""}`}
                     onClick={() => handleTabChange("2")}
                 >
                     Akademik davomati
@@ -116,11 +117,11 @@ export default function GroupDetail() {
                     <div className={styles.content}>
                         <div className={styles.mentorsCard}>
                             <div className={styles.cardHeader}>
-                                <h3>Guruh mentorlari</h3>
+                                <h3>Mentors</h3>
                             </div>
                             <div className={styles.cardBody}>
                                 {fakeGroupData.mentors.map(mentor => (
-                                    <div key={mentor.id} className={styles.mentorItem}>
+                                    <div key={mentor.id} className={mentor.role === "Teacher" ? styles.mentorItem : styles.assistantItem}>
                                         <img src={mentor.image} alt={mentor.name} className={styles.mentorAvatar} />
                                         <span className={styles.mentorRole}>{mentor.role}</span>
                                         <span className={styles.mentorName}>{mentor.name}</span>
@@ -131,79 +132,57 @@ export default function GroupDetail() {
 
                         <div className={styles.parametersCard}>
                             <div className={styles.cardHeader}>
-                                <h3>Parametrlar</h3>
+                                <h3>Guruh parametrlari</h3>
                             </div>
                             <div className={styles.cardBody}>
                                 <div className={styles.paramRow}>
-                                    <span>Kurs:</span>
+                                    <span>Yo'nalish</span>
                                     <strong>{fakeGroupData.parameters.course}</strong>
                                 </div>
                                 <div className={styles.paramRow}>
-                                    <span>O'rta yosh:</span>
-                                    <strong>{fakeGroupData.parameters.averageAge}</strong>
+                                    <span>O'rtacha yosh</span>
+                                    <strong>{fakeGroupData.parameters.averageAge} yosh</strong>
                                 </div>
                                 <div className={styles.paramRow}>
-                                    <span>O'quvchilar sig'imi:</span>
-                                    <strong>{fakeGroupData.parameters.capacity}</strong>
+                                    <span>Sig'imi</span>
+                                    <strong>{fakeGroupData.parameters.capacity} ta</strong>
                                 </div>
                                 <div className={styles.paramRow}>
-                                    <span>Mavjud o'quvchilar:</span>
-                                    <strong>{fakeGroupData.parameters.currentStudents}</strong>
+                                    <span>Hozirgi o'quvchilar</span>
+                                    <strong>{fakeGroupData.parameters.currentStudents} ta</strong>
                                 </div>
                                 <div className={styles.paramRow}>
-                                    <span>O'quv oyidagi darslar soni:</span>
-                                    <strong>{fakeGroupData.parameters.lessonsPerMonth}</strong>
+                                    <span>Darslar soni (1 oyda)</span>
+                                    <strong>{fakeGroupData.parameters.lessonsPerMonth} ta</strong>
                                 </div>
                                 <div className={styles.paramRow}>
-                                    <span>Kurs davomiyligi (oy):</span>
-                                    <strong>{fakeGroupData.parameters.durationMonths}</strong>
+                                    <span>Kurs davomiyligi</span>
+                                    <strong>{fakeGroupData.parameters.durationMonths} oy</strong>
                                 </div>
                                 <div className={styles.paramRow}>
-                                    <span>Jami darslar soni:</span>
-                                    <strong>{fakeGroupData.parameters.totalLessons}</strong>
+                                    <span>Darslar soni (Jami)</span>
+                                    <strong>{fakeGroupData.parameters.totalLessons} ta</strong>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div className={styles.scheduleSection}>
-                        <h2>Dars jadvali</h2>
-                        
+                        <h2>Dars vaqti va xonasi</h2>
                         <div className={styles.scheduleList}>
                             {fakeGroupData.schedule.map(item => (
                                 <div key={item.id} className={styles.scheduleItem}>
                                     <div className={styles.teacherName}>{item.teacher}</div>
                                     <div className={styles.scheduleDetails}>
-                                        <span>{item.days}</span>
-                                        <span>{item.time}</span>
+                                        <span>{item.days} // {item.time}</span>
                                         <span>{item.period}</span>
                                         <span>{item.room}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-
                         <div className={styles.showMoreBtnWrapper}>
-                            <button className={styles.showMoreBtn}>Yana ko'rsatish (9)</button>
-                        </div>
-
-                        <div className={styles.monthNavigator}>
-                            <button className={styles.navBtn}><KeyboardArrowLeftRoundedIcon fontSize="small" /></button>
-                            <span className={styles.monthText}>1-o'quv oyi</span>
-                            <button className={styles.navBtn}><KeyboardArrowRightRoundedIcon fontSize="small" /></button>
-                        </div>
-
-                        <div className={styles.calendarList}>
-                            {fakeGroupData.calendarDays.map(item => (
-                                <div key={item.id} className={`${styles.calendarDay} ${item.active ? styles.activeDay : ''}`}>
-                                    <span className={styles.month}>{item.month}</span>
-                                    <span className={styles.day}>{item.day}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className={styles.showAllBtnWrapper}>
-                            <button className={styles.showAllBtn}>Barchasini ko'rish</button>
+                            <button className={styles.showMoreBtn}>Ko'proq ko'rish</button>
                         </div>
                     </div>
                 </>
@@ -213,20 +192,31 @@ export default function GroupDetail() {
                 <div className={styles.lessonsSection}>
                     <div className={styles.lessonsHeader}>
                         <div className={styles.lessonsTabsAndTitle}>
-                            <h2>Guruh darsliklari</h2>
+                            <h2>Darslar</h2>
                             <div className={styles.subTabs}>
-                                {["Uyga vazifa", "Videolar", "Imtihonlar", "Jurnal"].map(tab => (
-                                    <button 
-                                        key={tab}
-                                        className={`${styles.subTab} ${activeSubTab === tab ? styles.activeSubTab : ''}`}
-                                        onClick={() => setActiveSubTab(tab)}
-                                    >
-                                        {tab}
-                                    </button>
-                                ))}
+                                <button 
+                                    className={`${styles.subTab} ${activeSubTab === "Darslik" ? styles.activeSubTab : ""}`}
+                                    onClick={() => setActiveSubTab("Darslik")}
+                                >
+                                    Darslik
+                                </button>
+                                <button 
+                                    className={`${styles.subTab} ${activeSubTab === "Uyga vazifa" ? styles.activeSubTab : ""}`}
+                                    onClick={() => setActiveSubTab("Uyga vazifa")}
+                                >
+                                    Uyga vazifa
+                                </button>
                             </div>
                         </div>
-                        <button className={styles.addLessonBtn} onClick={() => navigate(`/dashboard/groups/${id}/homework/create`)}>Qo'shish</button>
+                        
+                        {activeSubTab === "Uyga vazifa" && (
+                            <button 
+                                className={styles.addLessonBtn}
+                                onClick={() => navigate(`/dashboard/groups/${id}/homework/create`)}
+                            >
+                                Yangi vazifa qo'shish
+                            </button>
+                        )}
                     </div>
 
                     <div className={styles.tableCard}>
@@ -234,34 +224,51 @@ export default function GroupDetail() {
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Mavzu</th>
-                                    <th><PersonOutlineRoundedIcon fontSize="small" style={{ color: '#94a3b8' }} /></th>
-                                    <th><TimerOutlinedIcon fontSize="small" style={{ color: '#eab308' }} /></th>
-                                    <th><CheckCircleOutlineRoundedIcon fontSize="small" style={{ color: '#10b981' }} /></th>
-                                    <th>Berilgan vaqt</th>
-                                    <th>Tugash vaqti</th>
-                                    <th>Dars sanasi</th>
-                                    <th style={{ width: '40px' }}></th>
+                                    <th>Mavzu nomi</th>
+                                    <th>Tur</th>
+                                    <th>Qo'shilgan sana va vaqt</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {fakeGroupData.lessons.map(lesson => (
+                                {fakeGroupData.lessons.map((lesson, idx) => (
                                     <tr key={lesson.id}>
-                                        <td>{lesson.id}</td>
+                                        <td>{idx + 1}</td>
                                         <td className={styles.lessonTitle}>{lesson.title}</td>
-                                        <td>{lesson.studentsCount}</td>
-                                        <td>{lesson.timerCount}</td>
-                                        <td>{lesson.checkCount}</td>
-                                        <td className={styles.timeCell}>{lesson.givenTime}</td>
-                                        <td className={styles.timeCell}>{lesson.endTime}</td>
-                                        <td className={styles.timeCell}>{lesson.lessonDate}</td>
-                                        <td style={{ textAlign: 'right' }}>
-                                            <MoreVertRoundedIcon fontSize="small" className={styles.moreIcon} />
-                                        </td>
+                                        <td>{lesson.type}</td>
+                                        <td className={styles.timeCell}>{lesson.date}</td>
+                                        <td><MoreVertRoundedIcon className={styles.moreIcon} /></td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === "Akademik davomati" && (
+                <div className={styles.scheduleSection}>
+                    <div className={styles.monthNavigator}>
+                        <button className={styles.navBtn}>
+                            <KeyboardArrowLeftRoundedIcon />
+                        </button>
+                        <span className={styles.monthText}>May 2026</span>
+                        <button className={styles.navBtn}>
+                            <KeyboardArrowRightRoundedIcon />
+                        </button>
+                    </div>
+
+                    <div className={styles.calendarList}>
+                        {fakeGroupData.calendarDays.map(item => (
+                            <div key={item.id} className={`${styles.calendarDay} ${item.active ? styles.activeDay : ""}`}>
+                                <span className={styles.month}>{item.month}</span>
+                                <span className={styles.day}>{item.day}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className={styles.showAllBtnWrapper}>
+                        <button className={styles.showAllBtn}>Barchasini ko'rish</button>
                     </div>
                 </div>
             )}

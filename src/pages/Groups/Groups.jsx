@@ -4,6 +4,7 @@ import { api } from '../../api/api';
 
 import styles from "./Groups.module.scss";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import EditGroupSidebar from '../../components/UI/ManagementSidebar/EditGroupSidebar';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
@@ -16,14 +17,19 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function Groups() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("groups");
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [editGroupData, setEditGroupData] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groups, setGroup] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [openMenuId, setOpenMenuId] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [activeGroup, setActiveGroup] = useState(null);
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -46,33 +52,49 @@ export default function Groups() {
         fetchGroups();
     }, []);
 
-    useEffect(() => {
-        const handleDocClick = () => setOpenMenuId(null);
-        const handleKeyDown = (e) => {
-            if (e.key === 'Escape') setOpenMenuId(null);
-        }
+    const handleMenuOpen = (event, group) => {
+        setAnchorEl(event.currentTarget);
+        setActiveGroup(group);
+    };
 
-        document.addEventListener('click', handleDocClick);
-        document.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('click', handleDocClick);
-            document.removeEventListener('keydown', handleKeyDown);
-        }
-    }, []);
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setActiveGroup(null);
+    };
 
     const handleEdit = (group) => {
-        // navigate to edit page or open edit modal
-        navigate(`/dashboard/groups/${group.id}/edit`);
-    }
+        // Set local row data immediately so sidebar opens and populates instantly
+        setEditGroupData(group);
+        setIsEditOpen(true);
+
+        // Fetch fresh details in the background
+        api.get(`/groups/${group.id}`).then(res => {
+            const freshData = res.data.data || res.data;
+            if (freshData) {
+                setEditGroupData(prev => ({
+                    ...prev,
+                    ...freshData
+                }));
+            }
+        }).catch(err => {
+            console.error('Error fetching group data in background:', err);
+        });
+    };
+
+    const handleEditCancel = () => {
+        setIsEditOpen(false);
+        setEditGroupData(null);
+    };
 
     const handleDelete = (group) => {
         const confirmed = window.confirm("Guruhni o'chirishni xohlaysizmi?");
         if (!confirmed) return;
-        api.delete(`/groups/${group.id}`).then(() => {
-            fetchGroups();
-        }).catch(err => console.log(err.message));
-    }
+        api.delete(`/groups/${group.id}`)
+            .then(() => {
+                fetchGroups();
+            })
+            .catch(err => console.log(err.message));
+    };
 
     return (
         <div className={styles.container}>
@@ -237,7 +259,7 @@ export default function Groups() {
                                         <div className={styles.timeInfo}>
                                             <span className={styles.time}>{group.start_time}</span>
                                             <span className={styles.days}>{group.week_day.map(
-                                                item => item.toLowerCase().slice(0 , 3)
+                                                item => item.toLowerCase().slice(0, 3)
                                             ).join(',')} <br /></span>
                                         </div>
                                     </td>
@@ -250,27 +272,92 @@ export default function Groups() {
                                         </div>
                                     </td>
                                     <td><span className={styles.studentCount}>{group.students.length}</span></td>
-                                    <td style={{ textAlign: 'right', position: 'relative' }}>
-                                        <MoreVertRoundedIcon className={styles.rowMoreIcon} onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === group.id ? null : group.id); }} style={{ cursor: 'pointer' }} />
-                                        {openMenuId === group.id && (
-                                            <div className={styles.rowMenu} onClick={(e) => e.stopPropagation()}>
-                                                <button className={styles.menuButton} onClick={() => handleEdit(group)}>
-                                                    <EditRoundedIcon fontSize="small" />
-                                                    <span>Edit</span>
-                                                </button>
-                                                <button className={styles.menuButton} onClick={() => handleDelete(group)}>
-                                                    <DeleteOutlineRoundedIcon fontSize="small" />
-                                                    <span>Delete</span>
-                                                </button>
-                                            </div>
-                                        )}
+                                    <td style={{ textAlign: 'right' }}>
+                                        <MoreVertRoundedIcon
+                                            className={styles.rowMoreIcon}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleMenuOpen(e, group);
+                                            }}
+                                            style={{ cursor: 'pointer' }}
+                                        />
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    onClick={(e) => e.stopPropagation()}
+                    PaperProps={{
+                        sx: {
+                            boxShadow: '0 6px 18px rgba(16,24,40,0.08)',
+                            border: '1px solid #e6edf6',
+                            borderRadius: '8px',
+                            padding: '4px',
+                            minWidth: '120px',
+                        }
+                    }}
+                >
+                    <MenuItem
+                        onClick={() => {
+                            handleEdit(activeGroup);
+                            handleMenuClose();
+                        }}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px 12px',
+                            color: '#0f172a',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            borderRadius: '6px',
+                            '&:hover': {
+                                backgroundColor: '#f8fafc',
+                            }
+                        }}
+                    >
+                        <EditRoundedIcon fontSize="small" />
+                        <span>Edit</span>
+                    </MenuItem>
+                    <MenuItem
+                        onClick={() => {
+                            handleDelete(activeGroup);
+                            handleMenuClose();
+                        }}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px 12px',
+                            color: '#ef4444',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            borderRadius: '6px',
+                            '&:hover': {
+                                backgroundColor: '#fef2f2',
+                            }
+                        }}
+                    >
+                        <DeleteOutlineRoundedIcon fontSize="small" />
+                        <span>Delete</span>
+                    </MenuItem>
+                </Menu>
             </div>
+
+            {/* Edit Group Sidebar */}
+            <EditGroupSidebar
+                isOpen={isEditOpen}
+                onClose={handleEditCancel}
+                groupData={editGroupData}
+                onSave={() => {
+                    fetchGroups();
+                }}
+            />
 
             <GroupModal
                 isOpen={isModalOpen}
