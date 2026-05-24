@@ -13,6 +13,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import Switch from '@mui/material/Switch';
 import GroupModal from "../../components/UI/GroupModal/GroupModal";
+import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -30,6 +31,7 @@ export default function Groups() {
     const [isLoading, setIsLoading] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [activeGroup, setActiveGroup] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, group: null });
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
@@ -87,9 +89,11 @@ export default function Groups() {
     };
 
     const handleDelete = (group) => {
-        const confirmed = window.confirm("Guruhni o'chirishni xohlaysizmi?");
-        if (!confirmed) return;
-        api.delete(`/groups/${group.id}`)
+        setDeleteConfirm({ isOpen: true, group });
+    };
+
+    const actualDeleteGroup = (groupId) => {
+        api.delete(`/groups/${groupId}`)
             .then(() => {
                 fetchGroups();
             })
@@ -122,7 +126,10 @@ export default function Groups() {
                 </button>
                 <button
                     className={`${styles.tab} ${activeTab === "archive" ? styles.activeTab : ""}`}
-                    onClick={() => setActiveTab("archive")}
+                    onClick={() => {
+                        setActiveTab("archive")
+                        navigate('/dashboard/groups/archive')
+                    }}
                 >
                     <ArchiveOutlinedIcon fontSize="small" />
                     Arxiv
@@ -365,6 +372,18 @@ export default function Groups() {
                 onSave={() => {
                     fetchGroups();
                 }}
+            />
+
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, group: null })}
+                onConfirm={() => {
+                    const id = deleteConfirm.group?.id;
+                    setDeleteConfirm({ isOpen: false, group: null });
+                    if (id) actualDeleteGroup(id);
+                }}
+                title="Guruhni o'chirish"
+                message="Rostdan ham o'chirishni hohlaysizmi?"
             />
         </div>
     );

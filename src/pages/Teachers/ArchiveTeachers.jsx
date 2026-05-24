@@ -5,33 +5,23 @@ import { api } from '../../api/api';
 
 // ui librariries
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
 import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
 
-export default function Teachers() {
+export default function ArchiveTeachers() {
     const navigate = useNavigate();
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [teacherData, setTeacherData] = useState([]);
-    const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [restoreConfirm, setRestoreConfirm] = useState({ isOpen: false, teacherId: null });
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, teacherId: null });
-
-    const openTeacherModal = (teacher = null) => {
-        setSelectedTeacher(teacher);
-        setIsModalOpen(true);
-    };
-
-    const closeTeacherModal = () => {
-        setSelectedTeacher(null);
-        setIsModalOpen(false);
-    };
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTeacher, setSelectedTeacher] = useState(null);
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
@@ -43,11 +33,13 @@ export default function Teachers() {
         return `${day}.${month}.${year}`;
     };
 
-    const fetchTeachers = () => {
+    const fetchArchivedTeachers = () => {
         setIsLoading(true);
-        api.get('/teachers').then(
+        // Предполагаем, что архивные учителя приходят по этому или похожему эндпоинту
+        // Если API отличается, эндпоинт можно будет легко поменять
+        api.get('/teachers/archive').then(
             res => {
-                setTeacherData(res.data.data);
+                setTeacherData(res.data.data || []);
             }
         ).catch(
             err => {
@@ -59,48 +51,17 @@ export default function Teachers() {
     };
 
     useEffect(() => {
-        fetchTeachers();
+        fetchArchivedTeachers();
     }, []);
 
-    const handleTeacherSubmit = (payload, teacherToEdit) => {
-        setIsLoading(true);
+    const openTeacherModal = (teacher = null) => {
+        setSelectedTeacher(teacher);
+        setIsModalOpen(true);
+    };
 
-        const request = teacherToEdit?.id
-            ? api.patch(`/teachers/${teacherToEdit.id}`, payload)
-            : api.post('/teachers', payload);
-
-        request.then((res) => {
-            console.log(teacherToEdit?.id ? "Teacher updated successfully" : "Teacher created successfully");
-            fetchTeachers();
-            closeTeacherModal();
-        }).catch((err) => {
-            const responseData = err.response?.data;
-            console.log('Error response from server:', responseData);
-
-            let errorMsg = err.message;
-            if (responseData) {
-                if (responseData.errors && typeof responseData.errors === 'object') {
-                    const messages = [];
-                    for (const key in responseData.errors) {
-                        if (Array.isArray(responseData.errors[key])) {
-                            messages.push(`${key}: ${responseData.errors[key].join(", ")}`);
-                        } else {
-                            messages.push(`${key}: ${responseData.errors[key]}`);
-                        }
-                    }
-                    errorMsg = messages.join(" | ");
-                } else if (Array.isArray(responseData.message)) {
-                    errorMsg = responseData.message.join(", ");
-                } else if (responseData.message) {
-                    errorMsg = responseData.message;
-                } else if (responseData.error) {
-                    errorMsg = responseData.error;
-                } else {
-                    errorMsg = JSON.stringify(responseData);
-                }
-            }
-            alert("Xatolik yuz berdi: " + errorMsg);
-        }).finally(() => setIsLoading(false));
+    const closeTeacherModal = () => {
+        setSelectedTeacher(null);
+        setIsModalOpen(false);
     };
 
     const openTeacherEditModal = (teacherOrId) => {
@@ -117,63 +78,101 @@ export default function Teachers() {
         }
     };
 
-    function deleteTeachers(id) {
-        setDeleteConfirm({ isOpen: true, teacherId: id });
+    const handleTeacherSubmit = (payload, teacherToEdit) => {
+        setIsLoading(true);
+
+        const request = teacherToEdit?.id
+            ? api.patch(`/teachers/${teacherToEdit.id}`, payload)
+            : api.post('/teachers', payload);
+
+        request.then((res) => {
+            console.log(teacherToEdit?.id ? "Teacher updated successfully" : "Teacher created successfully");
+            fetchArchivedTeachers();
+            closeTeacherModal();
+        }).catch((err) => {
+            const responseData = err.response?.data;
+            let errorMsg = err.message;
+            if (responseData?.message) {
+                errorMsg = responseData.message;
+            }
+            alert("Xatolik yuz berdi: " + errorMsg);
+        }).finally(() => setIsLoading(false));
+    };
+
+    function restoreTeacher(id) {
+        setRestoreConfirm({ isOpen: true, teacherId: id });
     }
 
-    function actualDeleteTeacher(id) {
+    function actualRestoreTeacher(id) {
         setIsLoading(true);
-        api.delete(`/teachers/${id}`)
+        // Пример эндпоинта восстановления
+        api.post(`/teachers/${id}/restore`)
             .then((res) => {
-                if (res.status === 200 || res.status === 204) {
-                    setTeacherData(prev => prev.filter(item => item.id !== id));
-                } else {
-                    console.warn('Unexpected delete response', res);
-                }
+                setTeacherData(prev => prev.filter(item => item.id !== id));
             })
             .catch((err) => {
                 const responseData = err.response?.data;
-                console.error('Error deleting teacher:', responseData || err.message);
                 let errorMsg = err.message;
                 if (responseData?.message) {
                     errorMsg = responseData.message;
-                } else if (responseData?.error) {
-                    errorMsg = responseData.error;
                 }
                 alert("Xatolik yuz berdi: " + errorMsg);
             })
             .finally(() => setIsLoading(false));
     }
 
+    function deleteTeachersForever(id) {
+        setDeleteConfirm({ isOpen: true, teacherId: id });
+    }
 
+    function actualDeleteTeacherForever(id) {
+        setIsLoading(true);
+        // Пример эндпоинта для полного удаления
+        api.delete(`/teachers/${id}/force`)
+            .then((res) => {
+                setTeacherData(prev => prev.filter(item => item.id !== id));
+            })
+            .catch((err) => {
+                const responseData = err.response?.data;
+                let errorMsg = err.message;
+                if (responseData?.message) {
+                    errorMsg = responseData.message;
+                }
+                alert("Xatolik yuz berdi: " + errorMsg);
+            })
+            .finally(() => setIsLoading(false));
+    }
 
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTop}>
-                    <h1 className={styles.title}>O'qituvchilar</h1>
-                    <button className={styles.addBtn} onClick={() => openTeacherModal()}>
-                        <AddRoundedIcon fontSize="small" />
-                        <span className={styles.addBtnText}>O'qituvchi qo'shish</span>
-                    </button>
+                    <h1 className={styles.title}>O'qituvchilar (Arxiv)</h1>
                 </div>
                 <p className={styles.subtitle}>
-                    Ushbu sahifada siz o'qituvchilar ro'yxatini va ularning ma'lumotlarini topasiz.
-                    Har bir o'qituvchining ismi, fanlari va aloqa ma'lumotlari keltirilgan.
+                    Ushbu sahifada siz o'chirilgan (arxivlangan) o'qituvchilar ro'yxatini topasiz.
+                    Ularni qayta tiklashingiz yoki butunlay o'chirishingiz mumkin.
                 </p>
             </div>
 
             <div className={styles.tableCard}>
                 <div className={styles.tableHeader}>
                     <div className={styles.tableActions}>
-                        <button className={styles.filterBtn}>
+
+                        <button
+                            className={styles.backIconBtn}
+                            onClick={() => navigate('/dashboard/teachers')}
+                            title="O'qituvchilarga qaytish"
+                        >
+                            <KeyboardArrowLeftRoundedIcon fontSize="small" />
+                        </button>
+
+                        <button className={styles.filterBtn}
+                        >
                             <FilterListRoundedIcon fontSize="small" />
                             Filters
                         </button>
-                        <button className={styles.archiveBtn} onClick={() => navigate('/dashboard/teachers/archive')}>
-                            <ArchiveOutlinedIcon fontSize="small" />
-                            Arxiv
-                        </button>
+
                     </div>
                     <div className={styles.searchWrapper}>
                         <input type="text" placeholder="Search" className={styles.searchInput} />
@@ -254,8 +253,8 @@ export default function Teachers() {
                                             <button className={`${styles.actionBtn} ${styles.viewBtn}`}>
                                                 <VisibilityOutlinedIcon fontSize="small" />
                                             </button>
-                                            <button onClick={() => deleteTeachers(teacher.id)} className={`${styles.actionBtn}`}>
-                                                <DeleteOutlineRoundedIcon fontSize="small" />
+                                            <button onClick={() => restoreTeacher(teacher.id)} className={`${styles.actionBtn}`}>
+                                                <RestoreOutlinedIcon fontSize="small" style={{ color: '#16a34b' }} />
                                             </button>
                                             <button onClick={() => openTeacherEditModal(teacher)} className={`${styles.actionBtn}`}>
                                                 <EditOutlinedIcon fontSize="small" />
@@ -264,6 +263,13 @@ export default function Teachers() {
                                     </td>
                                 </tr>
                             ))}
+                            {teacherData.length === 0 && !isLoading && (
+                                <tr>
+                                    <td colSpan="8" style={{ textAlign: 'center', padding: '30px' }}>
+                                        Arxivlangan o'qituvchilar yo'q
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -272,22 +278,23 @@ export default function Teachers() {
                     <button className={styles.pageArrow}>← Previous</button>
                     <div className={styles.pageNumbers}>
                         <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                        <button className={styles.pageBtn}>2</button>
-                        <button className={styles.pageBtn}>3</button>
-                        <span className={styles.dots}>...</span>
-                        <button className={styles.pageBtn}>8</button>
-                        <button className={styles.pageBtn}>9</button>
-                        <button className={styles.pageBtn}>10</button>
                     </div>
                     <button className={styles.pageArrow}>Next →</button>
                 </div>
             </div>
 
-            <TeacherModal
-                isOpen={isModalOpen}
-                onClose={closeTeacherModal}
-                onSubmit={handleTeacherSubmit}
-                teacherToEdit={selectedTeacher}
+            <ConfirmDialog
+                isOpen={restoreConfirm.isOpen}
+                onClose={() => setRestoreConfirm({ isOpen: false, teacherId: null })}
+                onConfirm={() => {
+                    const id = restoreConfirm.teacherId;
+                    setRestoreConfirm({ isOpen: false, teacherId: null });
+                    if (id) actualRestoreTeacher(id);
+                }}
+                title="O'qituvchini tiklash"
+                message="Ushbu o'qituvchini arxivdan tiklashni xohlaysizmi?"
+                confirmText="Tiklash"
+                cancelText="Bekor qilish"
             />
 
             <ConfirmDialog
@@ -296,10 +303,17 @@ export default function Teachers() {
                 onConfirm={() => {
                     const id = deleteConfirm.teacherId;
                     setDeleteConfirm({ isOpen: false, teacherId: null });
-                    if (id) actualDeleteTeacher(id);
+                    if (id) actualDeleteTeacherForever(id);
                 }}
-                title="O'qituvchini o'chirish"
-                message="Rostdan ham o'chirishni hohlaysizmi?"
+                title="O'qituvchini butunlay o'chirish"
+                message="Rostdan ham bu o'qituvchini butunlay o'chirishni xohlaysizmi? Bu amalni ortga qaytarib bo'lmaydi."
+            />
+
+            <TeacherModal
+                isOpen={isModalOpen}
+                onClose={closeTeacherModal}
+                onSubmit={(payload) => handleTeacherSubmit(payload, selectedTeacher)}
+                teacherToEdit={selectedTeacher}
             />
         </div>
     );

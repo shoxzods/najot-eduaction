@@ -148,8 +148,21 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                     setRooms(res.data?.data || res.data || []);
                 })
                 .catch(err => console.error("Error fetching rooms:", err));
+
+            api.get('/teachers')
+                .then(res => {
+                    setTeachersOptions(res.data?.data || res.data || []);
+                })
+                .catch(err => console.error("Error fetching teachers:", err));
+
+            api.get('/students')
+                .then(res => {
+                    setStudentsOptions(res.data?.data || res.data || []);
+                })
+                .catch(err => console.error("Error fetching students:", err));
         }
     }, [isOpen]);
+
 
     // Prepopulate form fields when groupData, courses, or rooms are available
     useEffect(() => {
@@ -349,6 +362,11 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                                 </option>
                             ))}
                         </select>
+                        {form.courseId && (
+                            <div className={styles.durationInfo} style={{ marginTop: '6px', fontSize: '13px', color: '#6c35de', fontWeight: '500' }}>
+                                Kurs davomiyligi: {courses.find(c => String(c.id) === String(form.courseId))?.duration_month || 0} oy
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.formGroup}>
@@ -433,29 +451,69 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>
-                            O'qituvchilar 
+                        <label>O'qituvchilar</label>
+                        <div className={styles.groupsInputContainer}>
                             {form.teachers.length > 0 && (
-                                <span className={styles.countBadge}> ({form.teachers.length} ta tanlandi)</span>
+                                <div className={styles.groupTags}>
+                                    {form.teachers.map((teacherId) => {
+                                        const teacher = teachersOptions.find(t => t.id === Number(teacherId));
+                                        const label = teacher ? teacher.full_name : `Teacher #${teacherId}`;
+                                        return (
+                                            <span key={teacherId} className={styles.groupTag}>
+                                                {label}
+                                                <button
+                                                    type="button"
+                                                    className={styles.removeGroupBtn}
+                                                    onClick={() => setForm(prev => ({
+                                                        ...prev,
+                                                        teachers: prev.teachers.filter(id => id !== teacherId)
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
                             )}
-                        </label>
-                        <button type="button" className={styles.addOptionBtn} onClick={toggleAddTeacherModal}>
-                            <AddRoundedIcon fontSize="small" />
-                            <span>Qo'shish / Tahrirlash</span>
-                        </button>
+                            <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddTeacherModal}>
+                                <AddRoundedIcon fontSize="small" />
+                                <span>Qo'shish</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>
-                            Talabalar 
+                        <label>Talabalar</label>
+                        <div className={styles.groupsInputContainer}>
                             {form.students.length > 0 && (
-                                <span className={styles.countBadge}> ({form.students.length} ta tanlandi)</span>
+                                <div className={styles.groupTags}>
+                                    {form.students.map((studentId) => {
+                                        const student = studentsOptions.find(s => s.id === Number(studentId));
+                                        const label = student ? student.full_name : `Student #${studentId}`;
+                                        return (
+                                            <span key={studentId} className={styles.groupTag}>
+                                                {label}
+                                                <button
+                                                    type="button"
+                                                    className={styles.removeGroupBtn}
+                                                    onClick={() => setForm(prev => ({
+                                                        ...prev,
+                                                        students: prev.students.filter(id => id !== studentId)
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
                             )}
-                        </label>
-                        <button type="button" className={styles.addOptionBtn} onClick={toggleAddStudentModal}>
-                            <AddRoundedIcon fontSize="small" />
-                            <span>Qo'shish / Tahrirlash</span>
-                        </button>
+                            <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddStudentModal}>
+                                <AddRoundedIcon fontSize="small" />
+                                <span>Qo'shish</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -499,6 +557,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                         toggleAddStudentModal();
                     }}
                 />
+
             </form>
         </div>,
         document.body

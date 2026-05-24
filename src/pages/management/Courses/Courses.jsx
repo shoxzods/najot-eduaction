@@ -4,6 +4,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CourseModal from "../../../components/UI/CourseModal/CourseModal";
+import ConfirmDialog from "../../../components/UI/ConfirmDialog/ConfirmDialog";
 import { api } from "../../../api/api";
 import { lightGreen } from "@mui/material/colors";
 import CircularProgress from '@mui/material/CircularProgress';
@@ -14,6 +15,7 @@ export default function Courses() {
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, courseId: null });
     const defaultCourseData = {
         name: "",
         description: "",
@@ -120,20 +122,9 @@ export default function Courses() {
                         <div className={styles.cardHeader}>
                             <h3 className={styles.courseName}>{course.name}</h3>
                             <div className={styles.actions}>
-                                <button onClick={() => {
-                                    const confirmDelete = window.confirm('Haqiqatan ham kursni o‘chirilsinmi?');
-                                    if (!confirmDelete) return;
-
-                                    api.delete(`/courses/${course.id}`).then(
-                                        () => {
-                                            setCourses(prev => prev.filter(
-                                                item => item.id !== course.id
-                                            ));
-                                        }
-                                    ).catch(
-                                        err => console.log(err.message)
-                                    );
-                                }} className={styles.actionBtn}><DeleteOutlineRoundedIcon /></button>
+                                <button onClick={() => setDeleteConfirm({ isOpen: true, courseId: course.id })} className={styles.actionBtn}>
+                                    <DeleteOutlineRoundedIcon />
+                                </button>
                                 <button onClick={() => openEditCourseModal(course)} className={styles.actionBtn}><EditOutlinedIcon /></button>
                             </div>
                         </div>
@@ -222,6 +213,28 @@ export default function Courses() {
                     </div>
                 </form>
             </CourseModal>
+
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, courseId: null })}
+                onConfirm={() => {
+                    const id = deleteConfirm.courseId;
+                    setDeleteConfirm({ isOpen: false, courseId: null });
+                    if (id) {
+                        api.delete(`/courses/${id}`).then(
+                            () => {
+                                setCourses(prev => prev.filter(
+                                    item => item.id !== id
+                                ));
+                            }
+                        ).catch(
+                            err => console.log(err.message)
+                        );
+                    }
+                }}
+                title="Kursni o'chirish"
+                message="Rostdan ham o'chirishni hohlaysizmi?"
+            />
         </div>
     );
 }

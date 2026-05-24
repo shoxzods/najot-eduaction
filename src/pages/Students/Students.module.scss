@@ -141,6 +141,30 @@
     }
 }
 
+.backIconBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    color: #4a4a6a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    svg {
+        transform: rotate(180deg);
+    }
+
+    &:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #1a1a2e;
+    }
+}
+
 .tableWrapper {
     overflow-x: auto;
     overflow-y: hidden;

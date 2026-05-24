@@ -136,6 +136,18 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
         if (isOpen) {
             setShouldRender(true);
             document.body.style.overflow = 'hidden';
+            
+            // Pre-fetch all options to ensure labels render correctly
+            fetchCourses();
+            fetchRooms();
+            
+            api.get('/teachers').then(res => {
+                setTeachersOptions(res.data?.data || res.data || []);
+            }).catch(err => console.error('Error pre-fetching teachers:', err));
+
+            api.get('/students').then(res => {
+                setStudentsOptions(res.data?.data || res.data || []);
+            }).catch(err => console.error('Error pre-fetching students:', err));
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
@@ -144,6 +156,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
+
 
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
@@ -286,6 +299,11 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                                 ))
                             )}
                         </select>
+                        {groupData.courseId && (
+                            <div className={styles.durationInfo} style={{ marginTop: '6px', fontSize: '13px', color: '#6c35de', fontWeight: '500' }}>
+                                Kurs davomiyligi: {courses.find(c => String(c.id) === String(groupData.courseId))?.duration_month || 0} oy
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.formGroup}>
@@ -364,29 +382,69 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>
-                            O'qituvchilar 
+                        <label>O'qituvchilar</label>
+                        <div className={styles.groupsInputContainer}>
                             {groupData.teachers.length > 0 && (
-                                <span className={styles.countBadge}> ({groupData.teachers.length} ta tanlandi)</span>
+                                <div className={styles.groupTags}>
+                                    {groupData.teachers.map((teacherId) => {
+                                        const teacher = teachersOptions.find(t => t.id === Number(teacherId));
+                                        const label = teacher ? teacher.full_name : `Teacher #${teacherId}`;
+                                        return (
+                                            <span key={teacherId} className={styles.groupTag}>
+                                                {label}
+                                                <button
+                                                    type="button"
+                                                    className={styles.removeGroupBtn}
+                                                    onClick={() => setGroupData(prev => ({
+                                                        ...prev,
+                                                        teachers: prev.teachers.filter(id => id !== teacherId)
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
                             )}
-                        </label>
-                        <button type="button" className={styles.addOptionBtn} onClick={toggleAddTeacherModal}>
-                            <AddRoundedIcon fontSize="small" />
-                            <span>Qo'shish</span>
-                        </button>
+                            <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddTeacherModal}>
+                                <AddRoundedIcon fontSize="small" />
+                                <span>Qo'shish</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>
-                            Talabalar 
+                        <label>Talabalar</label>
+                        <div className={styles.groupsInputContainer}>
                             {groupData.students.length > 0 && (
-                                <span className={styles.countBadge}> ({groupData.students.length} ta tanlandi)</span>
+                                <div className={styles.groupTags}>
+                                    {groupData.students.map((studentId) => {
+                                        const student = studentsOptions.find(s => s.id === Number(studentId));
+                                        const label = student ? student.full_name : `Student #${studentId}`;
+                                        return (
+                                            <span key={studentId} className={styles.groupTag}>
+                                                {label}
+                                                <button
+                                                    type="button"
+                                                    className={styles.removeGroupBtn}
+                                                    onClick={() => setGroupData(prev => ({
+                                                        ...prev,
+                                                        students: prev.students.filter(id => id !== studentId)
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
                             )}
-                        </label>
-                        <button type="button" className={styles.addOptionBtn} onClick={toggleAddStudentModal}>
-                            <AddRoundedIcon fontSize="small" />
-                            <span>Qo'shish</span>
-                        </button>
+                            <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddStudentModal}>
+                                <AddRoundedIcon fontSize="small" />
+                                <span>Qo'shish</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -407,6 +465,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                     isOpen={isAddTeacherModalOpen}
                     onClose={toggleAddTeacherModal}
                     items={teachersOptions}
+                    initialSelected={groupData.teachers}
                     onAdd={(selected) => {
                         setGroupData(prev => ({
                             ...prev,
@@ -420,6 +479,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                     isOpen={isAddStudentModalOpen}
                     onClose={toggleAddStudentModal}
                     items={studentsOptions}
+                    initialSelected={groupData.students}
                     onAdd={(selected) => {
                         setGroupData(prev => ({
                             ...prev,
@@ -428,6 +488,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                         toggleAddStudentModal();
                     }}
                 />
+
             </form>
         </div>,
         document.body

@@ -4,13 +4,14 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { createPortal } from "react-dom";
 import { api } from '../../../../api/api';
 
-export default function AddTeacherModal({ isOpen, onClose, onAdd, items = [] }) {
+export default function AddTeacherModal({ isOpen, onClose, onAdd, items = [], initialSelected = [] }) {
     const [shouldRender, setShouldRender] = useState(isOpen);
     const [selectedIds, setSelectedIds] = useState([]);
 
     useEffect(() => {
         if (isOpen) {
             setShouldRender(true);
+            setSelectedIds(initialSelected);
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);

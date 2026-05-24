@@ -4,6 +4,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import RoomModal from "../../../components/UI/RoomModal/RoomModal";
+import ConfirmDialog from "../../../components/UI/ConfirmDialog/ConfirmDialog";
 import { api } from "../../../api/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -67,8 +68,9 @@ export default function Rooms() {
         setRoomData(defaultRoomData);
     };
 
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, roomId: null });
+
     function deleteRoom(id) {
-        if (!window.confirm("Haqiqatan ham xonani o'chirmoqchimisiz?")) return;
         setIsLoading(true);
         api.delete(`/rooms/${id}`)
             .then(res => {
@@ -81,6 +83,7 @@ export default function Rooms() {
             .catch(err => console.error(err.message))
             .finally(() => setIsLoading(false));
     }
+
 
     return (
         <div className={styles.roomsContainer}>
@@ -117,7 +120,7 @@ export default function Rooms() {
                             <h3 className={styles.roomName}>{room.name}</h3>
                             <div className={styles.actions}>
                                 <button
-                                    onClick={() => deleteRoom(room.id)}
+                                    onClick={() => setDeleteConfirm({ isOpen: true, roomId: room.id })}
                                     className={`${styles.actionBtn} ${styles.deleteBtn}`}
                                 >
                                     <DeleteOutlineRoundedIcon />
@@ -192,7 +195,20 @@ export default function Rooms() {
                     </div>
                 </form>
             </RoomModal>
+
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, roomId: null })}
+                onConfirm={() => {
+                    const id = deleteConfirm.roomId;
+                    setDeleteConfirm({ isOpen: false, roomId: null });
+                    deleteRoom(id);
+                }}
+                title="Xonani o'chirish"
+                message="Rostdan ham o'chirishni hohlaysizmi?"
+            />
         </div>
+
     );
 }
 

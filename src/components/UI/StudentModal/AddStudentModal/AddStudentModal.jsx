@@ -261,7 +261,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                         )}
                         <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddGroupModal}>
                             <AddRoundedIcon fontSize="small" />
-                            <span>Guruh qo'shish</span>
+                            <span>Qo'shish</span>
                         </button>
                     </div>
                 </div>

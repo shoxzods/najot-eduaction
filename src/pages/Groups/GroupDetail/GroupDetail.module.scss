@@ -285,6 +285,180 @@
     }
   }
 
+  // Schedule table (Dars jadvali)
+  .scheduleTable {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    .scheduleTableHeader {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      background-color: #fdfdfd;
+
+      span {
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+      }
+    }
+
+    .scheduleRow {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background-color 0.15s;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: #f8fafc;
+      }
+
+      span {
+        font-size: 14px;
+        color: #475569;
+      }
+    }
+
+    .scheduleColName {
+      flex: 2;
+      min-width: 180px;
+    }
+
+    .scheduleColDays {
+      flex: 1.2;
+      min-width: 120px;
+    }
+
+    .scheduleColTime {
+      flex: 2;
+      min-width: 180px;
+    }
+
+    .scheduleColPeriod {
+      flex: 2;
+      min-width: 200px;
+    }
+
+    .scheduleColRoom {
+      flex: 1.5;
+      min-width: 140px;
+      text-align: right;
+    }
+
+    .scheduleTeacher {
+      color: #3b82f6 !important;
+      font-weight: 500;
+    }
+  }
+
+  // Month navigator
+  .monthNav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    .monthNavBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background-color: #fff;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        background-color: #f1f5f9;
+        color: #0f172a;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    .monthNavLabel {
+      font-size: 14px;
+      font-weight: 500;
+      color: #0f172a;
+    }
+  }
+
+  // Study month blocks
+  .studyMonthBlock {
+    margin-bottom: 24px;
+
+    .studyMonthHeader {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      .studyMonthLabel {
+        font-size: 15px;
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      .currentMonthBadge {
+        background-color: #dcfce7;
+        color: #16a34a;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 12px;
+      }
+    }
+
+    .calendarDaysRow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .calendarChip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 52px;
+        height: 60px;
+        border-radius: 8px;
+        background-color: #f1f5f9;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: #e2e8f0;
+        }
+
+        .chipMonth {
+          font-size: 11px;
+          color: #64748b;
+          font-weight: 500;
+          margin-bottom: 2px;
+        }
+
+        .chipDay {
+          font-size: 15px;
+          font-weight: 600;
+          color: #0f172a;
+        }
+      }
+    }
+  }
+
   .monthNavigator {
     display: flex;
     align-items: center;

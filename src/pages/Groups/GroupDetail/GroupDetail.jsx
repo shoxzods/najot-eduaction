@@ -14,6 +14,8 @@ export default function GroupDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [currentMonth, setCurrentMonth] = useState(0);
+    const [showAllMonths, setShowAllMonths] = useState(false);
     
     const tabIndex = searchParams.get("tab") || "0";
     let activeTab = "Ma'lumotlar";
@@ -65,6 +67,45 @@ export default function GroupDetail() {
             { id: 11, day: 26, month: "May", active: true },
             { id: 12, day: 28, month: "May", active: true },
             { id: 13, day: 30, month: "May", active: true }
+        ],
+        studyMonths: [
+            {
+                label: "1-o'quv oyi",
+                isCurrent: true,
+                days: [
+                    { id: 1, day: 2, month: "May" },
+                    { id: 2, day: 5, month: "May" },
+                    { id: 3, day: 7, month: "May" },
+                    { id: 4, day: 9, month: "May" },
+                    { id: 5, day: 12, month: "May" },
+                    { id: 6, day: 14, month: "May" },
+                    { id: 7, day: 16, month: "May" },
+                    { id: 8, day: 19, month: "May" },
+                    { id: 9, day: 21, month: "May" },
+                    { id: 10, day: 23, month: "May" },
+                    { id: 11, day: 26, month: "May" },
+                    { id: 12, day: 28, month: "May" },
+                    { id: 13, day: 30, month: "May" }
+                ]
+            },
+            {
+                label: "2-o'quv oyi",
+                isCurrent: false,
+                days: [
+                    { id: 14, day: 2, month: "Jun" },
+                    { id: 15, day: 4, month: "Jun" },
+                    { id: 16, day: 6, month: "Jun" },
+                    { id: 17, day: 9, month: "Jun" },
+                    { id: 18, day: 11, month: "Jun" },
+                    { id: 19, day: 13, month: "Jun" },
+                    { id: 20, day: 16, month: "Jun" },
+                    { id: 21, day: 18, month: "Jun" },
+                    { id: 22, day: 20, month: "Jun" },
+                    { id: 23, day: 23, month: "Jun" },
+                    { id: 24, day: 25, month: "Jun" },
+                    { id: 25, day: 27, month: "Jun" }
+                ]
+            }
         ],
         lessons: [
             { id: 1, number: 1, title: "HTML elementlari va teglari", type: "Dars", date: "15 Yan, 2026 // 09:30" },
@@ -168,22 +209,83 @@ export default function GroupDetail() {
                     </div>
 
                     <div className={styles.scheduleSection}>
-                        <h2>Dars vaqti va xonasi</h2>
-                        <div className={styles.scheduleList}>
+                        <h2>Dars jadvali</h2>
+                        <div className={styles.scheduleTable}>
+                            <div className={styles.scheduleTableHeader}>
+                                <span className={styles.scheduleColName}>O'qituvchi</span>
+                                <span className={styles.scheduleColDays}>Kunlar</span>
+                                <span className={styles.scheduleColTime}>Vaqti</span>
+                                <span className={styles.scheduleColPeriod}>Davomiyligi</span>
+                                <span className={styles.scheduleColRoom}>Xona</span>
+                            </div>
                             {fakeGroupData.schedule.map(item => (
-                                <div key={item.id} className={styles.scheduleItem}>
-                                    <div className={styles.teacherName}>{item.teacher}</div>
-                                    <div className={styles.scheduleDetails}>
-                                        <span>{item.days} // {item.time}</span>
-                                        <span>{item.period}</span>
-                                        <span>{item.room}</span>
-                                    </div>
+                                <div key={item.id} className={styles.scheduleRow}>
+                                    <span className={styles.scheduleColName}>
+                                        <span className={styles.scheduleTeacher}>{item.teacher}</span>
+                                    </span>
+                                    <span className={styles.scheduleColDays}>{item.days}</span>
+                                    <span className={styles.scheduleColTime}>{item.time}</span>
+                                    <span className={styles.scheduleColPeriod}>{item.period}</span>
+                                    <span className={styles.scheduleColRoom}>{item.room}</span>
                                 </div>
                             ))}
                         </div>
+
                         <div className={styles.showMoreBtnWrapper}>
-                            <button className={styles.showMoreBtn}>Ko'proq ko'rish</button>
+                            <button className={styles.showMoreBtn}>Yana ko'rsatish (9)</button>
                         </div>
+
+                        {/* Month navigation */}
+                        <div className={styles.monthNav}>
+                            <button 
+                                className={styles.monthNavBtn} 
+                                onClick={() => setCurrentMonth(Math.max(0, currentMonth - 1))}
+                                disabled={currentMonth === 0}
+                            >
+                                <KeyboardArrowLeftRoundedIcon fontSize="small" />
+                            </button>
+                            <span className={styles.monthNavLabel}>
+                                {fakeGroupData.studyMonths[currentMonth]?.label}
+                            </span>
+                            <button 
+                                className={styles.monthNavBtn} 
+                                onClick={() => setCurrentMonth(Math.min(fakeGroupData.studyMonths.length - 1, currentMonth + 1))}
+                                disabled={currentMonth >= fakeGroupData.studyMonths.length - 1}
+                            >
+                                <KeyboardArrowRightRoundedIcon fontSize="small" />
+                            </button>
+                        </div>
+
+                        {/* Study months and calendar */}
+                        {(showAllMonths ? fakeGroupData.studyMonths : fakeGroupData.studyMonths.slice(0, 1)).map((studyMonth, idx) => (
+                            <div key={idx} className={styles.studyMonthBlock}>
+                                <div className={styles.studyMonthHeader}>
+                                    <span className={styles.studyMonthLabel}>{studyMonth.label}</span>
+                                    {studyMonth.isCurrent && (
+                                        <span className={styles.currentMonthBadge}>Joriy oy</span>
+                                    )}
+                                </div>
+                                <div className={styles.calendarDaysRow}>
+                                    {studyMonth.days.map(item => (
+                                        <div key={item.id} className={styles.calendarChip}>
+                                            <span className={styles.chipMonth}>{item.month}</span>
+                                            <span className={styles.chipDay}>{item.day}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        {fakeGroupData.studyMonths.length > 1 && (
+                            <div className={styles.showAllBtnWrapper}>
+                                <button 
+                                    className={styles.showAllBtn} 
+                                    onClick={() => setShowAllMonths(!showAllMonths)}
+                                >
+                                    {showAllMonths ? 'Yopish' : 'Barchasini ko\'rish'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </>
             )}

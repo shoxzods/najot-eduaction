@@ -1,4 +1,5 @@
 import { useEffect, useState, useTransition } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Students.module.scss";
 import { api } from '../../api/api';
 
@@ -11,10 +12,12 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import StudentModal from "../../components/UI/StudentModal/StudentModal";
+import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
 export default function Students() {
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentData, setStudentData] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
@@ -22,6 +25,7 @@ export default function Students() {
     const [totalPages, setTotalPages] = useState(10); // Default to 10 to match design if API doesn't provide
     const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, studentId: null });
 
     const openAddStudentModal = () => {
         setSelectedStudent(null);
@@ -113,7 +117,10 @@ export default function Students() {
 
 
     function deleteStudent(id) {
-        if (!window.confirm("Talabani o'chirmoqchimisiz?")) return;
+        setDeleteConfirm({ isOpen: true, studentId: id });
+    }
+
+    function actualDeleteStudent(id) {
         setIsLoading(true);
         api.delete(`/students/${id}`)
             .then(res => {
@@ -154,7 +161,7 @@ export default function Students() {
                             <FilterListRoundedIcon fontSize="small" />
                             Filters
                         </button>
-                        <button className={styles.archiveBtn}>
+                        <button className={styles.archiveBtn} onClick={() => navigate('/dashboard/students/archive')}>
                             <ArchiveOutlinedIcon fontSize="small" />
                             Arxiv
                         </button>
@@ -211,15 +218,16 @@ export default function Students() {
                                         </div>
                                     </td>
                                     <td>{student.phone}</td>
-                                    <td style={{paddingLeft:'16px'}}>{student.email}</td>
-                                    <td style={{paddingLeft:'20px'}}>{formatDate(student.birth_date)}</td>
-                                    <td style={{paddingLeft:'18px'}}>{student.address}</td>
-                                    <td style={{paddingLeft:'20px'}}>{formatDate(student.created_at)}</td>
+                                    <td style={{ paddingLeft: '16px' }}>{student.email}</td>
+                                    <td style={{ paddingLeft: '20px' }}>{formatDate(student.birth_date)}</td>
+                                    <td style={{ paddingLeft: '18px' }}>{student.address}</td>
+                                    <td style={{ paddingLeft: '20px' }}>{formatDate(student.created_at)}</td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div className={styles.actions}>
                                             <button className={styles.actionBtn}><VisibilityOutlinedIcon fontSize="small" /></button>
                                             <button onClick={() => deleteStudent(student.id)} className={styles.actionBtn}><DeleteOutlineRoundedIcon fontSize="small" /></button>
                                             <button onClick={() => openEditStudentModal(student)} className={styles.actionBtn}><EditOutlinedIcon fontSize="small" /></button>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -276,6 +284,18 @@ export default function Students() {
                     fetchStudents(page);
                 }}
                 studentToEdit={selectedStudent}
+            />
+
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, studentId: null })}
+                onConfirm={() => {
+                    const id = deleteConfirm.studentId;
+                    setDeleteConfirm({ isOpen: false, studentId: null });
+                    if (id) actualDeleteStudent(id);
+                }}
+                title="Talabani o'chirish"
+                message="Rostdan ham o'chirishni hohlaysizmi?"
             />
         </div>
     );
