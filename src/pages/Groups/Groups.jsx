@@ -146,7 +146,7 @@ export default function Groups() {
                     </div>
                     <div className={styles.statInfo}>
                         <p className={styles.statLabel}>Jami guruhlar</p>
-                        <h2 className={styles.statValue}>2</h2>
+                        <h2 className={styles.statValue}>{groups.length}</h2>
                     </div>
                 </div>
 
@@ -159,7 +159,9 @@ export default function Groups() {
                     </div>
                     <div className={styles.statInfo}>
                         <p className={styles.statLabel}>O'qituvchilar</p>
-                        <h2 className={styles.statValue}>0</h2>
+                        <h2 className={styles.statValue}>
+                            {new Set(groups.flatMap(g => g.teachers?.map(t => t.id).filter(Boolean) || [])).size || groups.reduce((sum, g) => sum + (g.teachers?.length || 0), 0)}
+                        </h2>
                     </div>
                 </div>
 
@@ -172,7 +174,9 @@ export default function Groups() {
                     </div>
                     <div className={styles.statInfo}>
                         <p className={styles.statLabel}>O'quvchilar</p>
-                        <h2 className={styles.statValue}>0</h2>
+                        <h2 className={styles.statValue}>
+                            {groups.reduce((sum, g) => sum + (g.students?.length || 0), 0)}
+                        </h2>
                     </div>
                     <div className={styles.studentAvatars}>
                         <div className={styles.smallAvatar} style={{ backgroundColor: '#1e293b' }}>I</div>

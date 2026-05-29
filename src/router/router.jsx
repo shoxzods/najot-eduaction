@@ -19,7 +19,9 @@ const ArchiveStudents = lazy(() => import("../pages/Students/ArchiveStudents"));
 const Groups = lazy(() => import("../pages/Groups/Groups"));
 const ArchiveGroups = lazy(() => import("../pages/Groups/ArchiveGroups.jsx"));
 const GroupDetail = lazy(() => import("../pages/Groups/GroupDetail/GroupDetail"));
+const LessonDetail = lazy(() => import("../pages/Groups/LessonDetail/LessonDetail"));
 const CreateHomework = lazy(() => import("../pages/Groups/CreateHomework/CreateHomework"));
+const HomeworkResults = lazy(() => import("../pages/Groups/HomeworkResults/HomeworkResults"));
 const Gifts = lazy(() => import("../pages/Gifts/Gifts"));
 const Default = lazy(() => import("../pages/management/default/Default"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
@@ -81,8 +83,16 @@ const router = createBrowserRouter([
         element: <GroupDetail />
       },
       {
+        path: '/dashboard/groups/:id/lesson/:date',
+        element: <LessonDetail />
+      },
+      {
         path: '/dashboard/groups/:id/homework/create',
         element: <CreateHomework />
+      },
+      {
+        path: '/dashboard/groups/:id/homework/:homeworkId/results',
+        element: <HomeworkResults />
       },
       {
         path: '/dashboard/gifts',

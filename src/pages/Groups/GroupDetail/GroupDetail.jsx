@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../../../api/api";
 import styles from "./GroupDetail.module.scss";
@@ -6,10 +6,14 @@ import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRound
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
-// import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
-// import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-// import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 
 export default function GroupDetail() {
     const { id } = useParams();
@@ -17,10 +21,36 @@ export default function GroupDetail() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [currentMonth, setCurrentMonth] = useState(0);
     const [showAllMonths, setShowAllMonths] = useState(false);
-    const [OverallLessons] = useState([]);    
+    const [OverallLessons] = useState([]);
     const [schedules, setSchedules] = useState([]);
     const [groupDetails, setGroupDetails] = useState(null);
-    
+    const [homeworkData, setHomeworkData] = useState([]);
+    const [videosData, setVideosData] = useState([]);
+    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+    const [selectedVideoFile, setSelectedVideoFile] = useState(null);
+    const [videoFileName, setVideoFileName] = useState("");
+    const [selectedLessonId, setSelectedLessonId] = useState("");
+    const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+    const [selectedPlayVideo, setSelectedPlayVideo] = useState(null);
+    const [groupLessons, setGroupLessons] = useState([]);
+    const [groupStudents, setGroupStudents] = useState([]);
+    const fileInputRef = useRef(null);
+
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedVideoFile(file);
+            setVideoFileName(file.name);
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsVideoModalOpen(false);
+        setSelectedVideoFile(null);
+        setVideoFileName("");
+        setSelectedLessonId("");
+    };
+
     useEffect(() => {
         const fetchSchedules = async () => {
             try {
@@ -60,8 +90,16 @@ export default function GroupDetail() {
     useEffect(() => {
         const fetchGroupDetails = async () => {
             try {
-                const res = await api.get(`/groups/one/${id}`);
-                setGroupDetails(res.data.data || res.data);
+                const [resOne, resBasic] = await Promise.all([
+                    api.get(`/groups/one/${id}`).catch(() => ({ data: {} })),
+                    api.get(`/groups/${id}`).catch(() => ({ data: {} }))
+                ]);
+                
+                const dataOne = resOne.data?.data || resOne.data || {};
+                const dataBasic = resBasic.data?.data || resBasic.data || {};
+                
+                // Merge data so that we have both Dars jadvali info (from /one) and Guruh parametrlari info (from basic endpoint)
+                setGroupDetails({ ...dataOne, ...dataBasic });
             } catch (err) {
                 console.error("Error fetching group details:", err);
             }
@@ -70,7 +108,69 @@ export default function GroupDetail() {
             fetchGroupDetails();
         }
     }, [id]);
-    
+
+    useEffect(() => {
+        const fetchHomework = async () => {
+            try {
+                const res = await api.get(`/homework/${id}`);
+                // if it returns an object that has data, or just array
+                const data = res.data.data || res.data || [];
+                setHomeworkData(Array.isArray(data) ? data : [data]);
+            } catch (err) {
+                console.error("Error fetching homework:", err);
+            }
+        };
+        if (id) {
+            fetchHomework();
+        }
+    }, [id]);
+
+    const fetchVideos = async () => {
+        try {
+            const res = await api.get(`/files/${id}`);
+            const data = res.data.data || res.data || [];
+            setVideosData(Array.isArray(data) ? data : [data]);
+        } catch (err) {
+            console.error("Error fetching videos:", err);
+        }
+    };
+
+    useEffect(() => {
+        if (id) {
+            fetchVideos();
+        }
+    }, [id]);
+
+    useEffect(() => {
+        const fetchGroupLessons = async () => {
+            try {
+                const res = await api.get(`/lessons/my/group/${id}`);
+                const data = res.data.data || res.data || [];
+                setGroupLessons(Array.isArray(data) ? data : [data]);
+            } catch (err) {
+                console.error("Error fetching group lessons:", err);
+            }
+        };
+        if (id) {
+            fetchGroupLessons();
+        }
+    }, [id]);
+
+    useEffect(() => {
+        const fetchStudents = async () => {
+            try {
+                const res = await api.get(`/groups/one/students/${id}`);
+                const data = res.data?.data || res.data || [];
+                setGroupStudents(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Error fetching group students:", err);
+            }
+        };
+        if (id) {
+            fetchStudents();
+        }
+    }, [id]);
+
     const tabIndex = searchParams.get("tab") || "0";
     let activeTab = "Ma'lumotlar";
     if (tabIndex === "1") activeTab = "Guruh darsliklari";
@@ -106,6 +206,24 @@ export default function GroupDetail() {
         return `${day} ${months[date.getMonth()]}, ${date.getFullYear()}`;
     };
 
+    const formatDateTime = (dateString) => {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "-";
+        const datePart = formatDate(dateString);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${datePart} ${hours}:${minutes}`;
+    };
+
+    const addDays = (dateString, days) => {
+        if (!dateString) return "-";
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "-";
+        date.setDate(date.getDate() + days);
+        return date.toISOString();
+    };
+
     const calculateEndTime = (timeStr, hoursToAdd = 2) => {
         if (!timeStr) return "";
         const parts = timeStr.split(":");
@@ -128,14 +246,55 @@ export default function GroupDetail() {
         return date.toISOString(); // Format back to ISO so formatDate can parse it
     };
 
+    const formatFileSize = (size) => {
+        if (!size) return "-";
+        if (typeof size === 'string' && size.includes("MB")) return size;
+        const bytes = Number(size);
+        if (isNaN(bytes)) return size;
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const handleVideoUpload = async () => {
+        if (!selectedVideoFile || !selectedLessonId) {
+            alert("Iltimos, darsni tanlang!");
+            return;
+        }
+
+        setIsUploadingVideo(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", selectedVideoFile);
+
+            await api.post(
+                `/files/group/${id}/upload?lessonId=${selectedLessonId}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            );
+
+            await fetchVideos();
+            handleModalClose();
+        } catch (err) {
+            console.error("Error uploading video:", err);
+            alert("Video yuklashda xatolik yuz berdi");
+        } finally {
+            setIsUploadingVideo(false);
+        }
+    };
+
     // Fake data for tabs that don't have API yet
     const fakeGroupData = {
         lessons: [
-            { id: 1, number: 1, title: "HTML elementlari va teglari", type: "Dars", date: "15 Yan, 2026 // 09:30" },
-            { id: 2, number: 2, title: "CSS selectors", type: "Dars", date: "17 Yan, 2026 // 09:30" },
-            { id: 3, number: 3, title: "Flexbox layout model", type: "Dars", date: "20 Yan, 2026 // 09:30" },
-            { id: 4, number: 4, title: "Git and Github", type: "Dars", date: "22 Yan, 2026 // 09:30" },
-            { id: 5, number: 5, title: "Javascript basics", type: "Dars", date: "25 Yan, 2026 // 09:30" }
+            { id: 1, number: 1, title: "Html asoslari", isPill: true, count1: 5, count2: 1, count3: 0, startDate: "13 May, 2026 10:00", endDate: "14 May, 2026 06:00", lessonDate: "12 May, 2026" },
+            { id: 2, number: 2, title: "Kirish", isPill: false, count1: 5, count2: 0, count3: 0, startDate: "13 May, 2026 11:52", endDate: "14 May, 2026 07:52", lessonDate: "9 May, 2026" },
+            { id: 3, number: 3, title: "Nodejs", isPill: false, count1: 5, count2: 0, count3: 3, startDate: "14 May, 2026 09:47", endDate: "15 May, 2026 05:47", lessonDate: "14 May, 2026" }
         ],
         calendarDays: [
             { id: 1, day: 2, month: "May", active: true },
@@ -171,19 +330,19 @@ export default function GroupDetail() {
             </div>
 
             <div className={styles.tabs}>
-                <button 
+                <button
                     className={`${styles.tab} ${activeTab === "Ma'lumotlar" ? styles.activeTab : ""}`}
                     onClick={() => handleTabChange("0")}
                 >
                     Ma'lumotlar
                 </button>
-                <button 
+                <button
                     className={`${styles.tab} ${activeTab === "Guruh darsliklari" ? styles.activeTab : ""}`}
                     onClick={() => handleTabChange("1")}
                 >
                     Guruh darsliklari
                 </button>
-                <button 
+                <button
                     className={`${styles.tab} ${activeTab === "Akademik davomati" ? styles.activeTab : ""}`}
                     onClick={() => handleTabChange("2")}
                 >
@@ -199,12 +358,12 @@ export default function GroupDetail() {
                                 <h3>Mentors</h3>
                             </div>
                             <div className={styles.cardBody}>
-                                {(groupDetails?.teachers || []).map((mentor, index) => (
-                                    <div key={mentor.id || index} className={styles.mentorItem}>
-                                        <img 
-                                            src={mentor.image || `https://ui-avatars.com/api/?name=${mentor.full_name || mentor.name || 'MO'}&background=f8fafc&color=3b82f6&size=128`} 
-                                            alt={mentor.full_name || mentor.name} 
-                                            className={styles.mentorAvatar} 
+                                {groupDetails?.teachers?.map((mentor, index) => (
+                                    <div key={index} className={styles.mentorInfo}>
+                                        <img
+                                            src={mentor.photo || `https://ui-avatars.com/api/?name=${mentor.full_name || mentor.name || 'MO'}&background=f8fafc&color=3b82f6&size=128`}
+                                            alt={mentor.full_name || mentor.name}
+                                            className={styles.mentorAvatar}
                                         />
                                         <span className={styles.mentorRole}>Teacher</span>
                                         <span className={styles.mentorName}>{mentor.full_name || mentor.name}</span>
@@ -224,11 +383,11 @@ export default function GroupDetail() {
                                 </div>
                                 <div className={styles.paramRow}>
                                     <span>O'rtacha yosh</span>
-                                    <strong>{groupDetails?.averageAge || "21"} yosh</strong>
+                                    <strong>{groupDetails?.averageAge ?? "0"} yosh</strong>
                                 </div>
                                 <div className={styles.paramRow}>
                                     <span>Sig'imi</span>
-                                    <strong>{groupDetails?.capacity || "20"} ta</strong>
+                                    <strong>{groupDetails?.room_capacity ?? "0"} ta</strong>
                                 </div>
                                 <div className={styles.paramRow}>
                                     <span>Hozirgi o'quvchilar</span>
@@ -256,7 +415,7 @@ export default function GroupDetail() {
                             {(() => {
                                 const teachersList = groupDetails?.teachers?.length > 0 ? groupDetails.teachers : (groupDetails ? [{ id: 'unknown', full_name: "Noma'lum" }] : []);
                                 const displayedTeachers = showAllSchedules ? teachersList : teachersList.slice(0, 2);
-                                
+
                                 return displayedTeachers.map((teacher, index) => {
                                     const item = {
                                         id: `${groupDetails?.id || 'g'}-${teacher.id || index}`,
@@ -283,7 +442,7 @@ export default function GroupDetail() {
 
                         {groupDetails?.teachers?.length > 2 && (
                             <div className={styles.showMoreBtnWrapper}>
-                                <button 
+                                <button
                                     className={styles.showMoreBtn}
                                     onClick={() => setShowAllSchedules(!showAllSchedules)}
                                 >
@@ -294,8 +453,8 @@ export default function GroupDetail() {
 
                         {/* Month navigation */}
                         <div className={styles.monthNav}>
-                            <button 
-                                className={styles.monthNavBtn} 
+                            <button
+                                className={styles.monthNavBtn}
                                 onClick={() => setCurrentMonth(Math.max(0, currentMonth - 1))}
                                 disabled={currentMonth === 0}
                             >
@@ -304,8 +463,8 @@ export default function GroupDetail() {
                             <span className={styles.monthNavLabel}>
                                 {schedules[currentMonth]?.label || ""}
                             </span>
-                            <button 
-                                className={styles.monthNavBtn} 
+                            <button
+                                className={styles.monthNavBtn}
                                 onClick={() => setCurrentMonth(Math.min(schedules.length - 1, currentMonth + 1))}
                                 disabled={currentMonth >= schedules.length - 1 || schedules.length === 0}
                             >
@@ -324,7 +483,12 @@ export default function GroupDetail() {
                                 </div>
                                 <div className={styles.calendarDaysRow}>
                                     {studyMonth.days.map(item => (
-                                        <div key={item.id} className={styles.calendarChip}>
+                                        <div 
+                                            key={item.id} 
+                                            className={styles.calendarChip}
+                                            onClick={() => navigate(`/dashboard/groups/${id}/lesson/2026-05-${String(item.day).padStart(2, '0')}`)}
+                                            style={{ cursor: "pointer" }}
+                                        >
                                             <span className={styles.chipMonth}>{item.month}</span>
                                             <span className={styles.chipDay}>{item.day}</span>
                                         </div>
@@ -335,8 +499,8 @@ export default function GroupDetail() {
 
                         {schedules.length > 1 && (
                             <div className={styles.showAllBtnWrapper}>
-                                <button 
-                                    className={styles.showAllBtn} 
+                                <button
+                                    className={styles.showAllBtn}
                                     onClick={() => setShowAllMonths(!showAllMonths)}
                                 >
                                     {showAllMonths ? 'Yopish' : 'Barchasini ko\'rish'}
@@ -351,56 +515,141 @@ export default function GroupDetail() {
                 <div className={styles.lessonsSection}>
                     <div className={styles.lessonsHeader}>
                         <div className={styles.lessonsTabsAndTitle}>
-                            <h2>Darslar</h2>
+                            <h2>Guruh darsliklari</h2>
                             <div className={styles.subTabs}>
-                                <button 
-                                    className={`${styles.subTab} ${activeSubTab === "Darslik" ? styles.activeSubTab : ""}`}
-                                    onClick={() => setActiveSubTab("Darslik")}
-                                >
-                                    Darslik
-                                </button>
-                                <button 
+                                <button
                                     className={`${styles.subTab} ${activeSubTab === "Uyga vazifa" ? styles.activeSubTab : ""}`}
                                     onClick={() => setActiveSubTab("Uyga vazifa")}
                                 >
                                     Uyga vazifa
                                 </button>
+                                <button
+                                    className={`${styles.subTab} ${activeSubTab === "Videolar" ? styles.activeSubTab : ""}`}
+                                    onClick={() => setActiveSubTab("Videolar")}
+                                >
+                                    Videolar
+                                </button>
+                                <button
+                                    className={`${styles.subTab} ${activeSubTab === "Imtihonlar" ? styles.activeSubTab : ""}`}
+                                    onClick={() => setActiveSubTab("Imtihonlar")}
+                                >
+                                    Imtihonlar
+                                </button>
+                                <button
+                                    className={`${styles.subTab} ${activeSubTab === "Jurnal" ? styles.activeSubTab : ""}`}
+                                    onClick={() => setActiveSubTab("Jurnal")}
+                                >
+                                    Jurnal
+                                </button>
                             </div>
                         </div>
-                        
-                        {activeSubTab === "Uyga vazifa" && (
-                            <button 
-                                className={styles.addLessonBtn}
-                                onClick={() => navigate(`/dashboard/groups/${id}/homework/create`)}
-                            >
-                                Yangi vazifa qo'shish
-                            </button>
-                        )}
+
+                        <button
+                            className={styles.addLessonBtn}
+                            onClick={() => {
+                                if (activeSubTab === "Videolar") {
+                                    setIsVideoModalOpen(true);
+                                } else {
+                                    navigate(`/dashboard/groups/${id}/homework/create`);
+                                }
+                            }}
+                        >
+                            Qo'shish
+                        </button>
                     </div>
 
                     <div className={styles.tableCard}>
-                        <table className={styles.lessonsTable}>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Mavzu nomi</th>
-                                    <th>Tur</th>
-                                    <th>Qo'shilgan sana va vaqt</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {fakeGroupData.lessons.map((lesson, idx) => (
-                                    <tr key={lesson.id}>
-                                        <td>{idx + 1}</td>
-                                        <td className={styles.lessonTitle}>{lesson.title}</td>
-                                        <td>{lesson.type}</td>
-                                        <td className={styles.timeCell}>{lesson.date}</td>
-                                        <td><MoreVertRoundedIcon className={styles.moreIcon} /></td>
+                        {activeSubTab === "Uyga vazifa" && (
+                            <table className={styles.lessonsTable}>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Mavzu</th>
+                                        <th><PersonOutlineRoundedIcon fontSize="small" style={{ color: '#94a3b8' }} /></th>
+                                        <th><TimerOutlinedIcon fontSize="small" style={{ color: '#f59e0b' }} /></th>
+                                        <th><CheckCircleOutlineRoundedIcon fontSize="small" style={{ color: '#22c55e' }} /></th>
+                                        <th>Berilgan vaqt</th>
+                                        <th>Tugash vaqti</th>
+                                        <th>Dars sanasi</th>
+                                        <th></th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {homeworkData.map((lesson, idx) => (
+                                        <tr 
+                                            key={`${lesson.id}-${idx}`}
+                                            onClick={() => navigate(`/dashboard/groups/${id}/homework/${lesson.id}/results`)}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            <td>{idx + 1}</td>
+                                            <td>
+                                                {lesson.homeworkPending > 0 ? (
+                                                    <div className={styles.pillOrange}>
+                                                        {lesson.topic}
+                                                    </div>
+                                                ) : (
+                                                    <div className={styles.lessonTitleText}>
+                                                        {lesson.topic}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td>{lesson.existStudentsIngroup || 0}</td>
+                                            <td>{lesson.homeworkPending || 0}</td>
+                                            <td>{lesson.homeworkAccept || 0}</td>
+                                            <td className={styles.timeCell}>{formatDateTime(lesson.created_at)}</td>
+                                            <td className={styles.timeCell}>{formatDateTime(addDays(lesson.created_at, 2))}</td>
+                                            <td className={styles.timeCell}>{formatDate(lesson.created_at)}</td>
+                                            <td><MoreVertRoundedIcon className={styles.moreIcon} /></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+
+                        {activeSubTab === "Videolar" && (
+                            <table className={styles.lessonsTable}>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Video nomi</th>
+                                        <th>Dars nomi</th>
+                                        <th>Status</th>
+                                        <th>Dars sanasi</th>
+                                        <th>Hajmi</th>
+                                        <th>Qo'shilgan vaqti</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {videosData.length > 0 ? videosData.map((video, idx) => (
+                                        <tr key={video.id || idx}>
+                                            <td>{idx + 1}</td>
+                                            <td>
+                                                <div
+                                                    className={styles.videoNameCell}
+                                                    onClick={() => setSelectedPlayVideo(video)}
+                                                >
+                                                    <PlayCircleOutlineRoundedIcon className={styles.playIcon} fontSize="small" />
+                                                    {video.originalname || video.title || video.videoName || video.name || "Video"}
+                                                </div>
+                                            </td>
+                                            <td className={styles.lessonNameCell}>{video.lesson?.topic || video.lessonName || "-"}</td>
+                                            <td>
+                                                <div className={styles.statusPill}>{video.status || "Tayyor"}</div>
+                                            </td>
+                                            <td className={styles.timeCell}>{video.lesson?.created_at ? formatDate(video.lesson.created_at) : video.lessonDate || "-"}</td>
+                                            <td className={styles.timeCell}>{video.size_mb ? parseFloat(video.size_mb).toFixed(2) + ' MB' : formatFileSize(video.size || video.file_size)}</td>
+                                            <td className={styles.timeCell}>{formatDate(video.created_at || video.addedTime)}</td>
+                                            <td><MoreVertRoundedIcon className={styles.moreIcon} /></td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan="8" style={{ textAlign: "center", padding: "20px" }}>Videolar topilmadi</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 </div>
             )}
@@ -419,7 +668,12 @@ export default function GroupDetail() {
 
                     <div className={styles.calendarList}>
                         {fakeGroupData.calendarDays.map(item => (
-                            <div key={item.id} className={`${styles.calendarDay} ${item.active ? styles.activeDay : ""}`}>
+                            <div 
+                                key={item.id} 
+                                className={`${styles.calendarDay} ${item.active ? styles.activeDay : ""}`}
+                                onClick={() => navigate(`/dashboard/groups/${id}/lesson/2026-05-${String(item.day).padStart(2, '0')}`)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 <span className={styles.month}>{item.month}</span>
                                 <span className={styles.day}>{item.day}</span>
                             </div>
@@ -428,6 +682,121 @@ export default function GroupDetail() {
 
                     <div className={styles.showAllBtnWrapper}>
                         <button className={styles.showAllBtn}>Barchasini ko'rish</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Video Modal */}
+            {isVideoModalOpen && (
+                <div className={styles.modalOverlay} onClick={handleModalClose}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2>Qo'shish</h2>
+                            <button className={styles.closeBtn} onClick={handleModalClose}>
+                                <CloseRoundedIcon fontSize="small" />
+                            </button>
+                        </div>
+
+                        <div className={styles.modalBody}>
+                            <div className={styles.uploadBox} onClick={() => fileInputRef.current?.click()}>
+                                <CloudUploadOutlinedIcon className={styles.uploadIcon} />
+                                <p className={styles.uploadTitle}>
+                                    Videofaylni yuklash uchun ushbu hudud ustiga bosing yoki faylni shu yerga olib keling
+                                </p>
+                                <p className={styles.uploadDesc}>
+                                    Videofayl: .mp4, .webm, .mpeg, .avi, .mkv, .m4v, .ogm, .mov formatlaridan birida bo'lishi kerak
+                                </p>
+                            </div>
+
+                            {selectedVideoFile && (
+                                <div className={styles.selectedVideoContainer}>
+                                    <table className={styles.selectedVideoTable}>
+                                        <thead>
+                                            <tr>
+                                                <th>File name</th>
+                                                <th><span>*</span> Dars</th>
+                                                <th><span>*</span> Video nomi</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td className={styles.fileNameCol}>{selectedVideoFile.name}</td>
+                                                <td>
+                                                    <select 
+                                                        className={styles.darsSelect} 
+                                                        value={selectedLessonId}
+                                                        onChange={(e) => setSelectedLessonId(e.target.value)}
+                                                    >
+                                                        <option value="" disabled>Darsni tanlang</option>
+                                                        {groupLessons.map((lesson) => (
+                                                            <option key={lesson.id} value={lesson.id}>{lesson.topic || lesson.title || lesson.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        className={styles.videoNameInput}
+                                                        value={videoFileName}
+                                                        onChange={(e) => setVideoFileName(e.target.value)}
+                                                    />
+                                                </td>
+                                                <td className={styles.actionsCol}>
+                                                    <button className={styles.deleteIconBtn} onClick={() => setSelectedVideoFile(null)}>
+                                                        <DeleteOutlineRoundedIcon fontSize="small" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                accept=".mp4,.webm,.mpeg,.avi,.mkv,.m4v,.ogm,.mov"
+                                onChange={handleFileSelect}
+                            />
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <button className={styles.cancelBtn} onClick={handleModalClose} disabled={isUploadingVideo}>
+                                Bekor qilish
+                            </button>
+                            {selectedVideoFile && (
+                                <button 
+                                    className={styles.uploadSubmitBtn} 
+                                    onClick={handleVideoUpload}
+                                    disabled={isUploadingVideo}
+                                >
+                                    {isUploadingVideo ? "Yuklanmoqda..." : "Fayllarni yuklash"}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Video Player Modal */}
+            {selectedPlayVideo && (
+                <div className={styles.modalOverlay} onClick={() => setSelectedPlayVideo(null)}>
+                    <div className={styles.videoPlayerModalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.videoPlayerHeader}>
+                            <h2>{selectedPlayVideo.originalname || selectedPlayVideo.title || "Video"}</h2>
+                            <button className={styles.closeBtn} onClick={() => setSelectedPlayVideo(null)}>
+                                <CloseRoundedIcon fontSize="small" />
+                            </button>
+                        </div>
+                        <div className={styles.videoPlayerContainer}>
+                            <video
+                                controls
+                                autoPlay
+                                src={`https://najot-edu.softwareengineer.uz/${selectedPlayVideo.video_url}`}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
