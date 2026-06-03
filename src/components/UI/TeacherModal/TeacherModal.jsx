@@ -15,6 +15,7 @@ export default function TeacherModal({
 }) {
     const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
     const [shouldRender, setShouldRender] = useState(isOpen);
+    const [allGroups, setAllGroups] = useState([]);
 
     const defaultTeacherData = {
         phone: "+998",
@@ -60,6 +61,11 @@ export default function TeacherModal({
             } else {
                 resetForm();
             }
+
+            // Fetch all groups to check which ones are deleted
+            api.get('/groups/all')
+                .then(res => setAllGroups(res.data.data || []))
+                .catch(err => console.log('groups/all error:', err.message));
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
@@ -78,8 +84,28 @@ export default function TeacherModal({
         const { fullName, email, password, phone, address, photo, groups } = teacherData;
         const isEditing = Boolean(teacherToEdit?.id);
 
-        if (!fullName || !email || !phone) {
-            alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+        if (!fullName || !email || !phone || !address || groups.length === 0) {
+            alert("Iltimos, barcha majburiy maydonlarni (shu jumladan guruh va manzilni ham) to'ldiring!");
+            return;
+        }
+
+        const hasDeletedGroups = groups.some(group => {
+            const label = group?.name ?? group?.title ?? String(group);
+            const rawId = group?.id ?? group?.group_id;
+            const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
+            
+            if (allGroups.length > 0) {
+                if (groupId !== null) {
+                    return !allGroups.some(g => Number(g.id) === groupId);
+                } else {
+                    return !allGroups.some(g => g.name === label || g.title === label);
+                }
+            }
+            return false;
+        });
+
+        if (hasDeletedGroups) {
+            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) guruhlarni ro'yxatdan olib tashlang!");
             return;
         }
 
@@ -168,6 +194,7 @@ export default function TeacherModal({
                                 placeholder="O'qituvchi FIO ni kiriting"
                                 value={teacherData.fullName}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
 
@@ -179,6 +206,7 @@ export default function TeacherModal({
                                 placeholder="Elektron pochtani kiriting"
                                 value={teacherData.email}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
 
@@ -190,6 +218,7 @@ export default function TeacherModal({
                                 placeholder="Manzilni kiriting"
                                 value={teacherData.address}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
 
@@ -201,9 +230,26 @@ export default function TeacherModal({
                                         {teacherData.groups.map((group, index) => {
                                             const key = group?.id ?? `${group?.name ?? group}-${index}`;
                                             const label = group?.name ?? group?.title ?? String(group);
+                                            const rawId = group?.id ?? group?.group_id;
+                                            const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
+                                            
+                                            let isDeleted = false;
+                                            if (allGroups.length > 0) {
+                                                if (groupId !== null) {
+                                                    isDeleted = !allGroups.some(g => Number(g.id) === groupId);
+                                                } else {
+                                                    isDeleted = !allGroups.some(g => g.name === label || g.title === label);
+                                                }
+                                            }
                                             return (
-                                                <span key={key} className={styles.groupTag}>
-                                                    {label}
+                                                <span
+                                                    key={key}
+                                                    className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                                    title={isDeleted ? "Bu guruh o'chirilgan" : undefined}
+                                                >
+                                                    <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                        {label}
+                                                    </span>
                                                     <button 
                                                         type="button"
                                                         className={styles.removeGroupBtn}
@@ -236,6 +282,7 @@ export default function TeacherModal({
                                 placeholder="Telefon raqamini kiriting"
                                 value={teacherData.phone}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
 
@@ -247,6 +294,7 @@ export default function TeacherModal({
                                 placeholder="Parolni kiriting"
                                 value={teacherData.password}
                                 onChange={handleInputChange}
+                                required={!teacherToEdit}
                             />
                         </div>
 
@@ -321,6 +369,7 @@ export default function TeacherModal({
                     isOpen={isAddGroupModalOpen}
                     onClose={toggleAddGroupModal}
                     initialSelectedGroups={teacherData.groups}
+                    preloadedGroups={allGroups}
                     onAdd={(selected) => {
                         setTeacherData(prev => ({
                             ...prev,

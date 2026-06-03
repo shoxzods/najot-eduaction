@@ -138,16 +138,30 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
             });
     };
 
+    const fetchTeachers = () => {
+        if (teachersOptions.length > 0) return;
+        api.get('/teachers')
+            .then(res => setTeachersOptions(res.data?.data || res.data || []))
+            .catch(err => console.error("Error fetching teachers:", err));
+    };
+
+    const fetchStudents = () => {
+        if (studentsOptions.length > 0) return;
+        api.get('/students')
+            .then(res => setStudentsOptions(res.data?.data || res.data || []))
+            .catch(err => console.error("Error fetching students:", err));
+    };
+
     useEffect(() => {
         if (isOpen) {
             setShouldRender(true);
             document.body.style.overflow = 'hidden';
             
-            // Pre-fetch courses and rooms
+            // Pre-fetch options to detect deleted ones
             fetchCourses();
             fetchRooms();
-            
-            // Removed teachers and students fetch to avoid unnecessary requests
+            fetchTeachers();
+            fetchStudents();
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
@@ -165,6 +179,29 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
 
         if (!name || !courseId || !roomId || !startDate || !startTime || !maxStudent || weekDays.length === 0) {
             alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+            return;
+        }
+
+        if (teachers.length === 0) {
+            alert("Iltimos, kamida bitta o'qituvchi qo'shing!");
+            return;
+        }
+
+        if (students.length === 0) {
+            alert("Iltimos, kamida bitta talaba qo'shing!");
+            return;
+        }
+
+        const hasDeletedTeacher = groupData.teachers.some(teacherId => {
+            return teachersOptions.length > 0 && !teachersOptions.find(t => t.id === Number(teacherId));
+        });
+
+        const hasDeletedStudent = groupData.students.some(studentId => {
+            return studentsOptions.length > 0 && !studentsOptions.find(s => s.id === Number(studentId));
+        });
+
+        if (hasDeletedTeacher || hasDeletedStudent) {
+            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) o'qituvchi yoki talabalarni ro'yxatdan olib tashlang!");
             return;
         }
 
@@ -277,6 +314,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                             placeholder="Frontend 2024" 
                             value={groupData.name} 
                             onChange={handleInputChange} 
+                            required
                         />
                     </div>
 
@@ -287,6 +325,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                             value={groupData.courseId}
                             onChange={handleInputChange}
                             onFocus={fetchCourses}
+                            required
                         >
                             <option value="" disabled>Tanlang</option>
                             {courses.length === 0 ? (
@@ -313,6 +352,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                             value={groupData.roomId}
                             onChange={handleInputChange}
                             onFocus={fetchRooms}
+                            required
                         >
                             <option value="" disabled>Tanlang</option>
                             {rooms.length === 0 ? (
@@ -350,6 +390,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                             name="startTime" 
                             value={groupData.startTime} 
                             onChange={handleInputChange} 
+                            required
                         />
                     </div>
 
@@ -366,6 +407,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                                 onBlur={(e) => {
                                     if (!e.target.value) e.target.type = 'text';
                                 }}
+                                required
                             />
                             <CalendarTodayRoundedIcon className={styles.calendarIcon} />
                         </div>
@@ -389,9 +431,16 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                                     {groupData.teachers.map((teacherId) => {
                                         const teacher = teachersOptions.find(t => t.id === Number(teacherId));
                                         const label = teacher ? teacher.full_name : `Teacher #${teacherId}`;
+                                        const isDeleted = teachersOptions.length > 0 && !teacher;
                                         return (
-                                            <span key={teacherId} className={styles.groupTag}>
-                                                {label}
+                                            <span 
+                                                key={teacherId} 
+                                                className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                                title={isDeleted ? "Bu o'qituvchi o'chirilgan" : undefined}
+                                            >
+                                                <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                    {label}
+                                                </span>
                                                 <button
                                                     type="button"
                                                     className={styles.removeGroupBtn}
@@ -422,9 +471,16 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                                     {groupData.students.map((studentId) => {
                                         const student = studentsOptions.find(s => s.id === Number(studentId));
                                         const label = student ? student.full_name : `Student #${studentId}`;
+                                        const isDeleted = studentsOptions.length > 0 && !student;
                                         return (
-                                            <span key={studentId} className={styles.groupTag}>
-                                                {label}
+                                            <span 
+                                                key={studentId} 
+                                                className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                                title={isDeleted ? "Bu talaba o'chirilgan" : undefined}
+                                            >
+                                                <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                    {label}
+                                                </span>
                                                 <button
                                                     type="button"
                                                     className={styles.removeGroupBtn}

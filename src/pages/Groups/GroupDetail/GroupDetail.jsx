@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { api } from "../../../api/api";
+import { api, getFileUrl } from "../../../api/api";
 import styles from "./GroupDetail.module.scss";
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
@@ -35,6 +36,8 @@ export default function GroupDetail() {
     const [isUploadingVideo, setIsUploadingVideo] = useState(false);
     const [groupLessons, setGroupLessons] = useState([]);
     const [groupStudents, setGroupStudents] = useState([]);
+    const [isMentorsOpen, setIsMentorsOpen] = useState(true);
+    const [isParamsOpen, setIsParamsOpen] = useState(true);
     const fileInputRef = useRef(null);
 
     // Refs to prevent duplicate fetching on re-renders
@@ -300,6 +303,44 @@ export default function GroupDetail() {
         ]
     };
 
+    let startYear = new Date().getFullYear();
+    let startMonth = new Date().getMonth();
+    if (groupDetails?.start_date) {
+        const sd = new Date(groupDetails.start_date);
+        if (!isNaN(sd.getTime())) {
+            startYear = sd.getFullYear();
+            startMonth = sd.getMonth();
+        }
+    }
+
+    const scheduleYears = [];
+    let currentYearCounter = startYear;
+    let lastMonthIndex = startMonth;
+
+    schedules.forEach((schedule) => {
+        const firstDay = schedule.days[0];
+        if (firstDay && firstDay.month) {
+            const monthMap = {
+                "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                "noy": 10, "nov": 10, "dek": 11, "dec": 11
+            };
+            let mIndex = -1;
+            for (const [key, val] of Object.entries(monthMap)) {
+                if (firstDay.month.toLowerCase().startsWith(key)) {
+                    mIndex = val; break;
+                }
+            }
+            if (mIndex !== -1) {
+                if (mIndex < lastMonthIndex && (lastMonthIndex - mIndex) > 2) {
+                    currentYearCounter++;
+                }
+                lastMonthIndex = mIndex;
+            }
+        }
+        scheduleYears.push(currentYearCounter);
+    });
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -341,56 +382,70 @@ export default function GroupDetail() {
                 <>
                     <div className={styles.content}>
                         <div className={styles.mentorsCard}>
-                            <div className={styles.cardHeader}>
-                                <h3>Mentors</h3>
+                            <div
+                                className={styles.cardHeader}
+                                onClick={() => setIsMentorsOpen(!isMentorsOpen)}
+                                style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
+                                <h3>Guruh mentorlari</h3>
+                                {isMentorsOpen ? <CloseRoundedIcon fontSize="small" style={{ color: "white" }} /> : <KeyboardArrowDownRoundedIcon fontSize="small" style={{ color: "white" }} />}
                             </div>
-                            <div className={styles.cardBody}>
-                                {groupDetails?.teachers?.map((mentor, index) => (
-                                    <div key={index} className={styles.mentorInfo}>
-                                        <img
-                                            src={mentor.photo || `https://ui-avatars.com/api/?name=${mentor.full_name || mentor.name || 'MO'}&background=f8fafc&color=3b82f6&size=128`}
-                                            alt={mentor.full_name || mentor.name}
-                                            className={styles.mentorAvatar}
-                                        />
-                                        <span className={styles.mentorRole}>Teacher</span>
-                                        <span className={styles.mentorName}>{mentor.full_name || mentor.name}</span>
-                                    </div>
-                                ))}
+                            <div className={`${styles.cardBodyWrapper} ${isMentorsOpen ? styles.open : ''}`}>
+                                <div className={styles.cardBody}>
+                                    {groupDetails?.teachers?.map((mentor, index) => (
+                                        <div key={index} className={styles.mentorItem}>
+                                            <img
+                                                src={getFileUrl(mentor.photo) || `https://ui-avatars.com/api/?name=${mentor.full_name || mentor.name || 'MO'}&background=f8fafc&color=3b82f6&size=128`}
+                                                alt={mentor.full_name || mentor.name}
+                                                className={styles.mentorAvatar}
+                                            />
+                                            <span className={styles.mentorRole}>Teacher</span>
+                                            <span className={styles.mentorName}>{mentor.full_name || mentor.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
                         <div className={styles.parametersCard}>
-                            <div className={styles.cardHeader}>
+                            <div
+                                className={styles.cardHeader}
+                                onClick={() => setIsParamsOpen(!isParamsOpen)}
+                                style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
                                 <h3>Guruh parametrlari</h3>
+                                {isParamsOpen ? <CloseRoundedIcon fontSize="small" style={{ color: "white" }} /> : <KeyboardArrowDownRoundedIcon fontSize="small" style={{ color: "white" }} />}
                             </div>
-                            <div className={styles.cardBody}>
-                                <div className={styles.paramRow}>
-                                    <span>Yo'nalish</span>
-                                    <strong>{groupDetails?.course?.name || ""}</strong>
-                                </div>
-                                <div className={styles.paramRow}>
-                                    <span>O'rtacha yosh</span>
-                                    <strong>{groupDetails?.averageAge ?? "0"} yosh</strong>
-                                </div>
-                                <div className={styles.paramRow}>
-                                    <span>Sig'imi</span>
-                                    <strong>{groupDetails?.room_capacity ?? "0"} ta</strong>
-                                </div>
-                                <div className={styles.paramRow}>
-                                    <span>Hozirgi o'quvchilar</span>
-                                    <strong>{groupDetails?.student_count ?? "0"} ta</strong>
-                                </div>
-                                <div className={styles.paramRow}>
-                                    <span>Darslar soni (1 oyda)</span>
-                                    <strong>{schedules.length > 0 ? Math.round(schedules.reduce((sum, m) => sum + m.days.length, 0) / schedules.length) : "0"} ta</strong>
-                                </div>
-                                <div className={styles.paramRow}>
-                                    <span>Kurs davomiyligi</span>
-                                    <strong>{groupDetails?.course?.duration_month ?? "0"} oy</strong>
-                                </div>
-                                <div className={styles.paramRow}>
-                                    <span>Darslar soni (Jami)</span>
-                                    <strong>{schedules.reduce((sum, m) => sum + m.days.length, 0)} ta</strong>
+                            <div className={`${styles.cardBodyWrapper} ${isParamsOpen ? styles.open : ''}`}>
+                                <div className={styles.cardBody}>
+                                    <div className={styles.paramRow}>
+                                        <span>Yo'nalish</span>
+                                        <strong>{groupDetails?.course?.name || ""}</strong>
+                                    </div>
+                                    <div className={styles.paramRow}>
+                                        <span>O'rtacha yosh</span>
+                                        <strong>{groupDetails?.averageAge ?? "0"} yosh</strong>
+                                    </div>
+                                    <div className={styles.paramRow}>
+                                        <span>Sig'imi</span>
+                                        <strong>{groupDetails?.room_capacity ?? "0"} ta</strong>
+                                    </div>
+                                    <div className={styles.paramRow}>
+                                        <span>Hozirgi o'quvchilar</span>
+                                        <strong>{groupDetails?.student_count ?? "0"} ta</strong>
+                                    </div>
+                                    <div className={styles.paramRow}>
+                                        <span>Darslar soni (1 oyda)</span>
+                                        <strong>{schedules.length > 0 ? Math.round(schedules.reduce((sum, m) => sum + m.days.length, 0) / schedules.length) : "0"} ta</strong>
+                                    </div>
+                                    <div className={styles.paramRow}>
+                                        <span>Kurs davomiyligi</span>
+                                        <strong>{groupDetails?.course?.duration_month ?? "0"} oy</strong>
+                                    </div>
+                                    <div className={styles.paramRow}>
+                                        <span>Darslar soni (Jami)</span>
+                                        <strong>{schedules.reduce((sum, m) => sum + m.days.length, 0)} ta</strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -469,17 +524,55 @@ export default function GroupDetail() {
                                     )}
                                 </div>
                                 <div className={styles.calendarDaysRow}>
-                                    {studyMonth.days.map(item => (
-                                        <div
-                                            key={item.id}
-                                            className={styles.calendarChip}
-                                            onClick={() => navigate(`/dashboard/groups/${id}/lesson/2026-05-${String(item.day).padStart(2, '0')}`)}
-                                            style={{ cursor: "pointer" }}
-                                        >
-                                            <span className={styles.chipMonth}>{item.month}</span>
-                                            <span className={styles.chipDay}>{item.day}</span>
-                                        </div>
-                                    ))}
+                                    {studyMonth.days.map(item => {
+                                        const { isFuture, dateStr } = (() => {
+                                            if (!item.month || !item.day) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                            const monthMap = {
+                                                "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                                                "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                                                "noy": 10, "nov": 10, "dek": 11, "dec": 11
+                                            };
+                                            let mIndex = -1;
+                                            for (const [key, val] of Object.entries(monthMap)) {
+                                                if (item.month.toLowerCase().startsWith(key)) {
+                                                    mIndex = val; break;
+                                                }
+                                            }
+                                            if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+
+                                            // Calculate actual true index inside the schedules array
+                                            const trueIdx = showAllMonths ? idx : currentMonth;
+                                            const year = scheduleYears[trueIdx] || new Date().getFullYear();
+
+                                            const today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+
+                                            const itemDate = new Date(year, mIndex, parseInt(item.day, 10));
+
+                                            const paddedMonth = String(mIndex + 1).padStart(2, '0');
+                                            const paddedDay = String(item.day).padStart(2, '0');
+                                            return {
+                                                isFuture: itemDate > today,
+                                                dateStr: `${year}-${paddedMonth}-${paddedDay}`
+                                            };
+                                        })();
+
+                                        return (
+                                            <div
+                                                key={item.id}
+                                                className={`${styles.calendarChip} ${isFuture ? styles.disabledDate : ""}`}
+                                                onClick={() => {
+                                                    if (!isFuture) {
+                                                        navigate(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                                                    }
+                                                }}
+                                                style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
+                                            >
+                                                <span className={styles.chipMonth}>{item.month}</span>
+                                                <span className={styles.chipDay}>{item.day}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         ))}
@@ -570,17 +663,52 @@ export default function GroupDetail() {
                     </div>
 
                     <div className={styles.calendarList}>
-                        {fakeGroupData.calendarDays.map(item => (
-                            <div
-                                key={item.id}
-                                className={`${styles.calendarDay} ${item.active ? styles.activeDay : ""}`}
-                                onClick={() => navigate(`/dashboard/groups/${id}/lesson/2026-05-${String(item.day).padStart(2, '0')}`)}
-                                style={{ cursor: "pointer" }}
-                            >
-                                <span className={styles.month}>{item.month}</span>
-                                <span className={styles.day}>{item.day}</span>
-                            </div>
-                        ))}
+                        {fakeGroupData.calendarDays.map(item => {
+                            const { isFuture, dateStr } = (() => {
+                                if (!item.month || !item.day) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                const monthMap = {
+                                    "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                                    "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                                    "noy": 10, "nov": 10, "dek": 11, "dec": 11
+                                };
+                                let mIndex = -1;
+                                for (const [key, val] of Object.entries(monthMap)) {
+                                    if (item.month.toLowerCase().startsWith(key)) {
+                                        mIndex = val; break;
+                                    }
+                                }
+                                if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                let year = today.getFullYear();
+                                if (today.getMonth() === 0 && mIndex === 11) year -= 1;
+                                if (today.getMonth() === 11 && mIndex === 0) year += 1;
+                                const itemDate = new Date(year, mIndex, parseInt(item.day, 10));
+
+                                const paddedMonth = String(mIndex + 1).padStart(2, '0');
+                                const paddedDay = String(item.day).padStart(2, '0');
+                                return {
+                                    isFuture: itemDate > today,
+                                    dateStr: `${year}-${paddedMonth}-${paddedDay}`
+                                };
+                            })();
+
+                            return (
+                                <div
+                                    key={item.id}
+                                    className={`${styles.calendarDay} ${item.active && !isFuture ? styles.activeDay : ""} ${isFuture ? styles.disabledDate : ""}`}
+                                    onClick={() => {
+                                        if (!isFuture) {
+                                            navigate(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                                        }
+                                    }}
+                                    style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
+                                >
+                                    <span className={styles.month}>{item.month}</span>
+                                    <span className={styles.day}>{item.day}</span>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     <div className={styles.showAllBtnWrapper}>

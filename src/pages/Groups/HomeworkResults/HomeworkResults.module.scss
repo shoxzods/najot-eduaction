@@ -166,6 +166,15 @@
       font-size: 14px;
       color: #1e293b;
     }
+
+    .clickableRow {
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f8fafc;
+      }
+    }
   }
 
   .emptyState {

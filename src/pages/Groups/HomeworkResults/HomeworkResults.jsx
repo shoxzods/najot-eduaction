@@ -16,46 +16,75 @@ export default function HomeworkResults() {
 
   const [activeTab, setActiveTab] = useState("Kutayotganlar");
   const [resultsData, setResultsData] = useState(null);
-  const [students, setStudents] = useState([]);
+  const [tabData, setTabData] = useState({
+    "Kutayotganlar": [],
+    "Qaytarilganlar": [],
+    "Qabul qilinganlar": [],
+    "Bajarilmagan": [],
+  });
   const [loading, setLoading] = useState(false);
 
-  const fetchResults = async (tab) => {
-    setLoading(true);
-    try {
-      let res;
-      if (tab === "Bajarilmagan") {
-        // Status jo'natilmaydi
-        res = await api.get(`/group/${id}/homework/${homeworkId}/results`);
-      } else {
-        res = await api.get(`/group/${id}/homework/${homeworkId}/results`, {
-          params: { status: STATUS_MAP[tab] }
-        });
-      }
-
-      const raw = res.data?.data || res.data || {};
-
-      // Agar response massiv bo'lsa (Bajarilmagan uchun)
-      if (Array.isArray(raw)) {
-        setResultsData(null);
-        setStudents(raw);
-      } else {
-        setResultsData(raw);
-        const list = raw.students || raw.results || raw.homeworks || raw.list || [];
-        setStudents(Array.isArray(list) ? list : []);
-      }
-    } catch (err) {
-      console.error("Xatolik:", err);
-      setStudents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchAllData = async () => {
+      setLoading(true);
+      try {
+        const fetchDataForTab = async (tabName) => {
+          let res;
+          if (tabName === "Bajarilmagan") {
+            res = await api.get(`/group/${id}/homework/${homeworkId}/results`);
+          } else {
+            res = await api.get(`/group/${id}/homework/${homeworkId}/results`, {
+              params: { status: STATUS_MAP[tabName] }
+            });
+          }
+          return res;
+        };
+
+        const [resKut, resQay, resQab, resBaj] = await Promise.all([
+          fetchDataForTab("Kutayotganlar"),
+          fetchDataForTab("Qaytarilganlar"),
+          fetchDataForTab("Qabul qilinganlar"),
+          fetchDataForTab("Bajarilmagan")
+        ]);
+
+        let metaData = null;
+        const processRes = (res) => {
+          const raw = res.data?.data || res.data || {};
+          if (!metaData && !Array.isArray(raw) && (raw.topic || raw.homework?.topic)) {
+              metaData = raw;
+          } else if (!metaData && !Array.isArray(raw)) {
+              metaData = raw; // fallback in case topic is not there but it's an object
+          }
+          
+          if (Array.isArray(raw)) return raw;
+          const list = raw.students || raw.results || raw.homeworks || raw.list || [];
+          return Array.isArray(list) ? list : [];
+        };
+
+        const kutList = processRes(resKut);
+        const qayList = processRes(resQay);
+        const qabList = processRes(resQab);
+        const bajList = processRes(resBaj);
+
+        if (metaData) setResultsData(metaData);
+        setTabData({
+          "Kutayotganlar": kutList,
+          "Qaytarilganlar": qayList,
+          "Qabul qilinganlar": qabList,
+          "Bajarilmagan": bajList
+        });
+      } catch (err) {
+        console.error("Error fetching all tab data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     if (id && homeworkId) {
-      fetchResults(activeTab);
+      fetchAllData();
     }
-  }, [id, homeworkId, activeTab]);
+  }, [id, homeworkId]);
+
+  const students = tabData[activeTab] || [];
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "-";
@@ -71,16 +100,16 @@ export default function HomeworkResults() {
   const counts = resultsData?.counts || resultsData?.statusCounts || {};
 
   const tabs = [
-    { id: "Kutayotganlar",     label: "Kutayotganlar",     count: counts.PENDING   ?? resultsData?.pending   ?? 0, colorClass: styles.badgeOrange },
-    { id: "Qaytarilganlar",   label: "Qaytarilganlar",    count: counts.REJECTED  ?? resultsData?.rejected  ?? 0, colorClass: styles.badgeRed    },
-    { id: "Qabul qilinganlar",label: "Qabul qilinganlar", count: counts.ACCEPTED  ?? resultsData?.accepted  ?? 0, colorClass: styles.badgeGreen  },
-    { id: "Bajarilmagan",     label: "Bajarilmagan",      count: counts.CHECKED   ?? resultsData?.checked   ?? 0, colorClass: styles.badgeGreen  },
+    { id: "Kutayotganlar",     label: "Kutayotganlar",     count: tabData["Kutayotganlar"]?.length || 0, colorClass: styles.badgeOrange },
+    { id: "Qaytarilganlar",   label: "Qaytarilganlar",    count: tabData["Qaytarilganlar"]?.length || 0, colorClass: styles.badgeRed    },
+    { id: "Qabul qilinganlar",label: "Qabul qilinganlar", count: tabData["Qabul qilinganlar"]?.length || 0, colorClass: styles.badgeGreen  },
+    { id: "Bajarilmagan",     label: "Bajarilmagan",      count: tabData["Bajarilmagan"]?.length || 0, colorClass: styles.badgeGreen  },
   ];
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={() => navigate(-1)}>
+        <button className={styles.backButton} onClick={() => navigate(`/dashboard/groups/${id}?tab=1`)}>
           &#8249;
         </button>
         <h1>{resultsData?.topic || resultsData?.homework?.topic || "Uyga vazifa"}</h1>
@@ -129,7 +158,14 @@ export default function HomeworkResults() {
           </thead>
           <tbody>
             {!loading && students.map((student, idx) => (
-              <tr key={student.id || idx}>
+              <tr 
+                key={student.id || idx}
+                onClick={() => {
+                  const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
+                  navigate(`/dashboard/groups/${id}/homework/${homeworkId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
+                }}
+                className={styles.clickableRow}
+              >
                 <td>{student.full_name || student.name || student.student?.full_name || "-"}</td>
                 <td style={{ textAlign: "right" }}>
                   {formatDateTime(student.submitted_at || student.created_at || student.sent_at)}

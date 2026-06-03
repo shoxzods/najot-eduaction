@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Courses.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CourseModal from "../../../components/UI/CourseModal/CourseModal";
 import ConfirmDialog from "../../../components/UI/ConfirmDialog/ConfirmDialog";
 import { api } from "../../../api/api";
@@ -11,6 +13,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
 export default function Courses() {
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [courses, setCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +53,17 @@ export default function Courses() {
         request.then(
             res => {
                 console.log(res.status);
-                fetchCourses();
+                
+                if (selectedCourse?.id) {
+                    // Update locally instead of fetching all again
+                    setCourses(prev => prev.map(course => 
+                        course.id === selectedCourse.id ? { ...course, ...courseData } : course
+                    ));
+                } else {
+                    const newCourse = res.data?.data?.id ? res.data.data : (res.data?.id ? res.data : { ...courseData, id: Date.now() });
+                    setCourses(prev => [...prev, newCourse]);
+                }
+
                 closeModal();
             }
         ).catch(
@@ -90,10 +103,16 @@ export default function Courses() {
         <div className={styles.coursesContainer}>
             <div className={styles.header}>
                 <h2 className={styles.title}>Kurslar</h2>
-                <button className={styles.addBtn} onClick={openAddCourseModal}>
-                    <AddRoundedIcon fontSize="small" />
-                    Kurslar qo'shish
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className={styles.archiveBtn} onClick={() => navigate('/management/courses/archive')}>
+                        <ArchiveOutlinedIcon fontSize="small" />
+                        Arxiv
+                    </button>
+                    <button className={styles.addBtn} onClick={openAddCourseModal}>
+                        <AddRoundedIcon fontSize="small" />
+                        Kurslar qo'shish
+                    </button>
+                </div>
             </div>
 
             <div className={styles.grid} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px' }}>

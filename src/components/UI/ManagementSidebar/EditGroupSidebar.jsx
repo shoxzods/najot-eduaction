@@ -157,24 +157,17 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                 })
                 .catch(err => console.error("Error fetching rooms:", err));
 
-            // Populate options with existing items to ensure labels render correctly without fetching all
-            if (groupData?.teachers?.length > 0 && typeof groupData.teachers[0] === 'object') {
-                const existingTeachers = groupData.teachers.map(t => ({ id: t.id, full_name: t.full_name || t.name }));
-                setTeachersOptions(prev => {
-                    const newOptions = existingTeachers.filter(et => !prev.find(p => p.id === et.id));
-                    return [...prev, ...newOptions];
-                });
-            }
+            // Fetch ALL teachers to detect deleted ones
+            api.get('/teachers')
+                .then(res => setTeachersOptions(res.data?.data || res.data || []))
+                .catch(err => console.error("Error fetching teachers:", err));
 
-            if (groupData?.students?.length > 0 && typeof groupData.students[0] === 'object') {
-                const existingStudents = groupData.students.map(s => ({ id: s.id, full_name: s.full_name || s.name || s.student?.full_name }));
-                setStudentsOptions(prev => {
-                    const newOptions = existingStudents.filter(es => !prev.find(p => p.id === es.id));
-                    return [...prev, ...newOptions];
-                });
-            }
+            // Fetch ALL students to detect deleted ones
+            api.get('/students')
+                .then(res => setStudentsOptions(res.data?.data || res.data || []))
+                .catch(err => console.error("Error fetching students:", err));
         }
-    }, [isOpen, groupData]);
+    }, [isOpen]);
 
 
     // Prepopulate form fields when groupData, courses, or rooms are available
@@ -265,6 +258,29 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
 
         if (!name || !courseId || !roomId || !startDate || !startTime || !maxStudent || weekDays.length === 0) {
             alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+            return;
+        }
+
+        if (teachers.length === 0) {
+            alert("Iltimos, kamida bitta o'qituvchi qo'shing!");
+            return;
+        }
+
+        if (students.length === 0) {
+            alert("Iltimos, kamida bitta talaba qo'shing!");
+            return;
+        }
+
+        const hasDeletedTeacher = form.teachers.some(teacherId => {
+            return teachersOptions.length > 0 && !teachersOptions.find(t => t.id === Number(teacherId));
+        });
+
+        const hasDeletedStudent = form.students.some(studentId => {
+            return studentsOptions.length > 0 && !studentsOptions.find(s => s.id === Number(studentId));
+        });
+
+        if (hasDeletedTeacher || hasDeletedStudent) {
+            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) o'qituvchi yoki talabalarni ro'yxatdan olib tashlang!");
             return;
         }
 
@@ -380,6 +396,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             placeholder="Frontend 2024" 
                             value={form.name} 
                             onChange={handleInputChange} 
+                            required
                         />
                     </div>
 
@@ -389,6 +406,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             name="courseId"
                             value={form.courseId}
                             onChange={handleInputChange}
+                            required
                         >
                             <option value="" disabled>Tanlang</option>
                             {courses.map(course => (
@@ -410,6 +428,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             name="roomId"
                             value={form.roomId}
                             onChange={handleInputChange}
+                            required
                         >
                             <option value="" disabled>Tanlang</option>
                             {rooms.map(room => (
@@ -443,6 +462,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             name="startTime" 
                             value={form.startTime} 
                             onChange={handleInputChange} 
+                            required
                         />
                     </div>
 
@@ -459,6 +479,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                                 onBlur={(e) => {
                                     if (!e.target.value) e.target.type = 'text';
                                 }}
+                                required
                             />
                             <CalendarTodayRoundedIcon className={styles.calendarIcon} />
                         </div>
@@ -472,6 +493,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             value={form.maxStudent} 
                             onChange={handleInputChange} 
                             min="1"
+                            required
                         />
                     </div>
 
@@ -493,9 +515,16 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                                     {form.teachers.map((teacherId) => {
                                         const teacher = teachersOptions.find(t => t.id === Number(teacherId));
                                         const label = teacher ? teacher.full_name : `Teacher #${teacherId}`;
+                                        const isDeleted = teachersOptions.length > 0 && !teacher;
                                         return (
-                                            <span key={teacherId} className={styles.groupTag}>
-                                                {label}
+                                            <span 
+                                                key={teacherId} 
+                                                className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                                title={isDeleted ? "Bu o'qituvchi o'chirilgan" : undefined}
+                                            >
+                                                <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                    {label}
+                                                </span>
                                                 <button
                                                     type="button"
                                                     className={styles.removeGroupBtn}
@@ -526,9 +555,16 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                                     {form.students.map((studentId) => {
                                         const student = studentsOptions.find(s => s.id === Number(studentId));
                                         const label = student ? student.full_name : `Student #${studentId}`;
+                                        const isDeleted = studentsOptions.length > 0 && !student;
                                         return (
-                                            <span key={studentId} className={styles.groupTag}>
-                                                {label}
+                                            <span 
+                                                key={studentId} 
+                                                className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                                title={isDeleted ? "Bu talaba o'chirilgan" : undefined}
+                                            >
+                                                <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                    {label}
+                                                </span>
                                                 <button
                                                     type="button"
                                                     className={styles.removeGroupBtn}

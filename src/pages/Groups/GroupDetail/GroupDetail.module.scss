@@ -5,18 +5,21 @@
   gap: 24px;
   height: 100%;
   overflow-y: auto;
-  
+
   /* Optional: Custom scrollbar for the page itself */
   &::-webkit-scrollbar {
     width: 4px;
   }
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
+
   &::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 4px;
   }
+
   &::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
   }
@@ -111,7 +114,7 @@
 
     &.activeTab {
       color: #6c35de;
-      
+
       &::after {
         content: '';
         position: absolute;
@@ -130,7 +133,8 @@
   gap: 24px;
   align-items: flex-start;
 
-  .mentorsCard, .parametersCard {
+  .mentorsCard,
+  .parametersCard {
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -150,12 +154,15 @@
         font-size: 16px;
         font-weight: 500;
       }
+    }
 
-      &::after {
-        content: '×';
-        font-size: 20px;
-        cursor: pointer;
-        opacity: 0.8;
+    .cardBodyWrapper {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+
+      &.open {
+        max-height: 800px;
       }
     }
 
@@ -166,10 +173,32 @@
 
   .mentorsCard {
     .cardBody {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      justify-items: center;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 24px;
+      justify-content: flex-start;
+      padding: 20px 24px;
+      overflow-x: auto;
+
+      /* Soft scrollbar design */
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: #e2e8f0;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: #cbd5e1;
+      }
     }
 
     .mentorItem {
@@ -178,6 +207,7 @@
       align-items: center;
       gap: 8px;
       width: 100px;
+      flex-shrink: 0;
 
       .mentorAvatar {
         width: 60px;
@@ -251,7 +281,7 @@
       background-color: #f8fafc;
       padding: 16px;
       border-radius: 8px;
-      
+
       .teacherName {
         width: 200px;
         color: #3b82f6;
@@ -503,20 +533,24 @@
     gap: 12px;
     margin-bottom: 32px;
     overflow-x: auto;
-    padding-bottom: 8px; /* For scrollbar */
-    
+    padding-bottom: 8px;
+    /* For scrollbar */
+
     /* Hide scrollbar for Chrome, Safari and Opera */
     &::-webkit-scrollbar {
       height: 4px;
     }
+
     &::-webkit-scrollbar-track {
       background: #f1f5f9;
       border-radius: 4px;
     }
+
     &::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
+
     &::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
@@ -526,7 +560,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 64px; /* Ensure it doesn't shrink */
+      min-width: 64px;
+      /* Ensure it doesn't shrink */
       height: 72px;
       border-radius: 8px;
       border: 1px solid #e2e8f0;
@@ -549,8 +584,9 @@
       &.activeDay {
         background-color: #e2e8f0;
         border-color: #cbd5e1;
-        
-        .month, .day {
+
+        .month,
+        .day {
           color: #475569;
         }
       }
@@ -930,7 +966,8 @@
   border-radius: 8px;
   overflow: hidden;
 
-  th, td {
+  th,
+  td {
     padding: 16px;
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
@@ -960,7 +997,8 @@
     text-align: center;
   }
 
-  .darsSelect, .videoNameInput {
+  .darsSelect,
+  .videoNameInput {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #cbd5e1;

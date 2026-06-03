@@ -112,7 +112,7 @@ export default function Videolar({ refreshTrigger }) {
                             <video
                                 controls
                                 autoPlay
-                                src={`https://najot-edu.softwareengineer.uz/${selectedPlayVideo.video_url}`}
+                                src={`https://najot-edu.softwareengineer.uz/files/files/${selectedPlayVideo.video_url}`}
                             />
                         </div>
                     </div>

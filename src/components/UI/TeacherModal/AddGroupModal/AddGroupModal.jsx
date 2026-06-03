@@ -9,10 +9,18 @@ export default function AddGroupModal({
     isOpen,
     onClose,
     onAdd,
-    initialSelectedGroups = []
+    initialSelectedGroups = [],
+    preloadedGroups = []
 }) {
     const [ groups , setGroups ] = useState([]);
     const [ selectedGroupIds, setSelectedGroupIds ] = useState([]);
+
+    // Use preloaded groups if provided, otherwise keep current state
+    useEffect(() => {
+        if (preloadedGroups.length > 0 && groups.length === 0) {
+            setGroups(preloadedGroups);
+        }
+    }, [preloadedGroups]);
 
     useEffect(() => {
         if (isOpen && groups.length > 0) {
@@ -35,18 +43,6 @@ export default function AddGroupModal({
             setSelectedGroupIds(newSelectedIds);
         }
     }, [isOpen, initialSelectedGroups, groups]);
-
-    useEffect(() => {
-        if (isOpen && groups.length === 0) {
-            api.get(`/groups/all`).then(
-                res => {
-                    setGroups(res.data.data)
-                }
-            ).catch(
-                err => console.log(err.message)
-            )
-        }
-    }, [isOpen, groups.length])
 
     if (!isOpen) return null;
 

@@ -1,8 +1,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Students.module.scss";
-import { api } from '../../api/api';
-
+import { api, getFileUrl } from '../../api/api';
 
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
@@ -22,7 +21,7 @@ export default function Students() {
     const [studentData, setStudentData] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(10); // Default to 10 to match design if API doesn't provide
+    const [totalPages, setTotalPages] = useState(1);
     const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, studentId: null });
@@ -64,8 +63,12 @@ export default function Students() {
                     setTotalPages(res.data.meta.last_page);
                 } else if (res.data.totalPages) {
                     setTotalPages(res.data.totalPages);
-                } else if (data.length < 3 && targetPage >= totalPages) {
+                } else if (data.length < 3) {
+                    // Agar ma'lumotlar kam kelsa (yoki bo'sh), demak bu oxirgi sahifa
                     setTotalPages(targetPage);
+                } else {
+                    // Agar to'liq 3 ta ma'lumot kelsa va API dan jami sahifalar soni kelmasa, yana bitta sahifa bor deb faraz qilamiz
+                    setTotalPages(Math.max(totalPages, targetPage + 1));
                 }
                 setIsLoading(false);
             }
@@ -207,6 +210,21 @@ export default function Students() {
                                     </td>
                                     <td>
                                         <div className={styles.userInfo}>
+                                            {student.photo ? (
+                                                <img
+                                                    src={getFileUrl(student.photo)}
+                                                    alt={student.full_name}
+                                                    className={styles.avatar}
+                                                    style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', marginRight: '10px' }}
+                                                />
+                                            ) : (
+                                                <div
+                                                    className={styles.initialAvatar}
+                                                    style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f0f0f0', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginRight: '10px' }}
+                                                >
+                                                    {student.full_name ? student.full_name.charAt(0).toUpperCase() : 'S'}
+                                                </div>
+                                            )}
                                             <span className={styles.userName}>{student.full_name}</span>
                                         </div>
                                     </td>
@@ -236,8 +254,9 @@ export default function Students() {
                     </table>
                 </div>
 
-                <div className={styles.pagination}>
-                    <button
+                {studentData.length > 0 && totalPages > 1 && (
+                    <div className={styles.pagination}>
+                        <button
                         onClick={decrement}
                         className={`${styles.pageArrow} ${(page === 1 || isPending || isLoading) ? styles.disabled : ''}`}
                         disabled={page === 1 || isPending || isLoading}
@@ -275,6 +294,7 @@ export default function Students() {
                         Next →
                     </button>
                 </div>
+                )}
             </div>
 
             <StudentModal

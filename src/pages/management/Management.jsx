@@ -13,7 +13,9 @@ export default function Management() {
     const { pathname } = useLocation();
     const navigate = useNavigate();
 
-    const currentTab = pathname.split("/").pop() || "courses";
+    const pathParts = pathname.split("/").filter(Boolean);
+    const managementIndex = pathParts.indexOf("management");
+    const currentTab = managementIndex >= 0 ? pathParts[managementIndex + 1] : "courses";
 
     const handleTabChange = (slug) => {
         navigate(`/management/${slug}`);

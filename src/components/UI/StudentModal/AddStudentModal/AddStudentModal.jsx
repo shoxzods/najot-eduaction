@@ -9,6 +9,7 @@ import { api } from "../../../../api/api";
 
 export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit }) {
     const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
+    const [allGroups, setAllGroups] = useState([]);
 
     const defaultStudentData = {
         phone: "+998",
@@ -45,6 +46,13 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
     };
 
     useEffect(() => {
+        if (isOpen) {
+            // Fetch all groups when modal opens
+            api.get('/groups/all')
+                .then(res => setAllGroups(res.data.data || []))
+                .catch(err => console.log('groups/all error:', err.message));
+        }
+
         if (studentToEdit) {
             setStudentData({
                 phone: studentToEdit.phone || "+998",
@@ -67,8 +75,27 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
         const { fullName, email, password, phone, address, birthDate, photo, groups } = studentData;
         const isEditing = Boolean(studentToEdit?.id);
 
-        if (!fullName || !email || !phone || !birthDate) {
-            alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+        if (!fullName || !email || !phone || !birthDate || !address || groups.length === 0) {
+            alert("Iltimos, barcha majburiy maydonlarni (shu jumladan guruh va manzilni ham) to'ldiring!");
+            return;
+        }
+
+        const hasDeletedGroups = groups.some(group => {
+            const rawId = group?.id ?? group?.group_id;
+            const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
+            
+            if (allGroups.length > 0) {
+                if (groupId !== null) {
+                    return !allGroups.some(g => Number(g.id) === groupId);
+                } else {
+                    return !allGroups.some(g => g.name === group.name || g.title === group.name);
+                }
+            }
+            return false;
+        });
+
+        if (hasDeletedGroups) {
+            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) guruhlarni ro'yxatdan olib tashlang!");
             return;
         }
 
@@ -177,6 +204,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                         placeholder="Talaba FIO ni kiriting"
                         value={studentData.fullName}
                         onChange={handleInputChange}
+                        required
                     />
                 </div>
 
@@ -188,6 +216,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                         placeholder="Telefon raqamini kiriting"
                         value={studentData.phone}
                         onChange={handleInputChange}
+                        required
                     />
                 </div>
 
@@ -199,6 +228,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                         placeholder="Elektron pochtani kiriting"
                         value={studentData.email}
                         onChange={handleInputChange}
+                        required
                     />
                 </div>
 
@@ -210,6 +240,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                             name="birthDate"
                             value={studentData.birthDate}
                             onChange={handleInputChange}
+                            required
                         />
                         <CalendarTodayRoundedIcon className={styles.calendarIcon} />
                     </div>
@@ -223,6 +254,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                         placeholder="Manzilni kiriting"
                         value={studentData.address}
                         onChange={handleInputChange}
+                        required
                     />
                 </div>
 
@@ -234,6 +266,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                         placeholder="Parolni kiriting"
                         value={studentData.password}
                         onChange={handleInputChange}
+                        required={!studentToEdit}
                     />
                 </div>
 
@@ -242,21 +275,40 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                     <div className={styles.groupsInputContainer}>
                         {studentData.groups.length > 0 && (
                             <div className={styles.groupTags}>
-                                {studentData.groups.map(group => (
-                                    <span key={group.id} className={styles.groupTag}>
-                                        {group.name}
-                                        <button
-                                            type="button"
-                                            className={styles.removeGroupBtn}
-                                            onClick={() => setStudentData(prev => ({
-                                                ...prev,
-                                                groups: prev.groups.filter(g => g.id !== group.id)
-                                            }))}
+                            {studentData.groups.map(group => {
+                                    const rawId = group?.id ?? group?.group_id;
+                                    const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
+                                    
+                                    let isDeleted = false;
+                                    if (allGroups.length > 0) {
+                                        if (groupId !== null) {
+                                            isDeleted = !allGroups.some(g => Number(g.id) === groupId);
+                                        } else {
+                                            isDeleted = !allGroups.some(g => g.name === group.name || g.title === group.name);
+                                        }
+                                    }
+                                    return (
+                                        <span
+                                            key={group.id}
+                                            className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                            title={isDeleted ? "Bu guruh o'chirilgan" : undefined}
                                         >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
+                                            <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                {group.name}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className={styles.removeGroupBtn}
+                                                onClick={() => setStudentData(prev => ({
+                                                    ...prev,
+                                                    groups: prev.groups.filter(g => g.id !== group.id)
+                                                }))}
+                                            >
+                                                ×
+                                            </button>
+                                        </span>
+                                    );
+                                })}
                             </div>
                         )}
                         <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddGroupModal}>
@@ -336,6 +388,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                 isOpen={isAddGroupModalOpen}
                 onClose={toggleAddGroupModal}
                 initialSelectedGroups={studentData.groups}
+                preloadedGroups={allGroups}
                 onAdd={(selected) => {
                     setStudentData(prev => ({
                         ...prev,

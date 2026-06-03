@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Rooms.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import RoomModal from "../../../components/UI/RoomModal/RoomModal";
 import ConfirmDialog from "../../../components/UI/ConfirmDialog/ConfirmDialog";
 import { api } from "../../../api/api";
@@ -10,6 +12,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
 export default function Rooms() {
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [rooms, setRooms] = useState([]);
@@ -91,10 +94,16 @@ export default function Rooms() {
                 <div className={styles.titleWrapper}>
                     <h2 className={styles.title}>Xonalar</h2>
                 </div>
-                <button className={styles.addBtn} onClick={openAddRoomModal}>
-                    <AddRoundedIcon fontSize="small" />
-                    Xonani qo'shish
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className={styles.archiveBtn} onClick={() => navigate('/management/rooms/archive')}>
+                        <ArchiveOutlinedIcon fontSize="small" />
+                        Arxiv
+                    </button>
+                    <button className={styles.addBtn} onClick={openAddRoomModal}>
+                        <AddRoundedIcon fontSize="small" />
+                        Xonani qo'shish
+                    </button>
+                </div>
             </div>
 
             <div className={styles.grid} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '100px' }}>
@@ -164,7 +173,16 @@ export default function Rooms() {
                     request.then(
                         res => {
                             console.log(res.status);
-                            fetchRooms();
+                            
+                            if (selectedRoom?.id) {
+                                setRooms(prev => prev.map(room => 
+                                    room.id === selectedRoom.id ? { ...room, ...payload } : room
+                                ));
+                            } else {
+                                const newRoom = res.data?.data?.id ? res.data.data : (res.data?.id ? res.data : { ...payload, id: Date.now() });
+                                setRooms(prev => [...prev, newRoom]);
+                            }
+                            
                             closeModal();
                         }
                     ).catch(

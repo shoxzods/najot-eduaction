@@ -79,7 +79,7 @@ export default function UygaVazifa() {
                 {homeworkData.map((lesson, idx) => (
                     <tr
                         key={`${lesson.id}-${idx}`}
-                        onClick={() => navigate(`/dashboard/groups/${id}/homework/${lesson.id}/results`)}
+                        onClick={() => navigate(`/dashboard/groups/${id}/homework/${lesson.homework?.[0]?.id || lesson.id}/results`)}
                         style={{ cursor: "pointer" }}
                     >
                         <td>{idx + 1}</td>

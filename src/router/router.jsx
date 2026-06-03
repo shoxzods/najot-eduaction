@@ -10,7 +10,9 @@ const Management = lazy(() => import("../pages/management/Management"));
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 const MainLayout = lazy(() => import("../layout/MainLayout"));
 const Courses = lazy(() => import("../pages/management/Courses/Courses"));
+const ArchiveCourses = lazy(() => import("../pages/management/Courses/ArchiveCourses"));
 const Rooms = lazy(() => import("../pages/management/Rooms/Rooms"));
+const ArchiveRooms = lazy(() => import("../pages/management/Rooms/ArchiveRooms"));
 const Staff = lazy(() => import("../pages/management/Staff/Staff"));
 const Teachers = lazy(() => import("../pages/Teachers/Teachers"));
 const ArchiveTeachers = lazy(() => import("../pages/Teachers/ArchiveTeachers"));
@@ -22,6 +24,7 @@ const GroupDetail = lazy(() => import("../pages/Groups/GroupDetail/GroupDetail")
 const LessonDetail = lazy(() => import("../pages/Groups/LessonDetail/LessonDetail"));
 const CreateHomework = lazy(() => import("../pages/Groups/CreateHomework/CreateHomework"));
 const HomeworkResults = lazy(() => import("../pages/Groups/HomeworkResults/HomeworkResults"));
+const StudentHomeworkDetail = lazy(() => import("../pages/Groups/HomeworkResults/StudentHomeworkDetail"));
 const Gifts = lazy(() => import("../pages/Gifts/Gifts"));
 const Default = lazy(() => import("../pages/management/default/Default"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
@@ -95,6 +98,10 @@ const router = createBrowserRouter([
         element: <HomeworkResults />
       },
       {
+        path: '/dashboard/groups/:id/homework/:homeworkId/results/:resultId',
+        element: <StudentHomeworkDetail />
+      },
+      {
         path: '/dashboard/gifts',
         element: <Gifts />
       },
@@ -107,8 +114,16 @@ const router = createBrowserRouter([
             element: <Courses />
           },
           {
+            path: 'courses/archive',
+            element: <ArchiveCourses />
+          },
+          {
             path: 'rooms',
             element: <Rooms />
+          },
+          {
+            path: 'rooms/archive',
+            element: <ArchiveRooms />
           },
           {
             path: 'staff',

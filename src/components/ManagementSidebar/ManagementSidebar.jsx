@@ -19,7 +19,9 @@ export default function ManagementSidebar({ isOpen, isCollapsed, onClose }) {
     const { pathname } = useLocation();
 
     // Determine current active sub-page slug
-    const currentSlug = pathname.split("/").pop() || "courses";
+    const pathParts = pathname.split("/").filter(Boolean);
+    const managementIndex = pathParts.indexOf("management");
+    const currentSlug = managementIndex >= 0 ? pathParts[managementIndex + 1] : "courses";
 
     return (
         <div className={`${styles.subSidebar} ${isOpen ? styles.open : ""} ${isCollapsed ? styles.collapsed : ""}`}>

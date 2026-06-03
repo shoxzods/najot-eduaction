@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Teachers.module.scss";
-import { api } from '../../api/api';
+import { api, getFileUrl } from '../../api/api';
 
 // ui librariries
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
@@ -221,7 +221,7 @@ export default function ArchiveTeachers() {
                                         <div className={styles.userInfo}>
                                             {teacher.photo ? (
                                                 <img
-                                                    src={teacher.photo.startsWith('http') ? teacher.photo : `https://najot-edu.softwareengineer.uz/${teacher.photo.replace(/^\//, '')}`}
+                                                    src={getFileUrl(teacher.photo)}
                                                     alt={teacher.full_name}
                                                     className={styles.avatar}
                                                 />

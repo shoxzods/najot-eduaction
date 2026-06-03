@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Students.module.scss";
-import { api } from '../../api/api';
+import { api, getFileUrl } from '../../api/api';
 
 // UI libraries
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
@@ -147,7 +147,26 @@ export default function ArchiveStudents() {
                             {studentData.map((student, idx) => (
                                 <tr className={styles.tdata} key={student.id ?? student.email ?? idx}>
                                     <td><input type="checkbox" /></td>
-                                    <td>{student.full_name}</td>
+                                    <td>
+                                        <div className={styles.userInfo}>
+                                            {student.photo ? (
+                                                <img
+                                                    src={getFileUrl(student.photo)}
+                                                    alt={student.full_name}
+                                                    className={styles.avatar}
+                                                    style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', marginRight: '10px' }}
+                                                />
+                                            ) : (
+                                                <div 
+                                                    className={styles.initialAvatar}
+                                                    style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f0f0f0', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginRight: '10px' }}
+                                                >
+                                                    {student.full_name ? student.full_name.charAt(0).toUpperCase() : 'S'}
+                                                </div>
+                                            )}
+                                            <span className={styles.userName}>{student.full_name}</span>
+                                        </div>
+                                    </td>
                                     <td>{student.groups?.map((group) => group.name).join(", ")}</td>
                                     <td>{student.phone}</td>
                                     <td>{student.email}</td>

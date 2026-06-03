@@ -4,6 +4,7 @@ import { api } from "../../../api/api";
 import styles from "./LessonDetail.module.scss";
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import Switch from '@mui/material/Switch';
 
 export default function LessonDetail() {
@@ -17,6 +18,102 @@ export default function LessonDetail() {
 
   const [students, setStudents] = useState([]);
   const [curriculumLessons, setCurriculumLessons] = useState([]);
+  
+  const [schedules, setSchedules] = useState([]);
+  const [currentMonth, setCurrentMonth] = useState(0);
+  const [isPast, setIsPast] = useState(false);
+
+  useEffect(() => {
+    if (date) {
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+      const currentLessonDate = new Date(date);
+      currentLessonDate.setHours(0, 0, 0, 0);
+      setIsPast(currentLessonDate < todayDate);
+    }
+  }, [date]);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      try {
+        const res = await api.get(`/groups/${id}/schedules`);
+        const data = res.data;
+        const formattedSchedules = [];
+        data.forEach((item) => {
+          const keys = Object.keys(item).sort((a, b) => Number(a) - Number(b));
+          keys.forEach((key) => {
+            const value = item[key];
+            formattedSchedules.push({
+              id: key,
+              label: `${key}-o'quv oyi`,
+              isCurrent: value.isActive,
+              days: value.days.map((d, dIdx) => ({
+                id: `${key}-${dIdx}`,
+                day: d.day,
+                month: d.month,
+                isCompleted: d.isCompleted
+              }))
+            });
+          });
+        });
+        setSchedules(formattedSchedules);
+      } catch (err) {
+        console.error("Error fetching schedules:", err);
+      }
+    };
+    if (id) {
+      fetchSchedules();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (schedules.length === 0 || !date) return;
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) return;
+    const m = dateObj.getMonth();
+    const d = dateObj.getDate();
+    
+    let foundIndex = schedules.findIndex(sm => {
+        return sm.days.some(item => {
+            const monthMap = {
+                "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                "noy": 10, "nov": 10, "dek": 11, "dec": 11
+            };
+            let mIndex = -1;
+            for (const [key, val] of Object.entries(monthMap)) {
+                if (item.month && item.month.toLowerCase().startsWith(key)) {
+                    mIndex = val; break;
+                }
+            }
+            return mIndex === m && parseInt(item.day, 10) === d;
+        });
+    });
+    
+    if (foundIndex !== -1) {
+        setCurrentMonth(foundIndex);
+    } else {
+        foundIndex = schedules.findIndex(sm => {
+            return sm.days.some(item => {
+                const monthMap = {
+                    "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                    "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                    "noy": 10, "nov": 10, "dek": 11, "dec": 11
+                };
+                let mIndex = -1;
+                for (const [key, val] of Object.entries(monthMap)) {
+                    if (item.month && item.month.toLowerCase().startsWith(key)) {
+                        mIndex = val; break;
+                    }
+                }
+                return mIndex === m;
+            });
+        });
+        if (foundIndex !== -1) {
+            setCurrentMonth(foundIndex);
+        }
+    }
+  }, [schedules, date]);
 
   useEffect(() => {
     const fetchCurriculumLessons = async () => {
@@ -61,22 +158,6 @@ export default function LessonDetail() {
     }
   }, [id, date]);
 
-  const dates = [
-    { day: 2, month: "May" },
-    { day: 5, month: "May" },
-    { day: 7, month: "May" },
-    { day: 9, month: "May" },
-    { day: 12, month: "May" },
-    { day: 14, month: "May" },
-    { day: 16, month: "May" },
-    { day: 19, month: "May" },
-    { day: 21, month: "May" },
-    { day: 23, month: "May" },
-    { day: 26, month: "May" },
-    { day: 28, month: "May" },
-    { day: 30, month: "May" },
-  ];
-
   const handleToggleStudent = (studentId) => {
     setStudents(students.map(s => s.id === studentId ? { ...s, present: !s.present } : s));
   };
@@ -115,25 +196,66 @@ export default function LessonDetail() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.pageHeader}>
+        <button className={styles.backBtn} onClick={() => navigate(`/dashboard/groups/${id}`)}>
+          <ArrowBackIosNewRoundedIcon fontSize="small" />
+        </button>
+        <h2>Dars tafsilotlari</h2>
+      </div>
+
       <div className={styles.dateNavigatorContainer}>
         <div className={styles.monthNavRow}>
-          <button className={styles.navArrow}><KeyboardArrowLeftRoundedIcon fontSize="small" /></button>
-          <span className={styles.monthLabel}>1-o'quv oyi</span>
-          <button className={styles.navArrow}><KeyboardArrowRightRoundedIcon fontSize="small" /></button>
+          <button 
+            className={styles.navArrow}
+            onClick={() => setCurrentMonth(Math.max(0, currentMonth - 1))}
+            disabled={currentMonth === 0}
+          >
+            <KeyboardArrowLeftRoundedIcon fontSize="small" />
+          </button>
+          <span className={styles.monthLabel}>
+            {schedules[currentMonth]?.label || "1-o'quv oyi"}
+          </span>
+          <button 
+            className={styles.navArrow}
+            onClick={() => setCurrentMonth(Math.min(schedules.length - 1, currentMonth + 1))}
+            disabled={schedules.length === 0 || currentMonth === schedules.length - 1}
+          >
+            <KeyboardArrowRightRoundedIcon fontSize="small" />
+          </button>
         </div>
 
         <div className={styles.dateChips}>
-          {dates.map((d, index) => {
-            const formattedDay = String(d.day).padStart(2, '0');
-            const dateStr = `2026-05-${formattedDay}`;
-            const chipDate = new Date(dateStr);
-            chipDate.setHours(0, 0, 0, 0);
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+          {schedules[currentMonth]?.days.map((d, index) => {
+            const { isFuture, dateStr } = (() => {
+                if (!d.month || !d.day) return { isFuture: false, dateStr: `2026-05-${String(d.day).padStart(2, '0')}` };
+                const monthMap = {
+                    "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                    "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                    "noy": 10, "nov": 10, "dek": 11, "dec": 11
+                };
+                let mIndex = -1;
+                for (const [key, val] of Object.entries(monthMap)) {
+                    if (d.month.toLowerCase().startsWith(key)) {
+                        mIndex = val; break;
+                    }
+                }
+                if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(d.day).padStart(2, '0')}` };
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                let year = today.getFullYear();
+                if (today.getMonth() === 0 && mIndex === 11) year -= 1;
+                if (today.getMonth() === 11 && mIndex === 0) year += 1;
+                const itemDate = new Date(year, mIndex, parseInt(d.day, 10));
+                
+                const paddedMonth = String(mIndex + 1).padStart(2, '0');
+                const paddedDay = String(d.day).padStart(2, '0');
+                return {
+                    isFuture: itemDate > today,
+                    dateStr: `${year}-${paddedMonth}-${paddedDay}`
+                };
+            })();
 
             const isActive = date === dateStr;
-            const isFuture = chipDate > today;
 
             let chipClass = styles.dateChip;
             if (isActive) {
@@ -153,6 +275,7 @@ export default function LessonDetail() {
                     navigate(`/dashboard/groups/${id}/lesson/${dateStr}`);
                   }
                 }}
+                style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
               >
                 <span className={styles.chipMonth}>{d.month}</span>
                 <span className={styles.chipDay}>{d.day}</span>
@@ -210,6 +333,7 @@ export default function LessonDetail() {
                 value="O'quv reja bo'yicha"
                 checked={topicType === "O'quv reja bo'yicha"}
                 onChange={(e) => setTopicType(e.target.value)}
+                disabled={isPast}
               />
               O'quv reja bo'yicha
             </label>
@@ -221,6 +345,7 @@ export default function LessonDetail() {
                 checked={topicType === "Boshqa"}
                 onChange={(e) => setTopicType(e.target.value)}
                 style={{ accentColor: "#10b981" }}
+                disabled={isPast}
               />
               <span style={{ color: topicType === "Boshqa" ? "#10b981" : "inherit", fontWeight: topicType === "Boshqa" ? 500 : 400 }}>Boshqa</span>
             </label>
@@ -235,7 +360,8 @@ export default function LessonDetail() {
             <select
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              style={{ width: "100%", padding: "12px 16px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", outline: "none", backgroundColor: "white" }}
+              style={{ width: "100%", padding: "12px 16px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", outline: "none", backgroundColor: isPast ? "#f1f5f9" : "white" }}
+              disabled={isPast}
             >
               <option value="" disabled>Mavzuni tanlang...</option>
               {curriculumLessons.map((lesson) => (
@@ -250,6 +376,7 @@ export default function LessonDetail() {
               placeholder="Mavzuni kiriting..."
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
+              disabled={isPast}
             />
           )}
         </div>
@@ -262,6 +389,7 @@ export default function LessonDetail() {
             placeholder="Dars haqida qo'shimcha ma'lumot..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            disabled={isPast}
           />
         </div>
 
@@ -287,6 +415,7 @@ export default function LessonDetail() {
                   <Switch
                     checked={student.present}
                     onChange={() => handleToggleStudent(student.id)}
+                    disabled={isPast}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#10b981',
@@ -306,7 +435,13 @@ export default function LessonDetail() {
         </table>
 
         <div className={styles.saveButtonWrapper}>
-          <button onClick={handleSave}>Saqlash</button>
+          <button 
+            onClick={handleSave} 
+            disabled={isPast} 
+            style={isPast ? { backgroundColor: '#cbd5e1', cursor: 'not-allowed', color: '#64748b' } : {}}
+          >
+            Saqlash
+          </button>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Teachers.module.scss";
-import { api } from '../../api/api';
+import { api, getFileUrl } from '../../api/api';
 
 // ui librariries
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
@@ -72,23 +72,9 @@ export default function Teachers() {
         request.then((res) => {
             console.log(teacherToEdit?.id ? "Teacher updated successfully" : "Teacher created successfully");
             
-            // fetchTeachers(); // Temporarily disabled per user request
-            
+            // As requested, call fetchTeachers to get updated data from API after PATCH
             if (teacherToEdit?.id) {
-                // Optimistic update for PATCH
-                setTeacherData(prev => prev.map(t => {
-                    if (t.id === teacherToEdit.id) {
-                        return {
-                            ...t,
-                            full_name: localData?.fullName || t.full_name,
-                            email: localData?.email || t.email,
-                            phone: localData?.phone || t.phone,
-                            address: localData?.address || t.address,
-                            groups: localData?.groups || t.groups
-                        };
-                    }
-                    return t;
-                }));
+                fetchTeachers();
             } else {
                 // Optimistic update for POST
                 if (res.data?.data) {
@@ -102,7 +88,7 @@ export default function Teachers() {
         }).catch((err) => {
             if (err.response && err.response.status === 304) {
                 console.log("Hech qanday o'zgarish qilinmadi (304 Not Modified)");
-                // fetchTeachers(); // Temporarily disabled
+                fetchTeachers(); 
                 closeTeacherModal();
                 return;
             }
@@ -255,7 +241,7 @@ export default function Teachers() {
                                         <div className={styles.userInfo}>
                                             {teacher.photo ? (
                                                 <img
-                                                    src={teacher.photo.startsWith('http') ? teacher.photo : `https://najot-edu.softwareengineer.uz/${teacher.photo.replace(/^\//, '')}`}
+                                                    src={getFileUrl(teacher.photo)}
                                                     alt={teacher.full_name}
                                                     className={styles.avatar}
                                                 />
@@ -301,19 +287,15 @@ export default function Teachers() {
                     </table>
                 </div>
 
-                <div className={styles.pagination}>
-                    <button className={styles.pageArrow}>← Previous</button>
-                    <div className={styles.pageNumbers}>
-                        <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                        <button className={styles.pageBtn}>2</button>
-                        <button className={styles.pageBtn}>3</button>
-                        <span className={styles.dots}>...</span>
-                        <button className={styles.pageBtn}>8</button>
-                        <button className={styles.pageBtn}>9</button>
-                        <button className={styles.pageBtn}>10</button>
+                {teacherData.length > 0 && (
+                    <div className={styles.pagination}>
+                        <button className={`${styles.pageArrow} ${styles.disabled}`} disabled>← Previous</button>
+                        <div className={styles.pageNumbers}>
+                            <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
+                        </div>
+                        <button className={`${styles.pageArrow} ${styles.disabled}`} disabled>Next →</button>
                     </div>
-                    <button className={styles.pageArrow}>Next →</button>
-                </div>
+                )}
             </div>
 
             <TeacherModal
