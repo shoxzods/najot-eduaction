@@ -19,6 +19,7 @@ import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
 export default function ArchiveTeachers() {
     const navigate = useNavigate();
     const [teacherData, setTeacherData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [restoreConfirm, setRestoreConfirm] = useState({ isOpen: false, teacherId: null });
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, teacherId: null });
@@ -186,7 +187,13 @@ export default function ArchiveTeachers() {
 
                     </div>
                     <div className={styles.searchWrapper}>
-                        <input type="text" placeholder="Search" className={styles.searchInput} />
+                        <input 
+                            type="text" 
+                            placeholder="Search" 
+                            className={styles.searchInput}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)} 
+                        />
                     </div>
                 </div>
 
@@ -223,7 +230,15 @@ export default function ArchiveTeachers() {
                             </tr>
                         </thead>
                         <tbody>
-                            {teacherData.map((teacher, index) => (
+                            {teacherData.filter(teacher => {
+                                if (!searchQuery) return true;
+                                const q = searchQuery.toLowerCase();
+                                return (
+                                    teacher.full_name?.toLowerCase().includes(q) ||
+                                    teacher.phone?.toLowerCase().includes(q) ||
+                                    teacher.email?.toLowerCase().includes(q)
+                                );
+                            }).map((teacher, index) => (
                                 <tr className={styles.tdata} key={teacher.id ?? teacher.email ?? index}>
                                     <td>
                                         <input type="checkbox" />
@@ -286,11 +301,11 @@ export default function ArchiveTeachers() {
                 </div>
 
                 <div className={styles.pagination}>
-                    <button className={styles.pageArrow}>← Previous</button>
+                    <button className={`${styles.pageArrow} ${styles.disabled}`} disabled>← Previous</button>
                     <div className={styles.pageNumbers}>
                         <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
                     </div>
-                    <button className={styles.pageArrow}>Next →</button>
+                    <button className={`${styles.pageArrow} ${styles.disabled}`} disabled>Next →</button>
                 </div>
             </div>
 

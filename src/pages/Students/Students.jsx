@@ -19,6 +19,7 @@ export default function Students() {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentData, setStudentData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -63,11 +64,11 @@ export default function Students() {
                     setTotalPages(res.data.meta.last_page);
                 } else if (res.data.totalPages) {
                     setTotalPages(res.data.totalPages);
-                } else if (data.length < 3) {
+                } else if (data.length < 4) {
                     // Agar ma'lumotlar kam kelsa (yoki bo'sh), demak bu oxirgi sahifa
                     setTotalPages(targetPage);
                 } else {
-                    // Agar to'liq 3 ta ma'lumot kelsa va API dan jami sahifalar soni kelmasa, yana bitta sahifa bor deb faraz qilamiz
+                    // Agar to'liq 4 ta ma'lumot kelsa va API dan jami sahifalar soni kelmasa, yana bitta sahifa bor deb faraz qilamiz
                     setTotalPages(Math.max(totalPages, targetPage + 1));
                 }
                 setIsLoading(false);
@@ -81,7 +82,7 @@ export default function Students() {
     };
 
     function increment() {
-        if (studentData.length === 3) {
+        if (page < totalPages) {
             startTransition(async () => {
                 await fetchStudents(page + 1);
             });
@@ -157,7 +158,13 @@ export default function Students() {
                 <div className={styles.tableHeader}>
                     <div className={styles.searchWrapper}>
                         <SearchRoundedIcon className={styles.searchIcon} fontSize="small" />
-                        <input type="text" placeholder="Search" className={styles.searchInput} />
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            className={styles.searchInput}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                     </div>
                     <div className={styles.tableActions}>
                         <button className={styles.filterBtn}>
@@ -203,7 +210,15 @@ export default function Students() {
                             </tr>
                         </thead>
                         <tbody className={styles.tbody}>
-                            {studentData.map((student) => (
+                            {studentData.filter(student => {
+                                if (!searchQuery) return true;
+                                const q = searchQuery.toLowerCase();
+                                return (
+                                    student.full_name?.toLowerCase().includes(q) ||
+                                    student.phone?.toLowerCase().includes(q) ||
+                                    student.email?.toLowerCase().includes(q)
+                                );
+                            }).map((student) => (
                                 <tr key={student.id}>
                                     <td>
                                         <input type="checkbox" />
@@ -257,43 +272,43 @@ export default function Students() {
                 {studentData.length > 0 && totalPages > 1 && (
                     <div className={styles.pagination}>
                         <button
-                        onClick={decrement}
-                        className={`${styles.pageArrow} ${(page === 1 || isPending || isLoading) ? styles.disabled : ''}`}
-                        disabled={page === 1 || isPending || isLoading}
-                    >
-                        ← Previous
-                    </button>
-                    <div className={styles.pageNumbers}>
-                        {getPaginationGroup().map((item, index) => {
-                            if (item === '...') {
-                                return <span key={`dots-${index}`} className={styles.dots}>...</span>;
-                            }
-                            return (
-                                <button
-                                    key={index}
-                                    className={`${styles.pageBtn} ${page === item ? styles.active : ''}`}
-                                    onClick={() => {
-                                        if (page !== item) {
-                                            startTransition(async () => {
-                                                await fetchStudents(item);
-                                            });
-                                        }
-                                    }}
-                                    disabled={isPending || isLoading}
-                                >
-                                    {item}
-                                </button>
-                            );
-                        })}
+                            onClick={decrement}
+                            className={`${styles.pageArrow} ${(page === 1 || isPending || isLoading) ? styles.disabled : ''}`}
+                            disabled={page === 1 || isPending || isLoading}
+                        >
+                            ← Previous
+                        </button>
+                        <div className={styles.pageNumbers}>
+                            {getPaginationGroup().map((item, index) => {
+                                if (item === '...') {
+                                    return <span key={`dots-${index}`} className={styles.dots}>...</span>;
+                                }
+                                return (
+                                    <button
+                                        key={index}
+                                        className={`${styles.pageBtn} ${page === item ? styles.active : ''}`}
+                                        onClick={() => {
+                                            if (page !== item) {
+                                                startTransition(async () => {
+                                                    await fetchStudents(item);
+                                                });
+                                            }
+                                        }}
+                                        disabled={isPending || isLoading}
+                                    >
+                                        {item}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <button
+                            onClick={increment}
+                            className={`${styles.pageArrow} ${(page >= totalPages || isPending || isLoading) ? styles.disabled : ''}`}
+                            disabled={page >= totalPages || isPending || isLoading}
+                        >
+                            Next →
+                        </button>
                     </div>
-                    <button
-                        onClick={increment}
-                        className={`${styles.pageArrow} ${(studentData.length < 3 || isPending || isLoading) ? styles.disabled : ''}`}
-                        disabled={studentData.length < 3 || isPending || isLoading}
-                    >
-                        Next →
-                    </button>
-                </div>
                 )}
             </div>
 

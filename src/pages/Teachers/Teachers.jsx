@@ -21,6 +21,7 @@ export default function Teachers() {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [teacherData, setTeacherData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, teacherId: null });
@@ -80,7 +81,7 @@ export default function Teachers() {
         request.then((res) => {
             const successMsg = teacherToEdit?.id ? "O'qituvchi muvaffaqiyatli tahrirlandi!" : "O'qituvchi muvaffaqiyatli qo'shildi!";
             setSnackbar({ open: true, message: successMsg, severity: 'success' });
-            
+
             // As requested, call fetchTeachers to get updated data from API after PATCH
             if (teacherToEdit?.id) {
                 fetchTeachers();
@@ -97,7 +98,7 @@ export default function Teachers() {
         }).catch((err) => {
             if (err.response && err.response.status === 304) {
                 console.log("Hech qanday o'zgarish qilinmadi (304 Not Modified)");
-                fetchTeachers(); 
+                fetchTeachers();
                 closeTeacherModal();
                 return;
             }
@@ -205,7 +206,13 @@ export default function Teachers() {
                         </button>
                     </div>
                     <div className={styles.searchWrapper}>
-                        <input type="text" placeholder="Search" className={styles.searchInput} />
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            className={styles.searchInput}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                     </div>
                 </div>
 
@@ -242,7 +249,15 @@ export default function Teachers() {
                             </tr>
                         </thead>
                         <tbody>
-                            {teacherData.map((teacher, index) => (
+                            {teacherData.filter(teacher => {
+                                if (!searchQuery) return true;
+                                const q = searchQuery.toLowerCase();
+                                return (
+                                    teacher.full_name?.toLowerCase().includes(q) ||
+                                    teacher.phone?.toLowerCase().includes(q) ||
+                                    teacher.email?.toLowerCase().includes(q)
+                                );
+                            }).map((teacher, index) => (
                                 <tr className={styles.tdata} key={teacher.id ?? teacher.email ?? index}>
                                     <td>
                                         <input type="checkbox" />
@@ -327,27 +342,27 @@ export default function Teachers() {
                 message="Rostdan ham o'chirishni hohlaysizmi?"
             />
 
-            <Snackbar 
-                open={snackbar.open} 
-                autoHideDuration={6000} 
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                sx={{ 
-                    top: '20px !important', 
+                sx={{
+                    top: '20px !important',
                     right: '20px !important',
                     width: 'calc(25vw - 40px)',
                     maxWidth: '400px'
                 }}
             >
-                <MuiAlert 
-                    onClose={handleCloseSnackbar} 
-                    severity={snackbar.severity} 
-                    elevation={6} 
+                <MuiAlert
+                    onClose={handleCloseSnackbar}
+                    severity={snackbar.severity}
+                    elevation={6}
                     variant="filled"
-                    sx={{ 
-                        width: '100%', 
-                        position: 'relative', 
-                        overflow: 'hidden', 
+                    sx={{
+                        width: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
                         padding: '6px 12px',
                         paddingBottom: '10px',
                         fontSize: '13px',
@@ -372,7 +387,7 @@ export default function Teachers() {
                     }}
                 >
                     {snackbar.message}
-                    <Box 
+                    <Box
                         sx={{
                             position: 'absolute',
                             bottom: 0,
@@ -384,7 +399,7 @@ export default function Teachers() {
                                 '0%': { width: '100%' },
                                 '100%': { width: '0%' }
                             }
-                        }} 
+                        }}
                     />
                 </MuiAlert>
             </Snackbar>

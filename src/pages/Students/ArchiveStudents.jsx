@@ -17,6 +17,7 @@ import StudentModal from "../../components/UI/StudentModal/StudentModal";
 export default function ArchiveStudents() {
     const navigate = useNavigate();
     const [studentData, setStudentData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [restoreConfirm, setRestoreConfirm] = useState({ isOpen: false, studentId: null });
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, studentId: null });
@@ -93,7 +94,13 @@ export default function ArchiveStudents() {
             <div className={styles.tableCard}>
                 <div className={styles.tableHeader}>
                     <div className={styles.searchWrapper}>
-                        <input type="text" placeholder="Search" className={styles.searchInput} />
+                        <input 
+                            type="text" 
+                            placeholder="Search" 
+                            className={styles.searchInput}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)} 
+                        />
                     </div>
                     <div className={styles.tableActions}>
                         {/* Filters button placed next to back */}
@@ -144,7 +151,15 @@ export default function ArchiveStudents() {
                             </tr>
                         </thead>
                         <tbody>
-                            {studentData.map((student, idx) => (
+                            {studentData.filter(student => {
+                                if (!searchQuery) return true;
+                                const q = searchQuery.toLowerCase();
+                                return (
+                                    student.full_name?.toLowerCase().includes(q) ||
+                                    student.phone?.toLowerCase().includes(q) ||
+                                    student.email?.toLowerCase().includes(q)
+                                );
+                            }).map((student, idx) => (
                                 <tr className={styles.tdata} key={student.id ?? student.email ?? idx}>
                                     <td><input type="checkbox" /></td>
                                     <td>
@@ -199,11 +214,11 @@ export default function ArchiveStudents() {
 
                 {/* Pagination (placeholder, mirrors teachers) */}
                 <div className={styles.pagination}>
-                    <button className={styles.pageArrow}>← Previous</button>
+                    <button className={`${styles.pageArrow} ${styles.disabled}`} disabled>← Previous</button>
                     <div className={styles.pageNumbers}>
                         <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
                     </div>
-                    <button className={styles.pageArrow}>Next →</button>
+                    <button className={`${styles.pageArrow} ${styles.disabled}`} disabled>Next →</button>
                 </div>
             </div>
 

@@ -421,9 +421,10 @@
         background: #f8f9fa;
     }
 
+    &:disabled,
     &.disabled {
         opacity: 0.5;
-        cursor: not-allowed;
+        cursor: not-allowed !important;
     }
 }
 
@@ -455,6 +456,11 @@
     &.active {
         background: #6c35de;
         color: #ffffff;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed !important;
     }
 }
 
