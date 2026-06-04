@@ -14,6 +14,8 @@ import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
 import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 export default function Teachers() {
     const navigate = useNavigate();
@@ -22,6 +24,12 @@ export default function Teachers() {
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, teacherId: null });
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') return;
+        setSnackbar({ ...snackbar, open: false });
+    };
 
     const openTeacherModal = (teacher = null) => {
         setSelectedTeacher(teacher);
@@ -70,7 +78,8 @@ export default function Teachers() {
             : api.post('/teachers', payload);
 
         request.then((res) => {
-            console.log(teacherToEdit?.id ? "Teacher updated successfully" : "Teacher created successfully");
+            const successMsg = teacherToEdit?.id ? "O'qituvchi muvaffaqiyatli tahrirlandi!" : "O'qituvchi muvaffaqiyatli qo'shildi!";
+            setSnackbar({ open: true, message: successMsg, severity: 'success' });
             
             // As requested, call fetchTeachers to get updated data from API after PATCH
             if (teacherToEdit?.id) {
@@ -118,7 +127,7 @@ export default function Teachers() {
                     errorMsg = JSON.stringify(responseData);
                 }
             }
-            alert("Xatolik yuz berdi: " + errorMsg);
+            setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
         }).finally(() => setIsLoading(false));
     };
 
@@ -146,6 +155,7 @@ export default function Teachers() {
             .then((res) => {
                 if (res.status === 200 || res.status === 204) {
                     setTeacherData(prev => prev.filter(item => item.id !== id));
+                    setSnackbar({ open: true, message: "O'qituvchi muvaffaqiyatli o'chirildi!", severity: 'success' });
                 } else {
                     console.warn('Unexpected delete response', res);
                 }
@@ -159,7 +169,7 @@ export default function Teachers() {
                 } else if (responseData?.error) {
                     errorMsg = responseData.error;
                 }
-                alert("Xatolik yuz berdi: " + errorMsg);
+                setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
             })
             .finally(() => setIsLoading(false));
     }
@@ -316,6 +326,68 @@ export default function Teachers() {
                 title="O'qituvchini o'chirish"
                 message="Rostdan ham o'chirishni hohlaysizmi?"
             />
+
+            <Snackbar 
+                open={snackbar.open} 
+                autoHideDuration={6000} 
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{ 
+                    top: '20px !important', 
+                    right: '20px !important',
+                    width: 'calc(25vw - 40px)',
+                    maxWidth: '400px'
+                }}
+            >
+                <MuiAlert 
+                    onClose={handleCloseSnackbar} 
+                    severity={snackbar.severity} 
+                    elevation={6} 
+                    variant="filled"
+                    sx={{ 
+                        width: '100%', 
+                        position: 'relative', 
+                        overflow: 'hidden', 
+                        padding: '6px 12px',
+                        paddingBottom: '10px',
+                        fontSize: '13px',
+                        alignItems: 'center',
+                        '& .MuiAlert-icon': {
+                            fontSize: '18px',
+                            marginRight: '8px'
+                        },
+                        '& .MuiAlert-message': {
+                            padding: '4px 0',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        },
+                        '& .MuiAlert-action': {
+                            padding: '0 0 0 8px',
+                            marginRight: '-4px'
+                        }
+                    }}
+                >
+                    {snackbar.message}
+                    <Box 
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: '3px',
+                            backgroundColor: 'rgba(255,255,255,0.5)',
+                            animation: snackbar.open ? 'shrink 6s linear forwards' : 'none',
+                            '@keyframes shrink': {
+                                '0%': { width: '100%' },
+                                '100%': { width: '0%' }
+                            }
+                        }} 
+                    />
+                </MuiAlert>
+            </Snackbar>
         </div>
     );
 }

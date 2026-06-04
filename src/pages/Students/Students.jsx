@@ -50,7 +50,7 @@ export default function Students() {
 
     const fetchStudents = (targetPage) => {
         setIsLoading(true);
-        return api(`/students?page=${targetPage}&limit=3`).then(
+        return api(`/students?page=${targetPage}&limit=4`).then(
             res => {
                 const data = res.data.data || [];
 

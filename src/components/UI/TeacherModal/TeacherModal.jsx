@@ -6,6 +6,9 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { createPortal } from "react-dom";
 import AddGroupModal from "./AddGroupModal/AddGroupModal";
 import { api } from "../../../api/api";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 
 export default function TeacherModal({
     isOpen,
@@ -28,6 +31,12 @@ export default function TeacherModal({
     };
 
     const [teacherData, setTeacherData] = useState(defaultTeacherData);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') return;
+        setSnackbar({ ...snackbar, open: false });
+    };
 
     const toggleAddGroupModal = () => setIsAddGroupModalOpen(!isAddGroupModalOpen);
 
@@ -85,7 +94,7 @@ export default function TeacherModal({
         const isEditing = Boolean(teacherToEdit?.id);
 
         if (!fullName || !email || !phone || !address || groups.length === 0) {
-            alert("Iltimos, barcha majburiy maydonlarni (shu jumladan guruh va manzilni ham) to'ldiring!");
+            setSnackbar({ open: true, message: "Iltimos, barcha majburiy maydonlarni (shu jumladan guruh va manzilni ham) to'ldiring!", severity: 'error' });
             return;
         }
 
@@ -105,12 +114,12 @@ export default function TeacherModal({
         });
 
         if (hasDeletedGroups) {
-            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) guruhlarni ro'yxatdan olib tashlang!");
+            setSnackbar({ open: true, message: "O'chirilgan guruhlarni (qizil) ro'yxatdan olib tashlang!", severity: 'error' });
             return;
         }
 
         if (!isEditing && !password) {
-            alert("Iltimos, parolni kiriting!");
+            setSnackbar({ open: true, message: "Iltimos, parolni kiriting!", severity: 'error' });
             return;
         }
 
@@ -175,179 +184,177 @@ export default function TeacherModal({
         >
             <form className={`${styles.modal} ${!isOpen ? styles.slideOut : ""}`} onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
-                    <div className={styles.headerText}>
-                        <h2 className={styles.title}>{teacherToEdit ? "O'qituvchini tahrirlash" : "O'qituvchi qo'shish"}</h2>
-                        <p className={styles.subtitle}>{teacherToEdit ? "Bu yerda o'qituvchini yangilashingiz mumkin." : "Bu yerda siz yangi o'qituvchi qo'shishingiz mumkin."}</p>
+                    <div className={styles.headerTop}>
+                        <div>
+                            <h2 className={styles.title}>{teacherToEdit ? "O'qituvchini tahrirlash" : "O'qituvchi qo'shish"}</h2>
+                            <p className={styles.subtitle}>{teacherToEdit ? "Bu yerda o'qituvchini yangilashingiz mumkin." : "Bu yerda siz yangi o'qituvchi qo'shishingiz mumkin."}</p>
+                        </div>
+                        <button type="button" className={styles.closeBtn} onClick={onClose}>
+                            <CloseRoundedIcon />
+                        </button>
                     </div>
-                    <button type="button" className={styles.closeBtn} onClick={onClose}>
-                        <CloseRoundedIcon />
-                    </button>
                 </div>
 
                 <div className={styles.body}>
-                    <div className={styles.leftColumn}>
-                        <div className={styles.formGroup}>
-                            <label>O'qituvchi FIO</label>
-                            <input
-                                type="text"
-                                name="fullName"
-                                placeholder="O'qituvchi FIO ni kiriting"
-                                value={teacherData.fullName}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+                    <div className={styles.formGroup}>
+                        <label>O'qituvchi FIO</label>
+                        <input
+                            type="text"
+                            name="fullName"
+                            placeholder="O'qituvchi FIO ni kiriting"
+                            value={teacherData.fullName}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Mail</label>
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Elektron pochtani kiriting"
-                                value={teacherData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+                    <div className={styles.formGroup}>
+                        <label>Mail</label>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Elektron pochtani kiriting"
+                            value={teacherData.email}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Manzil</label>
-                            <input
-                                type="text"
-                                name="address"
-                                placeholder="Manzilni kiriting"
-                                value={teacherData.address}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+                    <div className={styles.formGroup}>
+                        <label>Telefon raqam</label>
+                        <input
+                            type="text"
+                            name="phone"
+                            placeholder="Telefon raqamini kiriting"
+                            value={teacherData.phone}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Guruh</label>
-                            <div className={styles.groupsInputContainer}>
-                                {teacherData.groups.length > 0 && (
-                                    <div className={styles.groupTags}>
-                                        {teacherData.groups.map((group, index) => {
-                                            const key = group?.id ?? `${group?.name ?? group}-${index}`;
-                                            const label = group?.name ?? group?.title ?? String(group);
-                                            const rawId = group?.id ?? group?.group_id;
-                                            const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
-                                            
-                                            let isDeleted = false;
-                                            if (allGroups.length > 0) {
-                                                if (groupId !== null) {
-                                                    isDeleted = !allGroups.some(g => Number(g.id) === groupId);
-                                                } else {
-                                                    isDeleted = !allGroups.some(g => g.name === label || g.title === label);
-                                                }
+                    <div className={styles.formGroup}>
+                        <label>Manzil</label>
+                        <input
+                            type="text"
+                            name="address"
+                            placeholder="Manzilni kiriting"
+                            value={teacherData.address}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Parol</label>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Parolni kiriting"
+                            value={teacherData.password}
+                            onChange={handleInputChange}
+                            required={!teacherToEdit}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label>Guruh</label>
+                        <div className={styles.groupsInputContainer}>
+                            {teacherData.groups.length > 0 && (
+                                <div className={styles.groupTags}>
+                                    {teacherData.groups.map((group, index) => {
+                                        const key = group?.id ?? `${group?.name ?? group}-${index}`;
+                                        const label = group?.name ?? group?.title ?? String(group);
+                                        const rawId = group?.id ?? group?.group_id;
+                                        const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
+                                        
+                                        let isDeleted = false;
+                                        if (allGroups.length > 0) {
+                                            if (groupId !== null) {
+                                                isDeleted = !allGroups.some(g => Number(g.id) === groupId);
+                                            } else {
+                                                isDeleted = !allGroups.some(g => g.name === label || g.title === label);
                                             }
-                                            return (
-                                                <span
-                                                    key={key}
-                                                    className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
-                                                    title={isDeleted ? "Bu guruh o'chirilgan" : undefined}
-                                                >
-                                                    <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
-                                                        {label}
-                                                    </span>
-                                                    <button 
-                                                        type="button"
-                                                        className={styles.removeGroupBtn}
-                                                        onClick={() => setTeacherData(prev => ({
-                                                            ...prev,
-                                                            groups: prev.groups.filter((g, i) => i !== index)
-                                                        }))}
-                                                    >
-                                                        ×
-                                                    </button>
+                                        }
+                                        return (
+                                            <span
+                                                key={key}
+                                                className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
+                                                title={isDeleted ? "Bu guruh o'chirilgan" : undefined}
+                                            >
+                                                <span style={isDeleted ? { textDecoration: 'line-through', opacity: 0.7 } : {}}>
+                                                    {label}
                                                 </span>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                                <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddGroupModal}>
-                                    <AddRoundedIcon fontSize="small" />
-                                    <span>Qo'shish</span>
-                                </button>
-                            </div>
+                                                <button 
+                                                    type="button"
+                                                    className={styles.removeGroupBtn}
+                                                    onClick={() => setTeacherData(prev => ({
+                                                        ...prev,
+                                                        groups: prev.groups.filter((g, i) => i !== index)
+                                                    }))}
+                                                >
+                                                    ×
+                                                </button>
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                            <button type="button" className={styles.addGroupBtnInline} onClick={toggleAddGroupModal}>
+                                <AddRoundedIcon fontSize="small" />
+                                <span>Qo'shish</span>
+                            </button>
                         </div>
                     </div>
 
-                    <div className={styles.rightColumn}>
-                        <div className={styles.formGroup}>
-                            <label>Telefon raqam</label>
+                    <div className={styles.formGroup}>
+                        <label>Surati</label>
+                        <label
+                            className={styles.uploadArea}
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                    setTeacherData(prev => ({
+                                        ...prev,
+                                        photo: e.dataTransfer.files[0]
+                                    }));
+                                }
+                            }}
+                        >
                             <input
-                                type="text"
-                                name="phone"
-                                placeholder="Telefon raqamini kiriting"
-                                value={teacherData.phone}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label>Parol</label>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Parolni kiriting"
-                                value={teacherData.password}
-                                onChange={handleInputChange}
-                                required={!teacherToEdit}
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label>Surati</label>
-                            <label
-                                className={styles.uploadArea}
-                                onDragOver={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                }}
-                                onDrop={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                type="file"
+                                style={{ display: "none" }}
+                                accept="image/*"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
                                         setTeacherData(prev => ({
                                             ...prev,
-                                            photo: e.dataTransfer.files[0]
+                                            photo: e.target.files[0]
                                         }));
                                     }
                                 }}
-                            >
-                                <input
-                                    type="file"
-                                    style={{ display: "none" }}
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        if (e.target.files && e.target.files[0]) {
-                                            setTeacherData(prev => ({
-                                                ...prev,
-                                                photo: e.target.files[0]
-                                            }));
-                                        }
-                                    }}
-                                />
-                                <CloudUploadOutlinedIcon className={styles.uploadIcon} />
-                                {teacherData.photo ? (
-                                    <>
-                                        <p className={styles.uploadText}>
-                                            Tanlandi: <span className={styles.purpleText}>{teacherData.photo.name}</span>
-                                        </p>
-                                        <p className={styles.uploadHint}>O'zgartirish uchun bosing</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className={styles.uploadText}>
-                                            <span className={styles.purpleText}>Click to upload</span> or drag and drop
-                                        </p>
-                                        <p className={styles.uploadHint}>JPG or PNG (max. 2 MB)</p>
-                                    </>
-                                )}
-                            </label>
-                        </div>
+                            />
+                            <CloudUploadOutlinedIcon className={styles.uploadIcon} />
+                            {teacherData.photo ? (
+                                <>
+                                    <p className={styles.uploadText}>
+                                        Tanlandi: <span className={styles.purpleText}>{teacherData.photo.name}</span>
+                                    </p>
+                                    <p className={styles.uploadHint}>O'zgartirish uchun bosing</p>
+                                </>
+                            ) : (
+                                <>
+                                    <p className={styles.uploadText}>
+                                        <span className={styles.purpleText}>Click to upload</span> or drag and drop
+                                    </p>
+                                    <p className={styles.uploadHint}>JPG or PNG (max. 2 MB)</p>
+                                </>
+                            )}
+                        </label>
                     </div>
                 </div>
 
@@ -379,6 +386,68 @@ export default function TeacherModal({
                     }}
                 />
             </form>
+
+            <Snackbar 
+                open={snackbar.open} 
+                autoHideDuration={6000} 
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{ 
+                    top: '20px !important', 
+                    right: '20px !important',
+                    width: 'calc(25vw - 40px)',
+                    maxWidth: '400px'
+                }}
+            >
+                <MuiAlert 
+                    onClose={handleCloseSnackbar} 
+                    severity={snackbar.severity} 
+                    elevation={6} 
+                    variant="filled"
+                    sx={{ 
+                        width: '100%', 
+                        position: 'relative', 
+                        overflow: 'hidden', 
+                        padding: '6px 12px',
+                        paddingBottom: '10px',
+                        fontSize: '13px',
+                        alignItems: 'center',
+                        '& .MuiAlert-icon': {
+                            fontSize: '18px',
+                            marginRight: '8px'
+                        },
+                        '& .MuiAlert-message': {
+                            padding: '4px 0',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        },
+                        '& .MuiAlert-action': {
+                            padding: '0 0 0 8px',
+                            marginRight: '-4px'
+                        }
+                    }}
+                >
+                    {snackbar.message}
+                    <Box 
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: '3px',
+                            backgroundColor: 'rgba(255,255,255,0.5)',
+                            animation: snackbar.open ? 'shrink 6s linear forwards' : 'none',
+                            '@keyframes shrink': {
+                                '0%': { width: '100%' },
+                                '100%': { width: '0%' }
+                            }
+                        }} 
+                    />
+                </MuiAlert>
+            </Snackbar>
         </div>,
         document.body
     );

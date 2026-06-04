@@ -83,7 +83,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
         const hasDeletedGroups = groups.some(group => {
             const rawId = group?.id ?? group?.group_id;
             const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
-            
+
             if (allGroups.length > 0) {
                 if (groupId !== null) {
                     return !allGroups.some(g => Number(g.id) === groupId);
@@ -275,10 +275,10 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                     <div className={styles.groupsInputContainer}>
                         {studentData.groups.length > 0 && (
                             <div className={styles.groupTags}>
-                            {studentData.groups.map(group => {
+                                {studentData.groups.map(group => {
                                     const rawId = group?.id ?? group?.group_id;
                                     const groupId = rawId != null && !isNaN(Number(rawId)) ? Number(rawId) : null;
-                                    
+
                                     let isDeleted = false;
                                     if (allGroups.length > 0) {
                                         if (groupId !== null) {

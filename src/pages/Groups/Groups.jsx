@@ -213,7 +213,7 @@ export default function Groups() {
                                     <td>
                                         <div className={styles.statusCell}>
                                             <Switch
-                                                defaultChecked={group.status}
+                                                checked={true}
                                                 size="small"
                                                 onClick={(e) => e.stopPropagation()}
                                                 sx={{

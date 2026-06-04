@@ -202,12 +202,6 @@ export default function ArchiveStudents() {
                     <button className={styles.pageArrow}>← Previous</button>
                     <div className={styles.pageNumbers}>
                         <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                        <button className={styles.pageBtn}>2</button>
-                        <button className={styles.pageBtn}>3</button>
-                        <span className={styles.dots}>...</span>
-                        <button className={styles.pageBtn}>8</button>
-                        <button className={styles.pageBtn}>9</button>
-                        <button className={styles.pageBtn}>10</button>
                     </div>
                     <button className={styles.pageArrow}>Next →</button>
                 </div>

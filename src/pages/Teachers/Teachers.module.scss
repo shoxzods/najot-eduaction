@@ -184,7 +184,7 @@
     tbody {
         display: block;
         width: 100%;
-        max-height: 220px;
+        max-height: 276px;
         overflow-y: auto;
 
         &::-webkit-scrollbar {
@@ -342,6 +342,7 @@
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    cursor: all-scroll;
 
     &::-webkit-scrollbar {
         display: none;

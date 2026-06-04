@@ -45,7 +45,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
     const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
     const [teachersOptions, setTeachersOptions] = useState([]);
     const [studentsOptions, setStudentsOptions] = useState([]);
-    
+
     const [courses, setCourses] = useState([]);
     const [rooms, setRooms] = useState([]);
 
@@ -113,8 +113,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
             const exists = prev.weekDays.includes(dayId);
             return {
                 ...prev,
-                weekDays: exists 
-                    ? prev.weekDays.filter(d => d !== dayId) 
+                weekDays: exists
+                    ? prev.weekDays.filter(d => d !== dayId)
                     : [...prev.weekDays, dayId]
             };
         });
@@ -123,11 +123,11 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
     // Helper to format any date into YYYY-MM-DD
     const formatDateForInput = (dateValue) => {
         if (!dateValue) return "";
-        
+
         // Standard ISO format
         const isoMatch = dateValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (isoMatch) return isoMatch[0];
-        
+
         // dd/mm/yyyy or dd.mm.yyyy format
         const ddmmyyyyMatch = dateValue.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);
         if (ddmmyyyyMatch) {
@@ -136,7 +136,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
             const year = ddmmyyyyMatch[3];
             return `${year}-${month}-${day}`;
         }
-        
+
         const date = new Date(dateValue);
         if (isNaN(date.getTime())) return "";
         return date.toISOString().split("T")[0];
@@ -219,7 +219,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
 
             // Format date for date input
             const formattedDate = formatDateForInput(groupData.start_date);
-            
+
             // Format start time to HH:MM
             const formattedTime = groupData.start_time ? groupData.start_time.slice(0, 5) : "09:00";
 
@@ -337,7 +337,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
             err => {
                 const responseData = err.response?.data;
                 console.error("Error updating group:", responseData);
-                
+
                 let errorMsg = err.message;
                 if (responseData) {
                     if (responseData.errors && typeof responseData.errors === 'object') {
@@ -390,12 +390,12 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                 <div className={styles.body}>
                     <div className={styles.formGroup}>
                         <label>Guruh nomi <span>*</span></label>
-                        <input 
-                            type="text" 
-                            name="name" 
-                            placeholder="Frontend 2024" 
-                            value={form.name} 
-                            onChange={handleInputChange} 
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Frontend 2024"
+                            value={form.name}
+                            onChange={handleInputChange}
                             required
                         />
                     </div>
@@ -444,8 +444,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                         <div className={styles.daysGrid}>
                             {DAYS.map(day => (
                                 <label key={day.id} className={styles.dayItem}>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={form.weekDays.includes(day.id)}
                                         onChange={() => handleDayCheckboxChange(day.id)}
                                     />
@@ -457,11 +457,11 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
 
                     <div className={styles.formGroup}>
                         <label>Dars vaqti <span>*</span></label>
-                        <input 
-                            type="time" 
-                            name="startTime" 
-                            value={form.startTime} 
-                            onChange={handleInputChange} 
+                        <input
+                            type="time"
+                            name="startTime"
+                            value={form.startTime}
+                            onChange={handleInputChange}
                             required
                         />
                     </div>
@@ -469,10 +469,10 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                     <div className={styles.formGroup}>
                         <label>Boshlanish sanasi <span>*</span></label>
                         <div className={styles.dateInputWrapper}>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="startDate"
-                                placeholder="dd/mm/yyyy" 
+                                placeholder="dd/mm/yyyy"
                                 value={form.startDate}
                                 onChange={handleInputChange}
                                 onFocus={(e) => e.target.type = 'date'}
@@ -487,11 +487,11 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
 
                     <div className={styles.formGroup}>
                         <label>Maksimal o'quvchilar soni <span>*</span></label>
-                        <input 
-                            type="number" 
-                            name="maxStudent" 
-                            value={form.maxStudent} 
-                            onChange={handleInputChange} 
+                        <input
+                            type="number"
+                            name="maxStudent"
+                            value={form.maxStudent}
+                            onChange={handleInputChange}
                             min="1"
                             required
                         />
@@ -499,8 +499,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
 
                     <div className={styles.formGroup}>
                         <label>Tavsif</label>
-                        <textarea 
-                            name="description" 
+                        <textarea
+                            name="description"
                             placeholder="Guruh haqida qo'shimcha ma'lumot (ixtiyoriy)"
                             value={form.description}
                             onChange={handleInputChange}
@@ -517,8 +517,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                                         const label = teacher ? teacher.full_name : `Teacher #${teacherId}`;
                                         const isDeleted = teachersOptions.length > 0 && !teacher;
                                         return (
-                                            <span 
-                                                key={teacherId} 
+                                            <span
+                                                key={teacherId}
                                                 className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
                                                 title={isDeleted ? "Bu o'qituvchi o'chirilgan" : undefined}
                                             >
@@ -557,8 +557,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                                         const label = student ? student.full_name : `Student #${studentId}`;
                                         const isDeleted = studentsOptions.length > 0 && !student;
                                         return (
-                                            <span 
-                                                key={studentId} 
+                                            <span
+                                                key={studentId}
                                                 className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
                                                 title={isDeleted ? "Bu talaba o'chirilgan" : undefined}
                                             >

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../../../api/api";
+import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import styles from "./HomeworkResults.module.scss";
 
 const STATUS_MAP = {
@@ -84,6 +85,42 @@ export default function HomeworkResults() {
     }
   }, [id, homeworkId]);
 
+  const [homeworkDetails, setHomeworkDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchHomeworkDetails = async () => {
+      try {
+        const res = await api.get(`/homework/${id}`);
+        const data = res.data?.data || res.data || [];
+        const hwList = Array.isArray(data) ? data : [data];
+        
+        // Match by homework[0].id (homework id) — this is what's passed in the URL
+        const hw = hwList.find(lesson =>
+          String(lesson.homework?.[0]?.id) === String(homeworkId)
+        );
+        
+        if (hw) {
+          // Attach the homework sent date for deadline calculation
+          hw._homeworkSentAt = hw.homework?.[0]?.created_at || hw.created_at;
+          setHomeworkDetails(hw);
+        }
+      } catch (err) {
+        console.error("Error fetching homework details:", err);
+      }
+    };
+    if (id && homeworkId) {
+      fetchHomeworkDetails();
+    }
+  }, [id, homeworkId]);
+
+  const addDays = (dateString, days) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "-";
+    date.setDate(date.getDate() + days);
+    return date.toISOString();
+  };
+
   const students = tabData[activeTab] || [];
 
   const formatDateTime = (dateStr) => {
@@ -109,10 +146,10 @@ export default function HomeworkResults() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={() => navigate(`/dashboard/groups/${id}?tab=1`)}>
-          &#8249;
+        <button className={styles.backButton} onClick={() => navigate(`/dashboard/groups/${id}?tab=1`)} title="Orqaga qaytish">
+          <ChevronLeftRoundedIcon fontSize="small" />
         </button>
-        <h1>{resultsData?.topic || resultsData?.homework?.topic || "Uyga vazifa"}</h1>
+        <h1>{homeworkDetails?.topic || resultsData?.topic || resultsData?.homework?.topic || "Uyga vazifa"}</h1>
       </div>
 
       <div className={styles.infoCard}>
@@ -120,13 +157,15 @@ export default function HomeworkResults() {
           <div className={styles.infoItem}>
             <span className={styles.label}>Mavzu</span>
             <span className={styles.value}>
-              {resultsData?.topic || resultsData?.homework?.topic || "-"}
+              {homeworkDetails?.topic || resultsData?.topic || resultsData?.homework?.topic || "-"}
             </span>
           </div>
           <div className={styles.infoItem}>
             <span className={styles.label}>Tugash vaqti</span>
             <span className={styles.value}>
-              {formatDateTime(resultsData?.deadline || resultsData?.homework?.deadline || resultsData?.end_date)}
+              {homeworkDetails?._homeworkSentAt
+                ? formatDateTime(addDays(homeworkDetails._homeworkSentAt, 2))
+                : formatDateTime(resultsData?.deadline || resultsData?.homework?.deadline || resultsData?.end_date)}
             </span>
           </div>
         </div>
@@ -161,10 +200,12 @@ export default function HomeworkResults() {
               <tr 
                 key={student.id || idx}
                 onClick={() => {
+                  if (activeTab !== "Kutayotganlar") return;
                   const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
                   navigate(`/dashboard/groups/${id}/homework/${homeworkId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
                 }}
-                className={styles.clickableRow}
+                className={activeTab !== "Kutayotganlar" ? "" : styles.clickableRow}
+                style={activeTab !== "Kutayotganlar" ? { cursor: "default" } : {}}
               >
                 <td>{student.full_name || student.name || student.student?.full_name || "-"}</td>
                 <td style={{ textAlign: "right" }}>

@@ -24,7 +24,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
     const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
     const [teachersOptions, setTeachersOptions] = useState([]);
     const [studentsOptions, setStudentsOptions] = useState([]);
-    
+
     const [courses, setCourses] = useState([]);
     const [rooms, setRooms] = useState([]);
 
@@ -92,8 +92,8 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
             const exists = prev.weekDays.includes(dayId);
             return {
                 ...prev,
-                weekDays: exists 
-                    ? prev.weekDays.filter(d => d !== dayId) 
+                weekDays: exists
+                    ? prev.weekDays.filter(d => d !== dayId)
                     : [...prev.weekDays, dayId]
             };
         });
@@ -156,7 +156,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
         if (isOpen) {
             setShouldRender(true);
             document.body.style.overflow = 'hidden';
-            
+
             // Pre-fetch options to detect deleted ones
             fetchCourses();
             fetchRooms();
@@ -254,7 +254,7 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
             err => {
                 const responseData = err.response?.data;
                 console.error("Error creating group:", responseData);
-                
+
                 // Extract detailed error messages
                 let errorMsg = err.message;
                 if (responseData) {
@@ -308,12 +308,12 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                 <div className={styles.body}>
                     <div className={styles.formGroup}>
                         <label>Guruh nomi <span>*</span></label>
-                        <input 
-                            type="text" 
-                            name="name" 
-                            placeholder="Frontend 2024" 
-                            value={groupData.name} 
-                            onChange={handleInputChange} 
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Frontend 2024"
+                            value={groupData.name}
+                            onChange={handleInputChange}
                             required
                         />
                     </div>
@@ -372,8 +372,8 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                         <div className={styles.daysGrid}>
                             {DAYS.map(day => (
                                 <label key={day.id} className={styles.dayItem}>
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={groupData.weekDays.includes(day.id)}
                                         onChange={() => handleDayCheckboxChange(day.id)}
                                     />
@@ -385,11 +385,11 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
 
                     <div className={styles.formGroup}>
                         <label>Dars vaqti <span>*</span></label>
-                        <input 
-                            type="time" 
-                            name="startTime" 
-                            value={groupData.startTime} 
-                            onChange={handleInputChange} 
+                        <input
+                            type="time"
+                            name="startTime"
+                            value={groupData.startTime}
+                            onChange={handleInputChange}
                             required
                         />
                     </div>
@@ -397,10 +397,10 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                     <div className={styles.formGroup}>
                         <label>Boshlanish sanasi <span>*</span></label>
                         <div className={styles.dateInputWrapper}>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="startDate"
-                                placeholder="dd/mm/yyyy" 
+                                placeholder="dd/mm/yyyy"
                                 value={groupData.startDate}
                                 onChange={handleInputChange}
                                 onFocus={(e) => e.target.type = 'date'}
@@ -415,8 +415,8 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
 
                     <div className={styles.formGroup}>
                         <label>Tavsif</label>
-                        <textarea 
-                            name="description" 
+                        <textarea
+                            name="description"
                             placeholder="Guruh haqida qo'shimcha ma'lumot (ixtiyoriy)"
                             value={groupData.description}
                             onChange={handleInputChange}
@@ -433,8 +433,8 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                                         const label = teacher ? teacher.full_name : `Teacher #${teacherId}`;
                                         const isDeleted = teachersOptions.length > 0 && !teacher;
                                         return (
-                                            <span 
-                                                key={teacherId} 
+                                            <span
+                                                key={teacherId}
                                                 className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
                                                 title={isDeleted ? "Bu o'qituvchi o'chirilgan" : undefined}
                                             >
@@ -473,8 +473,8 @@ export default function GroupModal({ isOpen, onClose, onSave }) {
                                         const label = student ? student.full_name : `Student #${studentId}`;
                                         const isDeleted = studentsOptions.length > 0 && !student;
                                         return (
-                                            <span 
-                                                key={studentId} 
+                                            <span
+                                                key={studentId}
                                                 className={`${styles.groupTag} ${isDeleted ? styles.groupTagDeleted : ''}`}
                                                 title={isDeleted ? "Bu talaba o'chirilgan" : undefined}
                                             >

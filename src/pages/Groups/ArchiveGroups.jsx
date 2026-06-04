@@ -104,10 +104,6 @@ export default function ArchiveGroups() {
       <div className={styles.header}>
         <div className={styles.headerTop}>
           <h1 className={styles.title}>Guruhlar Archive</h1>
-          <button className={styles.addBtn} onClick={() => navigate('/dashboard/groups')}>
-            <KeyboardArrowLeftRoundedIcon fontSize="small" />
-            <span className={styles.addBtnText}>Orqaga</span>
-          </button>
         </div>
         <p className={styles.subtitle}>
           Arxivlangan guruhlar ro'yxati. Bu yerda o'chirilgan yoki arxivga ko'chirilgan guruhlarni ko'rishingiz mumkin.
@@ -164,13 +160,13 @@ export default function ArchiveGroups() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className={styles.tbody}>
               {groupData.map((group) => (
                 <tr key={group.id} style={{ transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                   <td>
                     <div className={styles.statusCell}>
                       <Switch
-                        defaultChecked={group.status}
+                        checked={false}
                         size="small"
                         onClick={(e) => e.stopPropagation()}
                         sx={{
@@ -200,7 +196,7 @@ export default function ArchiveGroups() {
                           },
                         }}
                       />
-                      <span className={styles.statusLabel}>FAOL</span>
+                      <span className={styles.statusLabel} style={{ color: '#ef4444' }}>NOFAOL</span>
                     </div>
                   </td>
                   <td><span className={styles.groupName}>{group.name}</span></td>

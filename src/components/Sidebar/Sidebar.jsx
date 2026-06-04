@@ -40,8 +40,9 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        onClick={() => {
+                        onClick={(e) => {
                             if (item.label === "Boshqarish") {
+                                e.preventDefault();
                                 toggleSubSidebar();
                             } else {
                                 // Close sub-sidebar when navigating to other sections

@@ -25,8 +25,11 @@ const LessonDetail = lazy(() => import("../pages/Groups/LessonDetail/LessonDetai
 const CreateHomework = lazy(() => import("../pages/Groups/CreateHomework/CreateHomework"));
 const HomeworkResults = lazy(() => import("../pages/Groups/HomeworkResults/HomeworkResults"));
 const StudentHomeworkDetail = lazy(() => import("../pages/Groups/HomeworkResults/StudentHomeworkDetail"));
+const ImtihonResults = lazy(() => import("../pages/Groups/ImtihonResults/ImtihonResults"));
+const StudentImtihonDetail = lazy(() => import("../pages/Groups/ImtihonResults/StudentImtihonDetail"));
 const Gifts = lazy(() => import("../pages/Gifts/Gifts"));
 const Default = lazy(() => import("../pages/management/default/Default"));
+const TestPage = lazy(() => import("../pages/management/TestPage/TestPage"));
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
 
 const router = createBrowserRouter([
@@ -55,83 +58,99 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/dashboard',
-        element: <Dashboard />, 
+        element: <Suspense fallback={<Loader />}><Dashboard /></Suspense>, 
       },
       {
         path: '/dashboard/teachers',
-        element: <Teachers />
+        element: <Suspense fallback={<Loader />}><Teachers /></Suspense>
       },
       {
         path: '/dashboard/teachers/archive',
-        element: <ArchiveTeachers />
+        element: <Suspense fallback={<Loader />}><ArchiveTeachers /></Suspense>
       },
       {
         path: '/dashboard/students',
-        element: <Students />
+        element: <Suspense fallback={<Loader />}><Students /></Suspense>
       },
       {
         path: '/dashboard/students/archive',
-        element: <ArchiveStudents />
+        element: <Suspense fallback={<Loader />}><ArchiveStudents /></Suspense>
       },
       {
         path: '/dashboard/groups',
-        element: <Groups />
+        element: <Suspense fallback={<Loader />}><Groups /></Suspense>
       },
       {
         path: '/dashboard/groups/archive',
-        element: <ArchiveGroups />
+        element: <Suspense fallback={<Loader />}><ArchiveGroups /></Suspense>
       },
       {
         path: '/dashboard/groups/:id',
-        element: <GroupDetail />
+        element: <Suspense fallback={<Loader />}><GroupDetail /></Suspense>
       },
       {
         path: '/dashboard/groups/:id/lesson/:date',
-        element: <LessonDetail />
+        element: <Suspense fallback={<Loader />}><LessonDetail /></Suspense>
       },
       {
         path: '/dashboard/groups/:id/homework/create',
-        element: <CreateHomework />
+        element: <Suspense fallback={<Loader />}><CreateHomework /></Suspense>
       },
       {
         path: '/dashboard/groups/:id/homework/:homeworkId/results',
-        element: <HomeworkResults />
+        element: <Suspense fallback={<Loader />}><HomeworkResults /></Suspense>
       },
       {
         path: '/dashboard/groups/:id/homework/:homeworkId/results/:resultId',
-        element: <StudentHomeworkDetail />
+        element: <Suspense fallback={<Loader />}><StudentHomeworkDetail /></Suspense>
+      },
+      {
+        path: '/dashboard/groups/:id/exam/:examId/results',
+        element: <Suspense fallback={<Loader />}><ImtihonResults /></Suspense>
+      },
+      {
+        path: '/dashboard/groups/:id/exam/:examId/results/:resultId',
+        element: <Suspense fallback={<Loader />}><StudentImtihonDetail /></Suspense>
       },
       {
         path: '/dashboard/gifts',
-        element: <Gifts />
+        element: <Suspense fallback={<Loader />}><Gifts /></Suspense>
       },
       {
         path: '/management',
-        element: <Management />, 
+        element: <Suspense fallback={<Loader />}><Management /></Suspense>, 
         children: [
           {
             path: 'courses',
-            element: <Courses />
+            element: <Suspense fallback={<Loader />}><Courses /></Suspense>
           },
           {
             path: 'courses/archive',
-            element: <ArchiveCourses />
+            element: <Suspense fallback={<Loader />}><ArchiveCourses /></Suspense>
           },
           {
             path: 'rooms',
-            element: <Rooms />
+            element: <Suspense fallback={<Loader />}><Rooms /></Suspense>
           },
           {
             path: 'rooms/archive',
-            element: <ArchiveRooms />
+            element: <Suspense fallback={<Loader />}><ArchiveRooms /></Suspense>
           },
           {
             path: 'staff',
-            element: <Staff />
+            element: <Suspense fallback={<Loader />}><Staff /></Suspense>
+          },
+          {
+            path: 'coin',
+            element: <Suspense fallback={<Loader />}><TestPage title="Coin" /></Suspense>
+          },
+          {
+            path: 'send-message',
+            element: <Suspense fallback={<Loader />}><TestPage title="Xabar Yuborish" /></Suspense>
           },
           {
             index: true,
-            element: <Default />
+            element: <Suspense fallback={<Loader />}><Default /></Suspense>
           },
         ]
       },

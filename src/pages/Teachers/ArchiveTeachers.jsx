@@ -12,6 +12,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import TeacherModal from "../../components/UI/TeacherModal/TeacherModal";
 
 export default function ArchiveTeachers() {
@@ -22,6 +24,12 @@ export default function ArchiveTeachers() {
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, teacherId: null });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') return;
+        setSnackbar({ ...snackbar, open: false });
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
@@ -86,7 +94,8 @@ export default function ArchiveTeachers() {
             : api.post('/teachers', payload);
 
         request.then((res) => {
-            console.log(teacherToEdit?.id ? "Teacher updated successfully" : "Teacher created successfully");
+            const successMsg = teacherToEdit?.id ? "O'qituvchi muvaffaqiyatli tahrirlandi!" : "O'qituvchi muvaffaqiyatli qo'shildi!";
+            setSnackbar({ open: true, message: successMsg, severity: 'success' });
             fetchArchivedTeachers();
             closeTeacherModal();
         }).catch((err) => {
@@ -95,7 +104,7 @@ export default function ArchiveTeachers() {
             if (responseData?.message) {
                 errorMsg = responseData.message;
             }
-            alert("Xatolik yuz berdi: " + errorMsg);
+            setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
         }).finally(() => setIsLoading(false));
     };
 
@@ -109,6 +118,7 @@ export default function ArchiveTeachers() {
         api.post(`/teachers/${id}/restore`)
             .then((res) => {
                 setTeacherData(prev => prev.filter(item => item.id !== id));
+                setSnackbar({ open: true, message: "O'qituvchi muvaffaqiyatli tiklandi!", severity: 'success' });
             })
             .catch((err) => {
                 const responseData = err.response?.data;
@@ -116,7 +126,7 @@ export default function ArchiveTeachers() {
                 if (responseData?.message) {
                     errorMsg = responseData.message;
                 }
-                alert("Xatolik yuz berdi: " + errorMsg);
+                setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
             })
             .finally(() => setIsLoading(false));
     }
@@ -131,6 +141,7 @@ export default function ArchiveTeachers() {
         api.delete(`/teachers/${id}/force`)
             .then((res) => {
                 setTeacherData(prev => prev.filter(item => item.id !== id));
+                setSnackbar({ open: true, message: "O'qituvchi muvaffaqiyatli butunlay o'chirildi!", severity: 'success' });
             })
             .catch((err) => {
                 const responseData = err.response?.data;
@@ -138,7 +149,7 @@ export default function ArchiveTeachers() {
                 if (responseData?.message) {
                     errorMsg = responseData.message;
                 }
-                alert("Xatolik yuz berdi: " + errorMsg);
+                setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
             })
             .finally(() => setIsLoading(false));
     }
@@ -315,6 +326,68 @@ export default function ArchiveTeachers() {
                 onSubmit={(payload) => handleTeacherSubmit(payload, selectedTeacher)}
                 teacherToEdit={selectedTeacher}
             />
+
+            <Snackbar 
+                open={snackbar.open} 
+                autoHideDuration={6000} 
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{ 
+                    top: '20px !important', 
+                    right: '20px !important',
+                    width: 'calc(25vw - 40px)',
+                    maxWidth: '400px'
+                }}
+            >
+                <MuiAlert 
+                    onClose={handleCloseSnackbar} 
+                    severity={snackbar.severity} 
+                    elevation={6} 
+                    variant="filled"
+                    sx={{ 
+                        width: '100%', 
+                        position: 'relative', 
+                        overflow: 'hidden', 
+                        padding: '6px 12px',
+                        paddingBottom: '10px',
+                        fontSize: '13px',
+                        alignItems: 'center',
+                        '& .MuiAlert-icon': {
+                            fontSize: '18px',
+                            marginRight: '8px'
+                        },
+                        '& .MuiAlert-message': {
+                            padding: '4px 0',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        },
+                        '& .MuiAlert-action': {
+                            padding: '0 0 0 8px',
+                            marginRight: '-4px'
+                        }
+                    }}
+                >
+                    {snackbar.message}
+                    <Box 
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: '3px',
+                            backgroundColor: 'rgba(255,255,255,0.5)',
+                            animation: snackbar.open ? 'shrink 6s linear forwards' : 'none',
+                            '@keyframes shrink': {
+                                '0%': { width: '100%' },
+                                '100%': { width: '0%' }
+                            }
+                        }} 
+                    />
+                </MuiAlert>
+            </Snackbar>
         </div>
     );
 }

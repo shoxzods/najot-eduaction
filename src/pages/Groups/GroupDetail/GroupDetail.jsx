@@ -7,6 +7,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
@@ -17,6 +18,7 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import UygaVazifa from './UygaVazifa';
 import Videolar from './Videolar';
+import Imtihonlar from './Imtihonlar';
 
 export default function GroupDetail() {
     const { id } = useParams();
@@ -379,7 +381,7 @@ export default function GroupDetail() {
             </div>
 
             {activeTab === "Ma'lumotlar" && (
-                <>
+                <div className={styles.tabContentScrollable}>
                     <div className={styles.content}>
                         <div className={styles.mentorsCard}>
                             <div
@@ -388,7 +390,7 @@ export default function GroupDetail() {
                                 style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                             >
                                 <h3>Guruh mentorlari</h3>
-                                {isMentorsOpen ? <CloseRoundedIcon fontSize="small" style={{ color: "white" }} /> : <KeyboardArrowDownRoundedIcon fontSize="small" style={{ color: "white" }} />}
+                                {isMentorsOpen ? <KeyboardArrowUpRoundedIcon fontSize="small" style={{ color: "white" }} /> : <KeyboardArrowDownRoundedIcon fontSize="small" style={{ color: "white" }} />}
                             </div>
                             <div className={`${styles.cardBodyWrapper} ${isMentorsOpen ? styles.open : ''}`}>
                                 <div className={styles.cardBody}>
@@ -414,7 +416,7 @@ export default function GroupDetail() {
                                 style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                             >
                                 <h3>Guruh parametrlari</h3>
-                                {isParamsOpen ? <CloseRoundedIcon fontSize="small" style={{ color: "white" }} /> : <KeyboardArrowDownRoundedIcon fontSize="small" style={{ color: "white" }} />}
+                                {isParamsOpen ? <KeyboardArrowUpRoundedIcon fontSize="small" style={{ color: "white" }} /> : <KeyboardArrowDownRoundedIcon fontSize="small" style={{ color: "white" }} />}
                             </div>
                             <div className={`${styles.cardBodyWrapper} ${isParamsOpen ? styles.open : ''}`}>
                                 <div className={styles.cardBody}>
@@ -588,7 +590,7 @@ export default function GroupDetail() {
                             </div>
                         )}
                     </div>
-                </>
+                </div>
             )}
 
             {activeTab === "Guruh darsliklari" && (
@@ -646,73 +648,79 @@ export default function GroupDetail() {
                         {activeSubTab === "Videolar" && (
                             <Videolar refreshTrigger={videoRefresh} />
                         )}
+
+                        {activeSubTab === "Imtihonlar" && (
+                            <Imtihonlar />
+                        )}
                     </div>
                 </div>
             )}
 
             {activeTab === "Akademik davomati" && (
-                <div className={styles.scheduleSection}>
-                    <div className={styles.monthNavigator}>
-                        <button className={styles.navBtn}>
-                            <KeyboardArrowLeftRoundedIcon />
-                        </button>
-                        <span className={styles.monthText}>May 2026</span>
-                        <button className={styles.navBtn}>
-                            <KeyboardArrowRightRoundedIcon />
-                        </button>
-                    </div>
+                <div className={styles.tabContentScrollable}>
+                    <div className={styles.scheduleSection}>
+                        <div className={styles.monthNavigator}>
+                            <button className={styles.navBtn}>
+                                <KeyboardArrowLeftRoundedIcon />
+                            </button>
+                            <span className={styles.monthText}>May 2026</span>
+                            <button className={styles.navBtn}>
+                                <KeyboardArrowRightRoundedIcon />
+                            </button>
+                        </div>
 
-                    <div className={styles.calendarList}>
-                        {fakeGroupData.calendarDays.map(item => {
-                            const { isFuture, dateStr } = (() => {
-                                if (!item.month || !item.day) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
-                                const monthMap = {
-                                    "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
-                                    "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
-                                    "noy": 10, "nov": 10, "dek": 11, "dec": 11
-                                };
-                                let mIndex = -1;
-                                for (const [key, val] of Object.entries(monthMap)) {
-                                    if (item.month.toLowerCase().startsWith(key)) {
-                                        mIndex = val; break;
-                                    }
-                                }
-                                if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
-                                const today = new Date();
-                                today.setHours(0, 0, 0, 0);
-                                let year = today.getFullYear();
-                                if (today.getMonth() === 0 && mIndex === 11) year -= 1;
-                                if (today.getMonth() === 11 && mIndex === 0) year += 1;
-                                const itemDate = new Date(year, mIndex, parseInt(item.day, 10));
-
-                                const paddedMonth = String(mIndex + 1).padStart(2, '0');
-                                const paddedDay = String(item.day).padStart(2, '0');
-                                return {
-                                    isFuture: itemDate > today,
-                                    dateStr: `${year}-${paddedMonth}-${paddedDay}`
-                                };
-                            })();
-
-                            return (
-                                <div
-                                    key={item.id}
-                                    className={`${styles.calendarDay} ${item.active && !isFuture ? styles.activeDay : ""} ${isFuture ? styles.disabledDate : ""}`}
-                                    onClick={() => {
-                                        if (!isFuture) {
-                                            navigate(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                        <div className={styles.calendarList}>
+                            {fakeGroupData.calendarDays.map(item => {
+                                const { isFuture, dateStr } = (() => {
+                                    if (!item.month || !item.day) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                    const monthMap = {
+                                        "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                                        "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                                        "noy": 10, "nov": 10, "dek": 11, "dec": 11
+                                    };
+                                    let mIndex = -1;
+                                    for (const [key, val] of Object.entries(monthMap)) {
+                                        if (item.month.toLowerCase().startsWith(key)) {
+                                            mIndex = val; break;
                                         }
-                                    }}
-                                    style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
-                                >
-                                    <span className={styles.month}>{item.month}</span>
-                                    <span className={styles.day}>{item.day}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                    }
+                                    if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                    const today = new Date();
+                                    today.setHours(0, 0, 0, 0);
+                                    let year = today.getFullYear();
+                                    if (today.getMonth() === 0 && mIndex === 11) year -= 1;
+                                    if (today.getMonth() === 11 && mIndex === 0) year += 1;
+                                    const itemDate = new Date(year, mIndex, parseInt(item.day, 10));
 
-                    <div className={styles.showAllBtnWrapper}>
-                        <button className={styles.showAllBtn}>Barchasini ko'rish</button>
+                                    const paddedMonth = String(mIndex + 1).padStart(2, '0');
+                                    const paddedDay = String(item.day).padStart(2, '0');
+                                    return {
+                                        isFuture: itemDate > today,
+                                        dateStr: `${year}-${paddedMonth}-${paddedDay}`
+                                    };
+                                })();
+
+                                return (
+                                    <div
+                                        key={item.id}
+                                        className={`${styles.calendarDay} ${item.active && !isFuture ? styles.activeDay : ""} ${isFuture ? styles.disabledDate : ""}`}
+                                        onClick={() => {
+                                            if (!isFuture) {
+                                                navigate(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                                            }
+                                        }}
+                                        style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
+                                    >
+                                        <span className={styles.month}>{item.month}</span>
+                                        <span className={styles.day}>{item.day}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className={styles.showAllBtnWrapper}>
+                            <button className={styles.showAllBtn}>Barchasini ko'rish</button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -7,15 +7,19 @@ import styles from "./GroupDetail.module.scss";
 import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 export default function Videolar({ refreshTrigger }) {
     const { id } = useParams();
     const [videosData, setVideosData] = useState([]);
     const [selectedPlayVideo, setSelectedPlayVideo] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const videosFetchedRef = useRef(false);
 
     const fetchVideos = async () => {
         videosFetchedRef.current = true;
+        setIsLoading(true);
         try {
             const res = await api.get(`/files/${id}`);
             const data = res.data.data || res.data || [];
@@ -23,6 +27,8 @@ export default function Videolar({ refreshTrigger }) {
         } catch (err) {
             console.error("Error fetching videos:", err);
             videosFetchedRef.current = false;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -55,7 +61,24 @@ export default function Videolar({ refreshTrigger }) {
 
     return (
         <>
-            <table className={styles.lessonsTable}>
+            <div style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px', width: '100%' }}>
+                {isLoading && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                        zIndex: 10
+                    }}>
+                        <CircularProgress sx={{ color: '#6c35de' }} />
+                    </Box>
+                )}
+                <table className={styles.lessonsTable}>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -97,6 +120,7 @@ export default function Videolar({ refreshTrigger }) {
                     )}
                 </tbody>
             </table>
+            </div>
 
             {/* Video Player Modal */}
             {selectedPlayVideo && (

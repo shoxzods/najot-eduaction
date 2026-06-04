@@ -41,8 +41,8 @@
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,6 +226,30 @@
 
     .name { font-weight: 600; font-size: 16px; }
     .role { color: #64748b; font-size: 14px; }
+  }
+}
+
+.assistantsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 60px;
+  max-width: 250px;
+  padding-right: 8px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 }
 
