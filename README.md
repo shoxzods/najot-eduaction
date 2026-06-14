@@ -86,7 +86,7 @@ education-crm/
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/your-org/education-crm.git
+git clone https://github.com/ShoxzodPrimov/najot_eduaction.git
 cd education-crm
 
 # Установить зависимости (frontend + backend)
