@@ -1,4 +1,5 @@
-import { useNavigate, useLocation } from "react-router-dom";
+"use client";
+import { useRouter, usePathname } from 'next/navigation';
 import styles from "./ManagementSidebar.module.scss";
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
 import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';
@@ -15,8 +16,8 @@ const subMenuItems = [
 ];
 
 export default function ManagementSidebar({ isOpen, isCollapsed, onClose }) {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
+    const router = useRouter();
+    const pathname = usePathname() || '';
 
     // Determine current active sub-page slug
     const pathParts = pathname.split("/").filter(Boolean);
@@ -37,7 +38,7 @@ export default function ManagementSidebar({ isOpen, isCollapsed, onClose }) {
                             className={`${styles.item} ${isActive ? styles.itemActive : ""}`}
                             onClick={() => {
                                 onClose();
-                                navigate(`/management/${item.slug}`);
+                                router.push(`/management/${item.slug}`);
                             }}
                         >
                             <span className={styles.icon}>{item.icon}</span>

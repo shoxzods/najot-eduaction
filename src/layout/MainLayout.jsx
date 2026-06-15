@@ -1,12 +1,13 @@
-import { useState, Suspense } from "react";
-import { Outlet } from "react-router-dom";
+"use client";
+import { useState, Suspense, useEffect } from "react";
+
 import Sidebar from "../components/Sidebar/Sidebar";
 import Header from "../components/header/Header";
 import ManagementSidebar from "../components/ManagementSidebar/ManagementSidebar";
 import Loader from "../components/UI/Loader/Loader";
 import styles from "./MainLayout.module.scss";
 
-export default function MainLayout() {
+export default function MainLayout({ children }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isSubSidebarVisible, setIsSubSidebarVisible] = useState(false);
 
@@ -29,7 +30,7 @@ export default function MainLayout() {
                 toggleSidebar={toggleSidebar}
                 isSubSidebarOpen={isSubSidebarVisible}
                 toggleSubSidebar={toggleSubSidebar}
-            />
+            /> 
             <ManagementSidebar
                 isOpen={isSubSidebarVisible}
                 isCollapsed={isCollapsed}
@@ -43,7 +44,7 @@ export default function MainLayout() {
                 <Header />
                 <main className={styles.content}>
                     <Suspense fallback={<Loader fullScreen={false} />}>
-                        <Outlet />
+                        {children}
                     </Suspense>
                 </main>
             </div>

@@ -1,3 +1,4 @@
+"use client";
 import styles from "./AddGroupModal.module.scss";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';

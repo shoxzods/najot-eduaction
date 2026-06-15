@@ -1,10 +1,19 @@
-import { Navigate } from "react-router-dom";
+"use client";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ProtectRouter({ children }) {
-    const token = sessionStorage.getItem('accessToken');
+    const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
 
-    if (!token)
-        return <Navigate to='/login' replace />
+    useEffect(() => {
+        setIsMounted(true);
+        const token = sessionStorage.getItem('accessToken');
+        if (!token) {
+            router.replace('/login');
+        }
+    }, [router]);
 
-    return children
+    if (!isMounted) return null;
+    return children;
 }

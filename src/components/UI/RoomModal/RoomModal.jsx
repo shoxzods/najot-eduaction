@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import styles from "./RoomModal.module.scss";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';

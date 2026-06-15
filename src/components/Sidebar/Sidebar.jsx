@@ -1,4 +1,6 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+"use client";
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import styles from "./Sidebar.module.scss";
 import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -19,13 +21,13 @@ const menuItems = [
 ];
 
 export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, toggleSubSidebar }) {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
+    const router = useRouter();
+    const pathname = usePathname() || '';
 
     return (
         <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
             <div className={styles.logo}>
-                <SchoolRoundedIcon className={styles.logoIcon} />
+                <SchoolRoundedIcon fontSize="large" className={styles.logoIcon} />
                 {!isCollapsed && <span className={styles.logoText}>NajotEdu</span>}
                 <button className={styles.toggleBtn} onClick={toggleSidebar}>
                     <ChevronLeftRoundedIcon
@@ -36,32 +38,32 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
             </div>
 
             <nav className={styles.nav}>
-                {menuItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        onClick={(e) => {
-                            if (item.label === "Boshqarish") {
-                                e.preventDefault();
-                                toggleSubSidebar();
-                            } else {
-                                // Close sub-sidebar when navigating to other sections
-                                if (isSubSidebarOpen) toggleSubSidebar();
-                            }
-                        }}
-                        className={({ isActive }) => {
-                            const isManagement = item.label === "Boshqarish";
-                            // Boshqarish is active when on any /management route
-                            const shouldBeActive = isManagement ? pathname.startsWith("/management") : isActive;
-                            return `${styles.item}${shouldBeActive ? ` ${styles.itemActive}` : ""}`;
-                        }}
-                        end={item.path === "/dashboard"}
-                    >
-                        <span className={styles.itemIcon}>{item.icon}</span>
-                        {!isCollapsed && <span className={styles.itemLabel}>{item.label}</span>}
-                        {isCollapsed && <span className={styles.tooltip}>{item.label}</span>}
-                    </NavLink>
-                ))}
+                {menuItems.map((item) => {
+                    const isManagement = item.label === "Boshqarish";
+                    let isActive = item.path === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.path);
+                    const shouldBeActive = isManagement ? pathname.startsWith("/management") : isActive;
+
+                    return (
+                        <Link
+                            key={item.path}
+                            href={item.path}
+                            onClick={(e) => {
+                                if (item.label === "Boshqarish") {
+                                    e.preventDefault();
+                                    toggleSubSidebar();
+                                } else {
+                                    // Close sub-sidebar when navigating to other sections
+                                    if (isSubSidebarOpen) toggleSubSidebar();
+                                }
+                            }}
+                            className={`${styles.item}${shouldBeActive ? ` ${styles.itemActive}` : ""}`}
+                        >
+                            <span className={styles.itemIcon}>{item.icon}</span>
+                            {!isCollapsed && <span className={styles.itemLabel}>{item.label}</span>}
+                            {isCollapsed && <span className={styles.tooltip}>{item.label}</span>}
+                        </Link>
+                    );
+                })}
             </nav>
 
             <div className={styles.subscription}>

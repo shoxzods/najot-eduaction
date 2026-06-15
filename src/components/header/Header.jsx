@@ -1,3 +1,4 @@
+"use client";
 import styles from './Header.module.scss';
 import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';

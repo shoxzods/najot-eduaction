@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import styles from "./StudentModal.module.scss";
 import { createPortal } from "react-dom";

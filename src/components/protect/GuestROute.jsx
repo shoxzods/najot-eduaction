@@ -1,11 +1,19 @@
-import { Navigate } from "react-router-dom";
+"use client";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function GuestRoute({ children }) {
-    const auth = sessionStorage.getItem('accessToken');
+    const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
 
-    if (auth) {
-        return <Navigate to={'/dashboard'} />
-    }
+    useEffect(() => {
+        setIsMounted(true);
+        const auth = sessionStorage.getItem('accessToken');
+        if (auth) {
+            router.replace('/dashboard');
+        }
+    }, [router]);
 
-    return children
+    if (!isMounted) return null;
+    return children;
 }

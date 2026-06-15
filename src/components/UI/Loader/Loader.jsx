@@ -1,3 +1,4 @@
+"use client";
 import Box from '@mui/material/Box';
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
 import { keyframes } from '@mui/system';
