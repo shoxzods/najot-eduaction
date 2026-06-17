@@ -3,10 +3,10 @@ import axios, { InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'ax
 const endpoint = 'https://najot-edu.softwareengineer.uz/api/v1';
 
 export const getFileUrl = (photo: string | null | undefined): string | null => {
-    if (!photo) return null;
-    if (photo.startsWith('http')) return photo;
-    const cleanPhoto = photo.startsWith('/') ? photo.slice(1) : photo;
-    return `https://najot-edu.softwareengineer.uz/files/${cleanPhoto}`;
+  if (!photo) return null;
+  if (photo.startsWith('http')) return photo;
+  const cleanPhoto = photo.startsWith('/') ? photo.slice(1) : photo;
+  return `https://najot-edu.softwareengineer.uz/files/${cleanPhoto}`;
 };
 
 export const api = axios.create({
@@ -48,8 +48,8 @@ api.interceptors.response.use(
 
     // If error is 401 and we haven't retried this request yet, and it's not a login or refresh request
     if (
-      error.response?.status === 401 && 
-      originalRequest && 
+      error.response?.status === 401 &&
+      originalRequest &&
       !originalRequest._retry &&
       !originalRequest.url?.includes('/auth/login') &&
       !originalRequest.url?.includes('/auth/refresh-token')
@@ -72,8 +72,8 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
-         isRefreshing = false;
-         return Promise.reject(error);
+        isRefreshing = false;
+        return Promise.reject(error);
       }
 
       try {
@@ -81,19 +81,19 @@ api.interceptors.response.use(
         const { data } = await axios.post(`${endpoint}/auth/refresh-token`, {
           token: refreshToken,
         });
-        
-        const newAccessToken = data?.accessToken || data?.data?.accessToken || data?.token; 
-        
+
+        const newAccessToken = data?.accessToken || data?.data?.accessToken || data?.token;
+
         if (newAccessToken) {
-           // Save the new token
-           localStorage.setItem('accessToken', newAccessToken);
-           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-           processQueue(null, newAccessToken);
-           
-           // Retry the original request
-           return api(originalRequest);
+          // Save the new token
+          localStorage.setItem('accessToken', newAccessToken);
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          processQueue(null, newAccessToken);
+
+          // Retry the original request
+          return api(originalRequest);
         } else {
-           throw new Error("No token returned from refresh endpoint");
+          throw new Error("No token returned from refresh endpoint");
         }
       } catch (err) {
         processQueue(err, null);
@@ -101,7 +101,7 @@ api.interceptors.response.use(
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         if (typeof window !== 'undefined') {
-            window.location.href = '/login';
+          window.location.href = '/login';
         }
         return Promise.reject(err);
       } finally {

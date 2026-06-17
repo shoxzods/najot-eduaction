@@ -23,6 +23,34 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useMemo } from 'react';
+
+const switchSx = {
+    width: 44,
+    height: 24,
+    padding: 0,
+    '& .MuiSwitch-switchBase': {
+        padding: '2px',
+        '&.Mui-checked': {
+            transform: 'translateX(20px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+                backgroundColor: '#22c55e',
+                opacity: 1,
+            },
+        },
+    },
+    '& .MuiSwitch-thumb': {
+        width: 20,
+        height: 20,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+    },
+    '& .MuiSwitch-track': {
+        borderRadius: 12,
+        backgroundColor: '#e2e8f0',
+        opacity: 1,
+    },
+};
 
 export default function Groups() {
     const router = useRouter();
@@ -56,6 +84,14 @@ export default function Groups() {
     useEffect(() => {
         fetchGroups();
     }, []);
+
+    const uniqueTeachers = useMemo(() => {
+        return new Set(groups.flatMap(g => g.teachers?.map(t => typeof t === 'object' ? String(t.id || t.full_name || t.name || '') : String(t)).filter(Boolean) || [])).size;
+    }, [groups]);
+
+    const uniqueStudents = useMemo(() => {
+        return new Set(groups.flatMap(g => g.students?.map(s => typeof s === 'object' ? String(s.id || s.full_name || s.name || '') : String(s)).filter(Boolean) || [])).size;
+    }, [groups]);
 
     const handleMenuOpen = (event, group) => {
         setAnchorEl(event.currentTarget);
@@ -144,7 +180,7 @@ export default function Groups() {
                     <div className={styles.statInfo}>
                         <p className={styles.statLabel}>O'qituvchilar</p>
                         <h2 className={styles.statValue}>
-                            {new Set(groups.flatMap(g => g.teachers?.map(t => typeof t === 'object' ? String(t.id || t.full_name || t.name || '') : String(t)).filter(Boolean) || [])).size}
+                            {uniqueTeachers}
                         </h2>
                     </div>
                 </div>
@@ -159,7 +195,7 @@ export default function Groups() {
                     <div className={styles.statInfo}>
                         <p className={styles.statLabel}>O'quvchilar</p>
                         <h2 className={styles.statValue}>
-                            {new Set(groups.flatMap(g => g.students?.map(s => typeof s === 'object' ? String(s.id || s.full_name || s.name || '') : String(s)).filter(Boolean) || [])).size}
+                            {uniqueStudents}
                         </h2>
                     </div>
                     <div className={styles.studentAvatars}>
@@ -213,32 +249,7 @@ export default function Groups() {
                                                 checked={true}
                                                 size="small"
                                                 onClick={(e) => e.stopPropagation()}
-                                                sx={{
-                                                    width: 44,
-                                                    height: 24,
-                                                    padding: 0,
-                                                    '& .MuiSwitch-switchBase': {
-                                                        padding: '2px',
-                                                        '&.Mui-checked': {
-                                                            transform: 'translateX(20px)',
-                                                            color: '#fff',
-                                                            '& + .MuiSwitch-track': {
-                                                                backgroundColor: '#22c55e',
-                                                                opacity: 1,
-                                                            },
-                                                        },
-                                                    },
-                                                    '& .MuiSwitch-thumb': {
-                                                        width: 20,
-                                                        height: 20,
-                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-                                                    },
-                                                    '& .MuiSwitch-track': {
-                                                        borderRadius: 12,
-                                                        backgroundColor: '#e2e8f0',
-                                                        opacity: 1,
-                                                    },
-                                                }}
+                                                sx={switchSx}
                                             />
                                             <span className={styles.statusLabel}>FAOL</span>
                                         </div>
