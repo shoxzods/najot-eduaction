@@ -17,8 +17,8 @@ export default function Login() {
         number: '',
         password: ""
     });
-    const [error, setError] = useState<boolean>(false);
-    const [success, setSuccess] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
     const router = useRouter();
 
@@ -34,30 +34,37 @@ export default function Login() {
                     if (auth && refresh) {
                         localStorage.setItem("accessToken", auth);
                         localStorage.setItem("refreshToken", refresh);
-                        setSuccess(true);
+                        setSuccess("Muvaffaqiyatli kirdingiz!");
                         setTimeout(() => {
                             router.push('/dashboard', {
                                 replace: true
                             } as any);
                         }, 1000);
                     } else {
-                        setError(true);
+                        setError("Login yoki parol noto'g'ri");
                     }
                 } else {
-                    setError(true);
+                    setError("Serverda xatolik yuz berdi");
                 }
             }
         ).catch(
-            err => {
+            (err: any) => {
                 console.error(err);
-                setError(true);
+                const apiMsg = err.response?.data?.message || err.response?.data?.error;
+                if (typeof apiMsg === 'string') {
+                    setError(`Xatolik yuz berdi: ${apiMsg}`);
+                } else if (Array.isArray(apiMsg) && apiMsg.length > 0) {
+                    setError(`Xatolik yuz berdi: ${apiMsg[0]}`);
+                } else {
+                    setError("Login yoki parol noto'g'ri");
+                }
             }
         )
     }
 
     function InputData(e: React.ChangeEvent<HTMLInputElement>) {
-        setError(false);
-        setSuccess(false);
+        setError(null);
+        setSuccess(null);
         setInput(current => ({
             ...current,
             [e.target.id]: e.target.value
@@ -82,9 +89,10 @@ export default function Login() {
                         </h2>
                     </div>
                     <form onSubmit={Submit} className={`${styles.form} ${error ? styles.shake : ''}`}>
-                        <Collapse in={error}>
+                        <Collapse in={!!error}>
                             <Alert
                                 severity="error"
+                                variant="filled"
                                 sx={{
                                     mb: 1,
                                     fontSize: '0.85rem',
@@ -92,13 +100,14 @@ export default function Login() {
                                     fontFamily: 'inherit'
                                 }}
                             >
-                                the password or login is inncorect
+                                {error}
                             </Alert>
                         </Collapse>
 
-                        <Collapse in={success}>
+                        <Collapse in={!!success}>
                             <Alert
                                 severity="success"
+                                variant="filled"
                                 sx={{
                                     mb: 1,
                                     fontSize: '0.85rem',
@@ -106,7 +115,7 @@ export default function Login() {
                                     fontFamily: 'inherit'
                                 }}
                             >
-                                you are in
+                                {success}
                             </Alert>
                         </Collapse>
 
