@@ -10,6 +10,7 @@ import DiamondRoundedIcon from '@mui/icons-material/DiamondRounded';
 import CardGiftcardRoundedIcon from '@mui/icons-material/CardGiftcardRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import React, { useState, useEffect } from 'react';
 import ButtonBase from '@mui/material/ButtonBase';
 
@@ -36,8 +37,15 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, toggleSubSidebar }: SidebarProps) {
+    const router = useRouter();
     const pathname = usePathname() || '';
     const [optimisticPath, setOptimisticPath] = useState(pathname);
+
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        router.replace('/login');
+    };
 
     useEffect(() => {
         setOptimisticPath(pathname);
@@ -92,6 +100,12 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                     );
                 })}
             </nav>
+
+            <button className={styles.logoutBtn} onClick={handleLogout}>
+                <LogoutRoundedIcon fontSize="small" />
+                {!isCollapsed && <span>Chiqish</span>}
+                {isCollapsed && <span className={styles.tooltip}>Chiqish</span>}
+            </button>
 
             <div className={styles.subscription}>
                 <div className={styles.subInfo}>

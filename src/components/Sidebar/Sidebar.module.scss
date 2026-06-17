@@ -336,3 +336,42 @@
         transform: translateY(-50%) translateX(0);
     }
 }
+
+.logoutBtn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    margin: 0 16px 8px 16px;
+    border-radius: 12px;
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    width: calc(100% - 32px);
+    transition: all 0.2s ease;
+    position: relative;
+    font-family: 'Outfit', 'Inter', sans-serif;
+
+    &:hover {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+.collapsed .logoutBtn {
+    justify-content: center;
+    padding: 12px 0;
+    width: calc(100% - 24px);
+    margin: 0 12px 8px 12px;
+
+    span:not(.tooltip) {
+        display: none;
+    }
+}
