@@ -216,7 +216,7 @@ export default function LessonDetail() {
     const [y, m, d] = date.split('-');
     const mIndex = parseInt(m, 10) - 1;
     const dayInt = parseInt(d, 10);
-    
+
     for (const sm of schedules) {
       for (const item of sm.days) {
         const monthMap = {
@@ -388,7 +388,7 @@ export default function LessonDetail() {
               </div>
             )
           )}
-          
+
           <div className={styles.infoItem}>
             <span className={styles.label}>Dars kuni</span>
             <span className={styles.value}>{date ? date.replace(/-/g, ' M') : "2026 M05 21"}</span>

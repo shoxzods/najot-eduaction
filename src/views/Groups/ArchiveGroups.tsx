@@ -267,14 +267,16 @@ export default function ArchiveGroups() {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
           onClick={(e) => e.stopPropagation()}
-          PaperProps={{
-            sx: {
-              boxShadow: '0 6px 18px rgba(16,24,40,0.08)',
-              border: '1px solid #e6edf6',
-              borderRadius: '8px',
-              padding: '4px',
-              minWidth: '120px',
-            },
+          slotProps={{
+            paper: {
+              sx: {
+                boxShadow: '0 6px 18px rgba(16,24,40,0.08)',
+                border: '1px solid #e6edf6',
+                borderRadius: '8px',
+                padding: '4px',
+                minWidth: '120px',
+              },
+            }
           }}
         >
           <MenuItem

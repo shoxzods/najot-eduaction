@@ -117,7 +117,7 @@ export default function Videolar({ refreshTrigger }) {
                         </tr>
                     )) : (
                         <tr>
-                            <td colSpan="8" style={{ textAlign: "center", padding: "20px" }}>Videolar topilmadi</td>
+                            <td colSpan={8} style={{ textAlign: "center", padding: "20px" }}>Videolar topilmadi</td>
                         </tr>
                     )}
                 </tbody>

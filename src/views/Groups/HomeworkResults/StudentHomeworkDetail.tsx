@@ -32,7 +32,7 @@ const TAB_TO_STATUS = {
 
 export default function StudentHomeworkDetail() {
   const { id, homeworkId, resultId } = useParams();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const tabLabel = searchParams.get("tab") || "Natijalar";
@@ -143,7 +143,7 @@ export default function StudentHomeworkDetail() {
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
-    if (isNaN(date)) return "-";
+    if (isNaN(date.getTime())) return "-";
     const months = ["Yan", "Fev", "Mar", "Apr", "May", "Iyun", "Iyul", "Avg", "Sen", "Okt", "Noy", "Dek"];
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
@@ -312,7 +312,7 @@ export default function StudentHomeworkDetail() {
                       }
                     }}
                     className={styles.rangeSlider}
-                    style={{ '--val': `${ballValue}%`, '--color': sliderColor, cursor: isLate ? 'not-allowed' : 'pointer', opacity: isLate ? 0.6 : 1 }}
+                    style={{ '--val': `${ballValue}%`, '--color': sliderColor, cursor: isLate ? 'not-allowed' : 'pointer', opacity: isLate ? 0.6 : 1 } as React.CSSProperties}
                     disabled={isLate}
                   />
                   <div className={styles.sliderLabel}>O'tish bali</div>
@@ -335,7 +335,7 @@ export default function StudentHomeworkDetail() {
                 <textarea
                   className={styles.commentInput}
                   placeholder="Izohingiz"
-                  rows="4"
+                  rows={4}
                   value={checkComment}
                   onChange={(e) => setCheckComment(e.target.value)}
                 ></textarea>

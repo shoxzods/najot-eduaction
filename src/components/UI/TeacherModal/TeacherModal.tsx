@@ -32,9 +32,9 @@ export default function TeacherModal({
     };
 
     const [teacherData, setTeacherData] = useState(defaultTeacherData);
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+    const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'error' | 'warning' | 'info' | 'success' }>({ open: false, message: '', severity: 'error' });
 
-    const handleCloseSnackbar = (event, reason) => {
+    const handleCloseSnackbar = (event?: any, reason?: string) => {
         if (reason === 'clickaway') return;
         setSnackbar({ ...snackbar, open: false });
     };
@@ -165,7 +165,7 @@ export default function TeacherModal({
         finalGroups.forEach(group => {
             const id = group?.id || group?.group_id;
             if (id) {
-                formData.append("groups", Number(id));
+                formData.append("groups", String(id));
             }
         });
 

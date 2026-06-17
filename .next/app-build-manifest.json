@@ -47,11 +47,6 @@
       "static/css/app/(dashboard)/dashboard/students/page.css",
       "static/chunks/app/(dashboard)/dashboard/students/page.js"
     ],
-    "/(dashboard)/dashboard/gifts/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/dashboard/gifts/page.js"
-    ],
     "/(dashboard)/management/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -69,48 +64,6 @@
       "static/chunks/main-app.js",
       "static/css/app/(dashboard)/management/courses/page.css",
       "static/chunks/app/(dashboard)/management/courses/page.js"
-    ],
-    "/(dashboard)/dashboard/teachers/archive/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/dashboard/teachers/archive/page.css",
-      "static/chunks/app/(dashboard)/dashboard/teachers/archive/page.js"
-    ],
-    "/(dashboard)/dashboard/groups/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/dashboard/groups/[id]/page.css",
-      "static/chunks/app/(dashboard)/dashboard/groups/[id]/page.js"
-    ],
-    "/(dashboard)/management/staff/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/management/staff/page.css",
-      "static/chunks/app/(dashboard)/management/staff/page.js"
-    ],
-    "/(dashboard)/dashboard/groups/archive/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/dashboard/groups/archive/page.css",
-      "static/chunks/app/(dashboard)/dashboard/groups/archive/page.js"
-    ],
-    "/(dashboard)/management/send-message/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/management/send-message/page.css",
-      "static/chunks/app/(dashboard)/management/send-message/page.js"
-    ],
-    "/(dashboard)/management/coin/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/management/coin/page.css",
-      "static/chunks/app/(dashboard)/management/coin/page.js"
-    ],
-    "/(dashboard)/dashboard/students/archive/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/dashboard/students/archive/page.css",
-      "static/chunks/app/(dashboard)/dashboard/students/archive/page.js"
     ]
   }
 }

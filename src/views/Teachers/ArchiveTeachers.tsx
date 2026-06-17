@@ -295,7 +295,7 @@ export default function ArchiveTeachers() {
                             ))}
                             {teacherData.length === 0 && !isLoading && (
                                 <tr>
-                                    <td colSpan="8" style={{ textAlign: 'center', padding: '30px' }}>
+                                    <td colSpan={8} style={{ textAlign: 'center', padding: '30px' }}>
                                         Arxivlangan o'qituvchilar yo'q
                                     </td>
                                 </tr>

@@ -72,8 +72,8 @@ export default function CreateHomework() {
 
         try {
             const formData = new FormData();
-            formData.append("lesson_id", Number(lessonId));
-            formData.append("group_id", Number(groupId));
+            formData.append("lesson_id", String(lessonId));
+            formData.append("group_id", String(groupId));
             formData.append("title", title);
             if (file) {
                 formData.append("file", file);
@@ -83,7 +83,7 @@ export default function CreateHomework() {
                 headers: { "Content-Type": "multipart/form-data" }
             });
 
-            router.push(-1);
+            router.back();
         } catch (err) {
             console.error("Error creating homework:", err);
             setError("Xatolik yuz berdi. Qayta urinib ko'ring.");
@@ -95,7 +95,7 @@ export default function CreateHomework() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <button className={styles.backBtn} onClick={() => router.push(-1)}>
+                <button className={styles.backBtn} onClick={() => router.back()}>
                     <ArrowBackIosNewRoundedIcon fontSize="small" />
                 </button>
                 <h1>Yangi uyga vazifa yaratish</h1>
@@ -199,7 +199,7 @@ export default function CreateHomework() {
                 {error && <p className={styles.errorMsg}>{error}</p>}
 
                 <div className={styles.formActions}>
-                    <button type="button" className={styles.cancelBtn} onClick={() => router.push(-1)}>
+                    <button type="button" className={styles.cancelBtn} onClick={() => router.back()}>
                         Bekor qilish
                     </button>
                     <button

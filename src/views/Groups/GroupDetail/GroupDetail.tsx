@@ -688,7 +688,7 @@ export default function GroupDetail() {
                                     let year = today.getFullYear();
                                     if (today.getMonth() === 0 && mIndex === 11) year -= 1;
                                     if (today.getMonth() === 11 && mIndex === 0) year += 1;
-                                    const itemDate = new Date(year, mIndex, parseInt(item.day, 10));
+                                    const itemDate = new Date(year, mIndex, Number(item.day));
 
                                     const paddedMonth = String(mIndex + 1).padStart(2, '0');
                                     const paddedDay = String(item.day).padStart(2, '0');

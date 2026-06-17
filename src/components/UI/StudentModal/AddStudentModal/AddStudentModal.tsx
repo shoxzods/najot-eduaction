@@ -127,7 +127,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
         }
 
         groups.forEach(group => {
-            formData.append("groups", Number(group.id));
+            formData.append("groups", String(group.id));
         });
 
         const request = isEditing

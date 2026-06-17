@@ -10,7 +10,7 @@ import styles from "../HomeworkResults/StudentHomeworkDetail.module.scss";
 
 export default function StudentImtihonDetail() {
   const { id, examId, resultId } = useParams();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const tabLabel = searchParams.get("tab") || "Kutayotganlar";
@@ -28,7 +28,7 @@ export default function StudentImtihonDetail() {
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
-    if (isNaN(date)) return "-";
+    if (isNaN(date.getTime())) return "-";
     const months = ["Yan", "Fev", "Mar", "Apr", "May", "Iyun", "Iyul", "Avg", "Sen", "Okt", "Noy", "Dek"];
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
@@ -88,13 +88,13 @@ export default function StudentImtihonDetail() {
               Fayl: <strong>1</strong>
             </p>
             <div className={styles.filesGrid}>
-                <a
-                  href={"#"}
-                  onClick={(e) => e.preventDefault()}
-                  className={styles.fileLink}
-                >
-                  📎 imtihon_javoblari.pdf
-                </a>
+              <a
+                href={"#"}
+                onClick={(e) => e.preventDefault()}
+                className={styles.fileLink}
+              >
+                📎 imtihon_javoblari.pdf
+              </a>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function StudentImtihonDetail() {
                   }
                 }}
                 className={styles.rangeSlider}
-                style={{ '--val': `${ballValue}%`, '--color': sliderColor, cursor: isLate ? 'not-allowed' : 'pointer', opacity: isLate ? 0.6 : 1 }}
+                style={{ '--val': `${ballValue}%`, '--color': sliderColor, cursor: isLate ? 'not-allowed' : 'pointer', opacity: isLate ? 0.6 : 1 } as React.CSSProperties}
                 disabled={isLate}
               />
               <div className={styles.sliderLabel}>O'tish bali</div>
