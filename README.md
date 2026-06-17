@@ -1,5 +1,5 @@
-# 🎓 Education CRM
-
+# 🎓 Education CRM  
+hosting: https://next-najot-eduaction-jboi.vercel.app/
 > CRM-система для управления студентами, курсами и коммуникацией на онлайн-платформах.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
