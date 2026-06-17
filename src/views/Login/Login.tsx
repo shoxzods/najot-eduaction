@@ -5,7 +5,7 @@ import styles from './Login.module.scss';
 import { api } from '../../api/api';
 import { useState } from 'react';
 import Alert from '@mui/material/Alert';
-import Collapse from '@mui/material/Collapse';
+import Snackbar from '@mui/material/Snackbar';
 
 interface LoginInput {
     number: string;
@@ -62,9 +62,13 @@ export default function Login() {
         )
     }
 
-    function InputData(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleCloseSnackbar() {
         setError(null);
         setSuccess(null);
+    }
+
+    function InputData(e: React.ChangeEvent<HTMLInputElement>) {
+        // No need to clear snackbar automatically on input anymore since it's floating
         setInput(current => ({
             ...current,
             [e.target.id]: e.target.value
@@ -89,35 +93,37 @@ export default function Login() {
                         </h2>
                     </div>
                     <form onSubmit={Submit} className={`${styles.form} ${error ? styles.shake : ''}`}>
-                        <Collapse in={!!error}>
+                        <Snackbar
+                            open={!!error}
+                            autoHideDuration={6000}
+                            onClose={handleCloseSnackbar}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        >
                             <Alert
+                                onClose={handleCloseSnackbar}
                                 severity="error"
                                 variant="filled"
-                                sx={{
-                                    mb: 1,
-                                    fontSize: '0.85rem',
-                                    borderRadius: '8px',
-                                    fontFamily: 'inherit'
-                                }}
+                                sx={{ width: '100%' }}
                             >
                                 {error}
                             </Alert>
-                        </Collapse>
+                        </Snackbar>
 
-                        <Collapse in={!!success}>
+                        <Snackbar
+                            open={!!success}
+                            autoHideDuration={6000}
+                            onClose={handleCloseSnackbar}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        >
                             <Alert
+                                onClose={handleCloseSnackbar}
                                 severity="success"
                                 variant="filled"
-                                sx={{
-                                    mb: 1,
-                                    fontSize: '0.85rem',
-                                    borderRadius: '8px',
-                                    fontFamily: 'inherit'
-                                }}
+                                sx={{ width: '100%' }}
                             >
                                 {success}
                             </Alert>
-                        </Collapse>
+                        </Snackbar>
 
                         <div className={styles.box}>
                             <label className={styles.form__label} htmlFor="phone">Login</label>
