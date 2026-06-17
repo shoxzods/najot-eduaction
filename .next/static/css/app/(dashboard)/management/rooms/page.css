@@ -1,0 +1,535 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/views/management/Rooms/Rooms.module.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Rooms_roomsContainer__lMOLm {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.Rooms_header__hIfmi {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.Rooms_titleWrapper__Tx8bi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.Rooms_title__2YBmn {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.Rooms_refreshIcon__THmyU {
+  color: #4a4a6a;
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.3s;
+}
+.Rooms_refreshIcon__THmyU:hover {
+  transform: rotate(180deg);
+  color: #6c35de;
+}
+
+.Rooms_addBtn__BBwV6 {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #6c35de;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.Rooms_addBtn__BBwV6:hover {
+  background: #5a2cc0;
+}
+.Rooms_addBtn__BBwV6 svg {
+  font-size: 20px;
+}
+
+.Rooms_grid__5Zr2V {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-gap: 12px;
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar-track {
+  background: transparent;
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 5px;
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar-thumb:hover {
+  background-color: #cbd5e1;
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar-button:single-button {
+  background-color: transparent;
+  display: block;
+  background-size: 8px;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 14px;
+  width: 10px;
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23e2e8f0'><polygon points='50,20 15,80 85,80'/></svg>");
+}
+.Rooms_grid__5Zr2V::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23e2e8f0'><polygon points='50,80 15,20 85,20'/></svg>");
+}
+
+.Rooms_card__XdGpA {
+  padding: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.Rooms_card__XdGpA:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+}
+
+.Rooms_cardHeader__1osaz {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Rooms_roomName__ZkHYL {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.Rooms_actions__KTkA1 {
+  display: flex;
+  gap: 4px;
+}
+
+.Rooms_actionBtn__ikXCK {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.Rooms_actionBtn__ikXCK svg {
+  font-size: 18px;
+}
+
+.Rooms_deleteBtn__fQ0_q {
+  color: #ff4d4f;
+}
+.Rooms_deleteBtn__fQ0_q:hover {
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.Rooms_editBtn__GmDhy {
+  color: #6c35de;
+}
+.Rooms_editBtn__GmDhy:hover {
+  background: rgba(108, 53, 222, 0.1);
+}
+
+.Rooms_capacity__0kGi9 {
+  font-size: 13px;
+  color: #4a4a6a;
+  margin: 0;
+}
+
+.Rooms_form__nmXan {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.Rooms_formGroup__SiA0v {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.Rooms_formGroup__SiA0v label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+.Rooms_formGroup__SiA0v label span {
+  color: #ef4444;
+  margin-left: 4px;
+}
+.Rooms_formGroup__SiA0v input {
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  transition: border-color 0.2s;
+}
+.Rooms_formGroup__SiA0v input:focus {
+  outline: none;
+  border-color: #6c35de;
+}
+.Rooms_formGroup__SiA0v input::placeholder {
+  color: #9ca3af;
+}
+
+.Rooms_cancelBtn__Hq53h {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.Rooms_cancelBtn__Hq53h:hover {
+  background: #f9fafb;
+}
+
+.Rooms_saveBtn__Np7vY {
+  background: #9333ea;
+  color: #ffffff;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.Rooms_saveBtn__Np7vY:hover {
+  background: #7e22ce;
+}
+
+.Rooms_backIconBtn__acRm6 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f7;
+  border: none;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  color: #4a4a6a;
+  transition: background 0.2s;
+}
+.Rooms_backIconBtn__acRm6:hover {
+  background: #ebebee;
+}
+
+.Rooms_archiveBtn__oTPbb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f5f5f7;
+  color: #4a4a6a;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.Rooms_archiveBtn__oTPbb:hover {
+  background: #ebebee;
+}
+.Rooms_archiveBtn__oTPbb svg {
+  font-size: 20px;
+}
+
+.Rooms_archivedCard__hdBQ3 {
+  opacity: 0.85;
+  filter: grayscale(20%);
+}
+.Rooms_archivedCard__hdBQ3:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+.Rooms_emptyState__sjYhg {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 40px;
+  color: #8a8a9a;
+  font-size: 15px;
+}
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/components/UI/RoomModal/RoomModal.module.scss ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.RoomModal_overlay__rWR6W {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+  animation: RoomModal_fadeIn__ZW0Ue 0.3s ease;
+}
+
+.RoomModal_fadeOut__1XIpq {
+  animation: RoomModal_fadeOut__1XIpq 0.3s ease forwards;
+}
+
+.RoomModal_modal__UXGDI {
+  width: 25%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  animation: RoomModal_slideIn__kY_SS 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+}
+
+.RoomModal_slideOut__GAcGK {
+  animation: RoomModal_slideOut__GAcGK 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.RoomModal_header__7gxS4 {
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.RoomModal_title__ey1U8 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.RoomModal_closeBtn__0DkXm {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  transition: all 0.2s;
+}
+.RoomModal_closeBtn__0DkXm:hover {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.RoomModal_closeBtn__0DkXm svg {
+  font-size: 24px;
+}
+
+.RoomModal_body__DR33s {
+  flex: 1 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.RoomModal_footer__ub8s1 {
+  padding: 16px 24px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@keyframes RoomModal_fadeIn__ZW0Ue {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes RoomModal_fadeOut__1XIpq {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes RoomModal_slideIn__kY_SS {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes RoomModal_slideOut__GAcGK {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/components/UI/ConfirmDialog/ConfirmDialog.module.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.ConfirmDialog_overlay__EhhxU {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: ConfirmDialog_fadeIn__Flp2V 0.2s ease-out;
+}
+
+.ConfirmDialog_modal__ChGtR {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: ConfirmDialog_scaleUp__psUyC 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ConfirmDialog_title__7NVTi {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.ConfirmDialog_message__d6h7M {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ConfirmDialog_footer__ax9KX {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.ConfirmDialog_cancelBtn__RuyWQ {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.ConfirmDialog_cancelBtn__RuyWQ:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.ConfirmDialog_confirmBtn__57xD3 {
+  background: #dc2626;
+  border: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 20px;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.1s;
+}
+.ConfirmDialog_confirmBtn__57xD3:hover {
+  background: #b91c1c;
+}
+.ConfirmDialog_confirmBtn__57xD3:active {
+  transform: scale(0.98);
+}
+
+.ConfirmDialog_fadeOut__Mcsp5 {
+  animation: ConfirmDialog_fadeOut__Mcsp5 0.2s ease-out forwards;
+}
+
+.ConfirmDialog_scaleDown__XiNv3 {
+  animation: ConfirmDialog_scaleDown__XiNv3 0.2s ease-out forwards;
+}
+
+@keyframes ConfirmDialog_fadeIn__Flp2V {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ConfirmDialog_fadeOut__Mcsp5 {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ConfirmDialog_scaleUp__psUyC {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes ConfirmDialog_scaleDown__XiNv3 {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}

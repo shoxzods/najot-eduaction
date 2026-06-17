@@ -20,7 +20,11 @@
     width: 80px;
 
     .logo {
+<<<<<<< HEAD
         padding: 16px 0;
+=======
+        padding: 20px 0 16px 0;
+>>>>>>> 4be67fa (feat: rewrited react project)
         justify-content: center;
         border-bottom: 1px solid #f1f5f9;
     }
@@ -69,6 +73,23 @@
         background: transparent;
         align-items: center;
         box-shadow: none;
+<<<<<<< HEAD
+=======
+
+        .subTextWrapper {
+            opacity: 0;
+            width: 0;
+            margin: 0;
+        }
+
+        .subBtn {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+>>>>>>> 4be67fa (feat: rewrited react project)
     }
 }
 
@@ -96,7 +117,11 @@
 .toggleBtn {
     position: absolute;
     right: -13px;
+<<<<<<< HEAD
     top: 52%;
+=======
+    top: 50%;
+>>>>>>> 4be67fa (feat: rewrited react project)
     transform: translateY(-50%);
     display: flex;
     align-items: center;
@@ -214,6 +239,18 @@
     opacity: 0.9;
 }
 
+<<<<<<< HEAD
+=======
+.subTextWrapper {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transition: opacity 0.2s ease, width 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+>>>>>>> 4be67fa (feat: rewrited react project)
 .subTitle {
     font-weight: 600;
     font-size: 13px;
@@ -253,8 +290,17 @@
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+<<<<<<< HEAD
     transition: background 0.2s ease;
     width: 100%;
+=======
+    transition: all 0.2s ease;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 34px;
+    opacity: 1;
+>>>>>>> 4be67fa (feat: rewrited react project)
 
     &:hover {
         background: #5a2cc0;
