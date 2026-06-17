@@ -57,6 +57,9 @@
     }
 
     &__button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         background: rgb(29, 45, 91);
         border: none;
         color: white;
@@ -70,14 +73,20 @@
         margin-top: 8px;
         box-shadow: 0 4px 6px -1px rgba(29, 45, 91, 0.2), 0 2px 4px -1px rgba(29, 45, 91, 0.1);
 
-        &:hover {
+        &:hover:not(:disabled) {
             opacity: 0.95;
             transform: translateY(-1px);
             box-shadow: 0 6px 8px -1px rgba(29, 45, 91, 0.25), 0 3px 6px -1px rgba(29, 45, 91, 0.15);
         }
 
-        &:active {
+        &:active:not(:disabled) {
             transform: translateY(0);
+        }
+
+        &:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
         }
     }
 }

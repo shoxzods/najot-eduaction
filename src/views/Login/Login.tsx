@@ -6,6 +6,7 @@ import { api } from '../../api/api';
 import { useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface LoginInput {
     number: string;
@@ -19,11 +20,13 @@ export default function Login() {
     });
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const router = useRouter();
 
     function Submit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setLoading(true);
 
         api.post('/auth/login', input).then(
             res => {
@@ -42,9 +45,11 @@ export default function Login() {
                         }, 1000);
                     } else {
                         setError("Login yoki parol noto'g'ri");
+                        setLoading(false);
                     }
                 } else {
                     setError("Serverda xatolik yuz berdi");
+                    setLoading(false);
                 }
             }
         ).catch(
@@ -58,6 +63,7 @@ export default function Login() {
                 } else {
                     setError("Login yoki parol noto'g'ri");
                 }
+                setLoading(false);
             }
         )
     }
@@ -81,6 +87,41 @@ export default function Login() {
                 <img className={styles.left_icon} src='/study.svg' alt="left images" />
             </div>
             <div className={`${styles.right_side}`}>
+                {/* Snackbars positioned inside the right container */}
+                <Snackbar
+                    open={!!error}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    sx={{ position: 'absolute', top: 24, right: 24, width: 'auto' }}
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity="error"
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {error}
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    open={!!success}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    sx={{ position: 'absolute', top: 24, right: 24, width: 'auto' }}
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity="success"
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {success}
+                    </Alert>
+                </Snackbar>
+
                 <div className={styles.right_container}>
                     <div style={{ padding: "0 20px" }}>
                         <h1 className={styles.title}>MUHAMMAD AL-XORAZMIY NOMIDAGI <br />
@@ -93,38 +134,6 @@ export default function Login() {
                         </h2>
                     </div>
                     <form onSubmit={Submit} className={`${styles.form} ${error ? styles.shake : ''}`}>
-                        <Snackbar
-                            open={!!error}
-                            autoHideDuration={6000}
-                            onClose={handleCloseSnackbar}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        >
-                            <Alert
-                                onClose={handleCloseSnackbar}
-                                severity="error"
-                                variant="filled"
-                                sx={{ width: '100%' }}
-                            >
-                                {error}
-                            </Alert>
-                        </Snackbar>
-
-                        <Snackbar
-                            open={!!success}
-                            autoHideDuration={6000}
-                            onClose={handleCloseSnackbar}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        >
-                            <Alert
-                                onClose={handleCloseSnackbar}
-                                severity="success"
-                                variant="filled"
-                                sx={{ width: '100%' }}
-                            >
-                                {success}
-                            </Alert>
-                        </Snackbar>
-
                         <div className={styles.box}>
                             <label className={styles.form__label} htmlFor="phone">Login</label>
                             <input onChange={InputData} className={styles.form__input} id='phone' type="text" placeholder='Loginni kiriting' required />
@@ -133,7 +142,10 @@ export default function Login() {
                             <label className={styles.form__label} htmlFor="password">Parol</label>
                             <input onChange={InputData} className={styles.form__input} id='password' type="password" placeholder='Parolni kiriting' required />
                         </div>
-                        <button className={styles.form__button}>Kirish</button>
+                        <button className={styles.form__button} disabled={loading}>
+                            {loading ? <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} /> : null}
+                            {loading ? 'Kirilmoqda...' : 'Kirish'}
+                        </button>
                     </form>
                 </div>
 
