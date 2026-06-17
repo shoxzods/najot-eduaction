@@ -5,6 +5,6 @@
   "/(dashboard)/dashboard/teachers/page": "app/(dashboard)/dashboard/teachers/page.js",
   "/(dashboard)/dashboard/groups/page": "app/(dashboard)/dashboard/groups/page.js",
   "/(dashboard)/dashboard/students/page": "app/(dashboard)/dashboard/students/page.js",
-  "/(dashboard)/management/courses/page": "app/(dashboard)/management/courses/page.js",
+  "/(dashboard)/dashboard/gifts/page": "app/(dashboard)/dashboard/gifts/page.js",
   "/(dashboard)/management/rooms/page": "app/(dashboard)/management/rooms/page.js"
 }

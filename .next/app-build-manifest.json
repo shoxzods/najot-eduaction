@@ -47,6 +47,11 @@
       "static/css/app/(dashboard)/dashboard/students/page.css",
       "static/chunks/app/(dashboard)/dashboard/students/page.js"
     ],
+    "/(dashboard)/dashboard/gifts/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/dashboard/gifts/page.js"
+    ],
     "/(dashboard)/management/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -58,12 +63,6 @@
       "static/chunks/main-app.js",
       "static/css/app/(dashboard)/management/rooms/page.css",
       "static/chunks/app/(dashboard)/management/rooms/page.js"
-    ],
-    "/(dashboard)/management/courses/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/(dashboard)/management/courses/page.css",
-      "static/chunks/app/(dashboard)/management/courses/page.js"
     ]
   }
 }
