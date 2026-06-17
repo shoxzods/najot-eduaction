@@ -34,6 +34,35 @@
       "static/chunks/main-app.js",
       "static/css/app/(dashboard)/dashboard/teachers/page.css",
       "static/chunks/app/(dashboard)/dashboard/teachers/page.js"
+    ],
+    "/(dashboard)/management/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(dashboard)/management/layout.css",
+      "static/chunks/app/(dashboard)/management/layout.js"
+    ],
+    "/(dashboard)/management/rooms/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(dashboard)/management/rooms/page.css",
+      "static/chunks/app/(dashboard)/management/rooms/page.js"
+    ],
+    "/(dashboard)/dashboard/groups/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(dashboard)/dashboard/groups/page.css",
+      "static/chunks/app/(dashboard)/dashboard/groups/page.js"
+    ],
+    "/(dashboard)/dashboard/students/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(dashboard)/dashboard/students/page.css",
+      "static/chunks/app/(dashboard)/dashboard/students/page.js"
+    ],
+    "/(dashboard)/dashboard/gifts/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/dashboard/gifts/page.js"
     ]
   }
 }
