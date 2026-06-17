@@ -13,6 +13,7 @@ import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import React, { useState, useEffect } from 'react';
 import ButtonBase from '@mui/material/ButtonBase';
+import ConfirmDialog from '../UI/ConfirmDialog/ConfirmDialog';
 
 interface MenuItem {
   label: string;
@@ -40,8 +41,10 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
     const router = useRouter();
     const pathname = usePathname() || '';
     const [optimisticPath, setOptimisticPath] = useState(pathname);
+    const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
     const handleLogout = () => {
+        setIsLogoutConfirmOpen(false);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         router.replace('/login');
@@ -103,8 +106,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                 {/* Divider */}
                 <div className={styles.navDivider} />
 
-                {/* Logout — same style as nav items but red */}
-                <button className={styles.logoutNavItem} onClick={handleLogout}>
+                {/* Logout */}
+                <button className={styles.logoutNavItem} onClick={() => setIsLogoutConfirmOpen(true)}>
                     <span className={styles.itemIcon}><LogoutRoundedIcon /></span>
                     {!isCollapsed && <span className={styles.itemLabel}>Chiqish</span>}
                     {isCollapsed && <span className={styles.tooltip}>Chiqish</span>}
@@ -120,10 +123,19 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                     </div>
                 </div>
                 <button className={styles.subBtn}>
-                    <i style={{ transform: 'rotate(50deg)' }} className="bi bi-arrow-clockwise"></i>
-                    <p className={styles.subtext}>Obunani yangilash</p>
+                    <i style={{ transform: 'rotate(50deg)' }} className="bi bi-arrow-clockwise"></i><p className={styles.subtext}>Obunani yangilash</p>
                 </button>
             </div>
+
+            <ConfirmDialog 
+                isOpen={isLogoutConfirmOpen}
+                onClose={() => setIsLogoutConfirmOpen(false)}
+                onConfirm={handleLogout}
+                title="Chiqish"
+                message="Tizimdan chiqishni xohlaysizmi?"
+                confirmText="Chiqish"
+                cancelText="Bekor qilish"
+            />
         </aside>
     );
 }
