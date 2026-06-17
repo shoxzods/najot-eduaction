@@ -30,7 +30,7 @@ export default function LessonDetail() {
     if (date) {
       const todayDate = new Date();
       todayDate.setHours(0, 0, 0, 0);
-      const currentLessonDate = new Date(date);
+      const currentLessonDate = new Date(date as string);
       currentLessonDate.setHours(0, 0, 0, 0);
       setIsPast(currentLessonDate < todayDate);
     }
@@ -85,7 +85,7 @@ export default function LessonDetail() {
 
   useEffect(() => {
     if (schedules.length === 0 || !date) return;
-    const dateObj = new Date(date);
+    const dateObj = new Date(date as string);
     if (isNaN(dateObj.getTime())) return;
     const m = dateObj.getMonth();
     const d = dateObj.getDate();
@@ -213,7 +213,7 @@ export default function LessonDetail() {
 
   const currentDayInfo = (() => {
     if (!date || schedules.length === 0) return null;
-    const [y, m, d] = date.split('-');
+    const [y, m, d] = (date as string).split('-');
     const mIndex = parseInt(m, 10) - 1;
     const dayInt = parseInt(d, 10);
 
@@ -391,7 +391,7 @@ export default function LessonDetail() {
 
           <div className={styles.infoItem}>
             <span className={styles.label}>Dars kuni</span>
-            <span className={styles.value}>{date ? date.replace(/-/g, ' M') : "2026 M05 21"}</span>
+            <span className={styles.value}>{date ? (date as string).replace(/-/g, ' M') : "2026 M05 21"}</span>
           </div>
           <div className={styles.infoItem}>
             <span className={styles.label}>Holat</span>
@@ -475,9 +475,9 @@ export default function LessonDetail() {
         <table className={styles.studentsTable}>
           <thead>
             <tr>
-              <th width="5%">#</th>
-              <th width="80%">O'quvchi ismi</th>
-              <th width="15%" className={styles.attendanceCell}>Keldi</th>
+              <th style={{ width: "5%" }}>#</th>
+              <th style={{ width: "80%" }}>O'quvchi ismi</th>
+              <th style={{ width: "15%" }} className={styles.attendanceCell}>Keldi</th>
             </tr>
           </thead>
           <tbody>

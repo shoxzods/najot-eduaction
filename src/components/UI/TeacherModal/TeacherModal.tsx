@@ -401,8 +401,8 @@ export default function TeacherModal({
                 }}
             >
                 <MuiAlert 
-                    onClose={handleCloseSnackbar} 
-                    severity={snackbar.severity} 
+                    onClose={(e) => handleCloseSnackbar(e, undefined)} 
+                    severity={snackbar.severity as "success" | "error" | "info" | "warning"} 
                     elevation={6} 
                     variant="filled"
                     sx={{ 

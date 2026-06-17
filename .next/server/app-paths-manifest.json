@@ -2,9 +2,5 @@
   "/page": "app/page.js",
   "/login/page": "app/login/page.js",
   "/(dashboard)/dashboard/page": "app/(dashboard)/dashboard/page.js",
-  "/(dashboard)/dashboard/teachers/page": "app/(dashboard)/dashboard/teachers/page.js",
-  "/(dashboard)/dashboard/groups/page": "app/(dashboard)/dashboard/groups/page.js",
-  "/(dashboard)/dashboard/students/page": "app/(dashboard)/dashboard/students/page.js",
-  "/(dashboard)/dashboard/gifts/page": "app/(dashboard)/dashboard/gifts/page.js",
-  "/(dashboard)/management/rooms/page": "app/(dashboard)/management/rooms/page.js"
+  "/(dashboard)/dashboard/teachers/page": "app/(dashboard)/dashboard/teachers/page.js"
 }

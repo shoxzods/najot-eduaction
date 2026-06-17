@@ -9,6 +9,8 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   title?: string;
   message?: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 export default function ConfirmDialog({
@@ -16,7 +18,9 @@ export default function ConfirmDialog({
     onClose,
     onConfirm,
     title = "O'chirish",
-    message = "Rostdan ham o'chirishni hohlaysizmi?"
+    message = "Rostdan ham o'chirishni hohlaysizmi?",
+    confirmText = "Ha",
+    cancelText = "Bekor qilish"
 }: ConfirmDialogProps) {
     const [shouldRender, setShouldRender] = useState<boolean>(isOpen);
 
@@ -46,10 +50,10 @@ export default function ConfirmDialog({
                 <p className={styles.message}>{message}</p>
                 <div className={styles.footer}>
                     <button type="button" className={styles.cancelBtn} onClick={onClose}>
-                        Bekor qilish
+                        {cancelText}
                     </button>
                     <button type="button" className={styles.confirmBtn} onClick={onConfirm}>
-                        Ha
+                        {confirmText}
                     </button>
                 </div>
             </div>

@@ -146,7 +146,7 @@ export default function StudentImtihonDetail() {
             <textarea
               className={styles.commentInput}
               placeholder="Izohingiz"
-              rows="4"
+              rows={4}
               value={checkComment}
               onChange={(e) => setCheckComment(e.target.value)}
             ></textarea>
