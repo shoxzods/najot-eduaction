@@ -99,13 +99,17 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                         </ButtonBase>
                     );
                 })}
-            </nav>
 
-            <button className={styles.logoutBtn} onClick={handleLogout}>
-                <LogoutRoundedIcon fontSize="small" />
-                {!isCollapsed && <span>Chiqish</span>}
-                {isCollapsed && <span className={styles.tooltip}>Chiqish</span>}
-            </button>
+                {/* Divider */}
+                <div className={styles.navDivider} />
+
+                {/* Logout — same style as nav items but red */}
+                <button className={styles.logoutNavItem} onClick={handleLogout}>
+                    <span className={styles.itemIcon}><LogoutRoundedIcon /></span>
+                    {!isCollapsed && <span className={styles.itemLabel}>Chiqish</span>}
+                    {isCollapsed && <span className={styles.tooltip}>Chiqish</span>}
+                </button>
+            </nav>
 
             <div className={styles.subscription}>
                 <div className={styles.subInfo}>
@@ -116,7 +120,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                     </div>
                 </div>
                 <button className={styles.subBtn}>
-                    <i style={{ transform: 'rotate(50deg)' }} className="bi bi-arrow-clockwise"></i><p className={styles.subtext}>Obunani yangilash</p>
+                    <i style={{ transform: 'rotate(50deg)' }} className="bi bi-arrow-clockwise"></i>
+                    <p className={styles.subtext}>Obunani yangilash</p>
                 </button>
             </div>
         </aside>
