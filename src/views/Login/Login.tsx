@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 interface LoginInput {
     number: string;
@@ -99,9 +100,48 @@ export default function Login() {
                         onClose={handleCloseSnackbar}
                         severity="error"
                         variant="filled"
-                        sx={{ width: '100%' }}
+                        sx={{ 
+                            width: '100%', 
+                            position: 'relative', 
+                            overflow: 'hidden', 
+                            padding: '6px 12px',
+                            paddingBottom: '10px',
+                            fontSize: '13px',
+                            alignItems: 'center',
+                            '& .MuiAlert-icon': {
+                                fontSize: '18px',
+                                marginRight: '8px'
+                            },
+                            '& .MuiAlert-message': {
+                                padding: '4px 0',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '100%'
+                            },
+                            '& .MuiAlert-action': {
+                                padding: '0 0 0 8px',
+                                marginRight: '-4px'
+                            }
+                        }}
                     >
                         {error}
+                        <Box 
+                            sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                height: '3px',
+                                backgroundColor: 'rgba(255,255,255,0.5)',
+                                animation: !!error ? 'shrink 6s linear forwards' : 'none',
+                                '@keyframes shrink': {
+                                    '0%': { width: '100%' },
+                                    '100%': { width: '0%' }
+                                }
+                            }} 
+                        />
                     </Alert>
                 </Snackbar>
 
@@ -116,9 +156,48 @@ export default function Login() {
                         onClose={handleCloseSnackbar}
                         severity="success"
                         variant="filled"
-                        sx={{ width: '100%' }}
+                        sx={{ 
+                            width: '100%', 
+                            position: 'relative', 
+                            overflow: 'hidden', 
+                            padding: '6px 12px',
+                            paddingBottom: '10px',
+                            fontSize: '13px',
+                            alignItems: 'center',
+                            '& .MuiAlert-icon': {
+                                fontSize: '18px',
+                                marginRight: '8px'
+                            },
+                            '& .MuiAlert-message': {
+                                padding: '4px 0',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '100%'
+                            },
+                            '& .MuiAlert-action': {
+                                padding: '0 0 0 8px',
+                                marginRight: '-4px'
+                            }
+                        }}
                     >
                         {success}
+                        <Box 
+                            sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                height: '3px',
+                                backgroundColor: 'rgba(255,255,255,0.5)',
+                                animation: !!success ? 'shrink 6s linear forwards' : 'none',
+                                '@keyframes shrink': {
+                                    '0%': { width: '100%' },
+                                    '100%': { width: '0%' }
+                                }
+                            }} 
+                        />
                     </Alert>
                 </Snackbar>
 
