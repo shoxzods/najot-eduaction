@@ -57,7 +57,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
         <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
             <div className={styles.logo}>
                 <img className={styles.logo_icon} src="/najot_edu.svg" alt="" />
-                <p className={styles.logo_title}>Najot Edu</p>
+                {!isCollapsed && <p className={styles.logo_title}>Najot Edu</p>}
                 <button className={styles.toggleBtn} onClick={toggleSidebar}>
                     <ChevronLeftRoundedIcon
                         fontSize="small"
