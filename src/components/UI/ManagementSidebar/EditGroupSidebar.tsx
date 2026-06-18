@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import AddStudentModal from "../GroupModal/AddStudentModal/AddStudentModal";
 import AddTeacherModal from "../GroupModal/AddTeacherModal/AddTeacherModal";
 import { api } from "../../../api/api";
+import { toast } from '../../../utils/toast';
 
 const DAYS = [
     { id: 'mon', label: 'Dushanba' },
@@ -258,17 +259,17 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
         const { name, description, courseId, roomId, startDate, startTime, maxStudent, weekDays, teachers, students } = form;
 
         if (!name || !courseId || !roomId || !startDate || !startTime || !maxStudent || weekDays.length === 0) {
-            alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+            toast.error("Iltimos, barcha majburiy maydonlarni to'ldiring!");
             return;
         }
 
         if (teachers.length === 0) {
-            alert("Iltimos, kamida bitta o'qituvchi qo'shing!");
+            toast.error("Iltimos, kamida bitta o'qituvchi qo'shing!");
             return;
         }
 
         if (students.length === 0) {
-            alert("Iltimos, kamida bitta talaba qo'shing!");
+            toast.error("Iltimos, kamida bitta talaba qo'shing!");
             return;
         }
 
@@ -281,7 +282,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
         });
 
         if (hasDeletedTeacher || hasDeletedStudent) {
-            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) o'qituvchi yoki talabalarni ro'yxatdan olib tashlang!");
+            toast.error("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) o'qituvchi yoki talabalarni ro'yxatdan olib tashlang!");
             return;
         }
 
@@ -361,7 +362,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                         errorMsg = JSON.stringify(responseData);
                     }
                 }
-                alert("Xatolik yuz berdi: " + errorMsg);
+                toast.error("Xatolik yuz berdi: " + errorMsg);
             }
         );
     };
@@ -417,7 +418,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             ))}
                         </select>
                         {form.courseId && (
-                            <div className={styles.durationInfo} style={{ marginTop: '6px', fontSize: '13px', color: '#6c35de', fontWeight: '500' }}>
+                            <div className={styles.durationInfo} style={{ marginTop: '6px', fontSize: '13px', color: 'rgb(29, 45, 91)', fontWeight: '500' }}>
                                 Kurs davomiyligi: {courses.find(c => String(c.id) === String(form.courseId))?.duration_month || 0} oy
                             </div>
                         )}
@@ -596,8 +597,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                     </div>
                     <div className={styles.logoWrapper}>
                         <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M50 20L80 35V65L50 80L20 65V35L50 20Z" stroke="#6c35de" strokeOpacity="0.1" strokeWidth="1" />
-                            <path d="M50 30L70 40V60L50 70L30 60V40L50 30Z" stroke="#6c35de" strokeOpacity="0.1" strokeWidth="1" />
+                            <path d="M50 20L80 35V65L50 80L20 65V35L50 20Z" stroke="rgb(29, 45, 91)" strokeOpacity="0.1" strokeWidth="1" />
+                            <path d="M50 30L70 40V60L50 70L30 60V40L50 30Z" stroke="rgb(29, 45, 91)" strokeOpacity="0.1" strokeWidth="1" />
                         </svg>
                     </div>
                 </div>

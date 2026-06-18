@@ -124,7 +124,7 @@
         transition: border-color 0.2s;
 
         &:focus {
-            border-color: #6c35de;
+            border-color: rgb(29, 45, 91);
         }
 
         &::placeholder {
@@ -141,7 +141,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     background: #ffffff;
-    color: #6c35de;
+    color: rgb(29, 45, 91);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -149,7 +149,7 @@
 
     &:hover {
         background: #f9fafb;
-        border-color: #6c35de;
+        border-color: rgb(29, 45, 91);
     }
 }
 
@@ -165,7 +165,7 @@
     transition: all 0.2s;
 
     &:hover {
-        border-color: #6c35de;
+        border-color: rgb(29, 45, 91);
         background: #fdfbff;
     }
 }
@@ -182,7 +182,7 @@
 }
 
 .purpleText {
-    color: #6c35de;
+    color: rgb(29, 45, 91);
     font-weight: 600;
 }
 
@@ -238,7 +238,7 @@
     flex: 1;
     padding: 12px;
     border: none;
-    background: #6c35de;
+    background: rgb(29, 45, 91);
     color: #ffffff;
     font-size: 14px;
     font-weight: 600;
@@ -247,7 +247,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: #5a2cc0;
+        background: rgb(22, 34, 69);
     }
 }
 
@@ -283,7 +283,7 @@
     transition: border-color 0.2s;
 
     &:focus-within {
-        border-color: #6c35de;
+        border-color: rgb(29, 45, 91);
     }
 }
 
@@ -295,7 +295,7 @@
 
 .groupTag {
     background: #f3effd;
-    color: #6c35de;
+    color: rgb(29, 45, 91);
     font-size: 13px;
     font-weight: 500;
     padding: 4px 8px;
@@ -314,7 +314,7 @@
 .removeGroupBtn {
     background: none;
     border: none;
-    color: #6c35de;
+    color: rgb(29, 45, 91);
     cursor: pointer;
     padding: 0;
     display: flex;
@@ -328,7 +328,7 @@
     transition: background 0.2s, color 0.2s;
 
     &:hover {
-        background: #6c35de;
+        background: rgb(29, 45, 91);
         color: #ffffff;
     }
 }
@@ -338,7 +338,7 @@
     gap: 4px;
     background: none;
     border: none;
-    color: #6c35de;
+    color: rgb(29, 45, 91);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -347,6 +347,6 @@
     transition: color 0.2s;
 
     &:hover {
-        color: #5a2cc0;
+        color: rgb(22, 34, 69);
     }
 }

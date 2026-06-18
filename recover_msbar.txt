@@ -1,0 +1,39 @@
+Created At: 2026-06-18T11:00:34Z
+Completed At: 2026-06-18T11:00:35Z
+File Path: `file:///c:/Users/user/Desktop/najot_eduaction-master/src/components/ManagementSidebar/ManagementSidebar.tsx`
+Total Lines: 80
+Total Bytes: 3361
+Showing lines 50 to 80
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+50:                     return (
+51:                         <ButtonBase
+52:                             component={Link}
+53:                             href={`/management/${item.slug}`}
+54:                             key={index}
+55:                             style={{ 
+56:                                 width: '100%', 
+57:                                 borderRadius: '12px',
+58:                                 marginBottom: '4px',
+59:                                 display: 'block',
+60:                                 textAlign: 'left'
+61:                             }}
+62:                         >
+63:                             <div
+64:                                 className={`${styles.item} ${isActive ? styles.itemActive : ""}`}
+65:                                 onClick={() => {
+66:                                     onClose();
+67:                                 }}
+68:                                 style={{ marginBottom: 0 }}
+69:                             >
+70:                                 <span className={styles.icon}>{item.icon}</span>
+71:                                 <span className={styles.label}>{item.label}</span>
+72:                             </div>
+73:                         </ButtonBase>
+74:                     );
+75:                 })}
+76:             </div>
+77:         </div>
+78:     );
+79: }
+80: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

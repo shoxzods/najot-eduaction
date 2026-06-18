@@ -3,11 +3,10 @@
     top: 0;
     left: 255px;
     width: 210px;
-    height: 100vh;
+    height: calc(100vh / 0.9);
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(241, 245, 249, 0.6);
-    box-shadow: 12px 0 32px rgba(0, 0, 0, 0.04);
     z-index: 90;
     transform: translateX(-10px);
     opacity: 0;
@@ -23,6 +22,7 @@
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
     overflow: hidden;
+    zoom: 0.9;
 }
 
 .open {
@@ -35,7 +35,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 25px 12px 23px;
+    padding: 24.5px 12px 19px;
     border-bottom: 1px solid #f1f5f9;
     margin-bottom: 16px;
 }
@@ -79,17 +79,16 @@
 }
 
 .itemActive {
-    background: linear-gradient(135deg, #7c4dff 0%, #6c35de 100%);
+    background: rgb(29, 45, 91);
     color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(108, 53, 222, 0.25);
 
     .icon {
         color: #ffffff;
     }
 
     &:hover {
-        background: linear-gradient(135deg, #6c35de 0%, #5a2cc0 100%);
+        background: rgb(22, 34, 69);
         color: #ffffff;
 
         .icon {

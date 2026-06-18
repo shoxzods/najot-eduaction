@@ -132,7 +132,7 @@ export default function Courses() {
                         backgroundColor: 'rgba(255, 255, 255, 0.4)',
                         zIndex: 10
                     }}>
-                        <CircularProgress sx={{ color: '#6c35de' }} />
+                        <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
                     </Box>
                 )}
                 {courses.map((course) => (

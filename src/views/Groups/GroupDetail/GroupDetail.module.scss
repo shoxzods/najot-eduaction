@@ -125,7 +125,7 @@
     }
 
     &.activeTab {
-      color: #6c35de;
+      color: rgb(29, 45, 91);
 
       &::after {
         content: '';
@@ -134,7 +134,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background-color: #6c35de;
+        background-color: rgb(29, 45, 91);
       }
     }
   }

@@ -11,6 +11,7 @@ import { api } from "../../../api/api";
 import ConfirmDialog from "../../../components/UI/ConfirmDialog/ConfirmDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { toast } from '../../../utils/toast';
 
 export default function ArchiveCourses() {
     const router = useRouter();
@@ -48,7 +49,7 @@ export default function ArchiveCourses() {
                 const responseData = err.response?.data;
                 let errorMsg = err.message;
                 if (responseData?.message) errorMsg = responseData.message;
-                alert("Xatolik yuz berdi: " + errorMsg);
+                toast.error("Xatolik yuz berdi: " + errorMsg);
             })
             .finally(() => setIsLoading(false));
     }
@@ -63,7 +64,7 @@ export default function ArchiveCourses() {
                 const responseData = err.response?.data;
                 let errorMsg = err.message;
                 if (responseData?.message) errorMsg = responseData.message;
-                alert("Xatolik yuz berdi: " + errorMsg);
+                toast.error("Xatolik yuz berdi: " + errorMsg);
             })
             .finally(() => setIsLoading(false));
     }
@@ -98,7 +99,7 @@ export default function ArchiveCourses() {
                         backgroundColor: 'rgba(255, 255, 255, 0.4)',
                         zIndex: 10
                     }}>
-                        <CircularProgress sx={{ color: '#6c35de' }} />
+                        <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
                     </Box>
                 )}
 

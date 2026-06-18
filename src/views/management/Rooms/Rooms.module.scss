@@ -33,7 +33,7 @@
 
     &:hover {
         transform: rotate(180deg);
-        color: #6c35de;
+        color: rgb(29, 45, 91);
     }
 }
 
@@ -41,7 +41,7 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    background: #6c35de;
+    background: rgb(29, 45, 91);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -52,7 +52,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: #5a2cc0;
+        background: rgb(22, 34, 69);
     }
 
     svg {
@@ -166,10 +166,10 @@
 }
 
 .editBtn {
-    color: #6c35de;
+    color: rgb(29, 45, 91);
 
     &:hover {
-        background: rgba(108, 53, 222, 0.1);
+        background: rgba(29, 45, 91, 0.1);
     }
 }
 
@@ -211,7 +211,7 @@
 
         &:focus {
             outline: none;
-            border-color: #6c35de;
+            border-color: rgb(29, 45, 91);
         }
 
         &::placeholder {

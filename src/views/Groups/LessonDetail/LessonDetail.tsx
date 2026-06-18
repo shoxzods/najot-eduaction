@@ -8,6 +8,7 @@ import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftR
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import Switch from '@mui/material/Switch';
+import { toast } from '../../../utils/toast';
 
 export default function LessonDetail() {
   const { id, date } = useParams();
@@ -181,7 +182,7 @@ export default function LessonDetail() {
 
   const handleSave = async () => {
     if (!topic.trim()) {
-      alert("Iltimos, dars mavzusini kiriting.");
+      toast.error("Iltimos, dars mavzusini kiriting.");
       return;
     }
 
@@ -200,10 +201,10 @@ export default function LessonDetail() {
       };
 
       await api.post(`/groups/${id}/lesson`, payload);
-      alert("Ma'lumotlar saqlandi!");
+      toast.success("Ma'lumotlar saqlandi!");
     } catch (error) {
       console.error("Saqlashda xatolik yuz berdi:", error);
-      alert("Saqlashda xatolik yuz berdi.");
+      toast.error("Saqlashda xatolik yuz berdi.");
     }
   };
 

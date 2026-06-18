@@ -2,7 +2,6 @@
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import styles from "./Sidebar.module.scss";
-import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
@@ -16,9 +15,9 @@ import ButtonBase from '@mui/material/ButtonBase';
 import ConfirmDialog from '../UI/ConfirmDialog/ConfirmDialog';
 
 interface MenuItem {
-  label: string;
-  icon: React.ReactNode;
-  path: string;
+    label: string;
+    icon: React.ReactNode;
+    path: string;
 }
 
 const menuItems: MenuItem[] = [
@@ -31,10 +30,10 @@ const menuItems: MenuItem[] = [
 ];
 
 interface SidebarProps {
-  isCollapsed: boolean;
-  toggleSidebar: () => void;
-  isSubSidebarOpen: boolean;
-  toggleSubSidebar: () => void;
+    isCollapsed: boolean;
+    toggleSidebar: () => void;
+    isSubSidebarOpen: boolean;
+    toggleSubSidebar: () => void;
 }
 
 export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, toggleSubSidebar }: SidebarProps) {
@@ -57,8 +56,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
     return (
         <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
             <div className={styles.logo}>
-                <SchoolRoundedIcon fontSize="large" className={styles.logoIcon} />
-                {!isCollapsed && <span className={styles.logoText}>NajotEdu</span>}
+                <img className={styles.logo_icon} src="/najot_edu.svg" alt="" />
+                <p className={styles.logo_title}>Najot Edu</p>
                 <button className={styles.toggleBtn} onClick={toggleSidebar}>
                     <ChevronLeftRoundedIcon
                         fontSize="small"
@@ -87,8 +86,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                                     if (isSubSidebarOpen) toggleSubSidebar();
                                 }
                             }}
-                            style={{ 
-                                width: '100%', 
+                            style={{
+                                width: '100%',
                                 borderRadius: '12px',
                                 marginBottom: '6px',
                                 display: 'block'
@@ -127,7 +126,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                 </button>
             </div>
 
-            <ConfirmDialog 
+            <ConfirmDialog
                 isOpen={isLogoutConfirmOpen}
                 onClose={() => setIsLogoutConfirmOpen(false)}
                 onConfirm={handleLogout}

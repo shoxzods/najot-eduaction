@@ -7,10 +7,19 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded';
 import AddGroupModal from "../../TeacherModal/AddGroupModal/AddGroupModal";
 import { api } from "../../../../api/api";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 
 export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit }) {
     const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
     const [allGroups, setAllGroups] = useState([]);
+    const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'error' | 'success' | 'info' | 'warning' }>({ open: false, message: '', severity: 'error' });
+
+    const handleCloseSnackbar = (_event?: any, reason?: string) => {
+        if (reason === 'clickaway') return;
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
 
     const defaultStudentData = {
         phone: "+998",
@@ -77,7 +86,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
         const isEditing = Boolean(studentToEdit?.id);
 
         if (!fullName || !email || !phone || !birthDate || !address || groups.length === 0) {
-            alert("Iltimos, barcha majburiy maydonlarni (shu jumladan guruh va manzilni ham) to'ldiring!");
+            setSnackbar({ open: true, message: "Iltimos, barcha majburiy maydonlarni (shu jumladan guruh va manzilni ham) to'ldiring!", severity: 'error' });
             return;
         }
 
@@ -96,12 +105,12 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
         });
 
         if (hasDeletedGroups) {
-            alert("Iltimos, o'chirilgan (qizil chiziq bilan belgilangan) guruhlarni ro'yxatdan olib tashlang!");
+            setSnackbar({ open: true, message: "O'chirilgan guruhlarni (qizil) ro'yxatdan olib tashlang!", severity: 'error' });
             return;
         }
 
         if (!isEditing && !password) {
-            alert("Iltimos, parolni kiriting!");
+            setSnackbar({ open: true, message: "Iltimos, parolni kiriting!", severity: 'error' });
             return;
         }
 
@@ -144,7 +153,8 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
 
         request.then(
             res => {
-                console.log(isEditing ? "Student updated successfully:" : "Student created successfully:", res.status);
+                const successMsg = isEditing ? "Talaba muvaffaqiyatli tahrirlandi!" : "Talaba muvaffaqiyatli qo'shildi!";
+                setSnackbar({ open: true, message: successMsg, severity: 'success' });
                 if (onSave) {
                     onSave();
                 }
@@ -179,7 +189,7 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                     }
                 }
 
-                alert("Xatolik yuz berdi: " + errorMsg);
+                setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
             }
         );
     };
@@ -398,6 +408,68 @@ export default function AddStudentModal({ isOpen, onClose, onSave, studentToEdit
                     toggleAddGroupModal();
                 }}
             />
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{
+                    top: '20px !important',
+                    right: '20px !important',
+                    width: 'calc(25vw - 40px)',
+                    maxWidth: '400px'
+                }}
+            >
+                <MuiAlert
+                    onClose={(e) => handleCloseSnackbar(e, undefined)}
+                    severity={snackbar.severity as "success" | "error" | "info" | "warning"}
+                    elevation={6}
+                    variant="filled"
+                    sx={{
+                        width: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        padding: '6px 12px',
+                        paddingBottom: '10px',
+                        fontSize: '13px',
+                        alignItems: 'center',
+                        '& .MuiAlert-icon': {
+                            fontSize: '18px',
+                            marginRight: '8px'
+                        },
+                        '& .MuiAlert-message': {
+                            padding: '4px 0',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        },
+                        '& .MuiAlert-action': {
+                            padding: '0 0 0 8px',
+                            marginRight: '-4px'
+                        }
+                    }}
+                >
+                    {snackbar.message}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: '3px',
+                            backgroundColor: 'rgba(255,255,255,0.5)',
+                            animation: snackbar.open ? 'shrink 6s linear forwards' : 'none',
+                            '@keyframes shrink': {
+                                '0%': { width: '100%' },
+                                '100%': { width: '0%' }
+                            }
+                        }}
+                    />
+                </MuiAlert>
+            </Snackbar>
         </form>
     );
 }

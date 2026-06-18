@@ -8,6 +8,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import MicNoneOutlinedIcon from '@mui/icons-material/MicNoneOutlined';
 import styles from "./StudentHomeworkDetail.module.scss";
+import { toast } from '../../../utils/toast';
 
 const STATUS_LABELS = {
   PENDING: "Kutayabti",
@@ -134,7 +135,7 @@ export default function StudentHomeworkDetail() {
       router.push(`/dashboard/groups/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`);
     } catch (err) {
       console.error("Error submitting check:", err);
-      alert("Xatolik yuz berdi");
+      toast.error("Xatolik yuz berdi");
     } finally {
       setSubmitting(false);
     }

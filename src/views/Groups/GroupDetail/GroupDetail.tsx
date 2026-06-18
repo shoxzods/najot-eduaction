@@ -21,6 +21,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import UygaVazifa from './UygaVazifa';
 import Videolar from './Videolar';
 import Imtihonlar from './Imtihonlar';
+import { toast } from '../../../utils/toast';
 
 export default function GroupDetail() {
     const { id } = useParams();
@@ -250,7 +251,7 @@ export default function GroupDetail() {
 
     const handleVideoUpload = async () => {
         if (!selectedVideoFile || !selectedLessonId) {
-            alert("Iltimos, darsni tanlang!");
+            toast.error("Iltimos, darsni tanlang!");
             return;
         }
 
@@ -273,7 +274,7 @@ export default function GroupDetail() {
             handleModalClose();
         } catch (err) {
             console.error("Error uploading video:", err);
-            alert("Video yuklashda xatolik yuz berdi");
+            toast.error("Video yuklashda xatolik yuz berdi");
         } finally {
             setIsUploadingVideo(false);
         }

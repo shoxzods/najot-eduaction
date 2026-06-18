@@ -36,8 +36,8 @@
 
         &:focus {
             outline: none;
-            border-color: rgba(108, 53, 222, 0.5);
-            box-shadow: 0 0 0 3px rgba(108, 53, 222, 0.1);
+            border-color: rgba(29, 45, 91, 0.5);
+            box-shadow: 0 0 0 3px rgba(29, 45, 91, 0.1);
         }
 
         &::placeholder {
@@ -84,7 +84,7 @@
 }
 
 .saveBtn {
-    background: #6c35de;
+    background: rgb(29, 45, 91);
     color: #ffffff;
     border: none;
     padding: 10px 24px;
@@ -95,7 +95,7 @@
     transition: background 0.2s, transform 0.1s;
 
     &:hover {
-        background: #5a2cc0;
+        background: rgb(22, 34, 69);
     }
 
     &:active {
@@ -121,7 +121,7 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    background: #6c35de;
+    background: rgb(29, 45, 91);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -132,7 +132,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: #5a2cc0;
+        background: rgb(22, 34, 69);
     }
 
     svg {

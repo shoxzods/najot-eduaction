@@ -17,6 +17,8 @@ import StudentModal from "../../components/UI/StudentModal/StudentModal";
 import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 export default function Students() {
     const router = useRouter();
@@ -29,6 +31,12 @@ export default function Students() {
     const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; studentId: number | null }>({ isOpen: false, studentId: null });
+    const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'error' | 'success' | 'info' | 'warning' }>({ open: false, message: '', severity: 'error' });
+
+    const handleCloseSnackbar = (_event: any, reason?: string) => {
+        if (reason === 'clickaway') return;
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
 
     const openAddStudentModal = useCallback(() => {
         setSelectedStudent(null);
@@ -133,11 +141,22 @@ export default function Students() {
             .then(res => {
                 if (res.status === 200 || res.status === 204) {
                     setStudentData(prev => prev.filter(s => s.id !== id));
+                    setSnackbar({ open: true, message: "Talaba muvaffaqiyatli o'chirildi!", severity: 'success' });
                 } else {
                     console.warn('Unexpected delete response', res);
                 }
             })
-            .catch(err => console.error(err.message))
+            .catch(err => {
+                const responseData = err.response?.data;
+                console.error('Error deleting student:', responseData || err.message);
+                let errorMsg = err.message;
+                if (responseData?.message) {
+                    errorMsg = responseData.message;
+                } else if (responseData?.error) {
+                    errorMsg = responseData.error;
+                }
+                setSnackbar({ open: true, message: "Xatolik yuz berdi: " + errorMsg, severity: 'error' });
+            })
             .finally(() => setIsLoading(false));
     }
 
@@ -205,7 +224,7 @@ export default function Students() {
                             backgroundColor: 'rgba(255, 255, 255, 0.4)',
                             zIndex: 10
                         }}>
-                            <CircularProgress sx={{ color: '#6c35de' }} />
+                            <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
                         </Box>
                     )}
                     <table className={styles.table}>
@@ -345,6 +364,68 @@ export default function Students() {
                 title="Talabani o'chirish"
                 message="Rostdan ham o'chirishni hohlaysizmi?"
             />
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{
+                    top: '20px !important',
+                    right: '20px !important',
+                    width: 'calc(25vw - 40px)',
+                    maxWidth: '400px'
+                }}
+            >
+                <MuiAlert
+                    onClose={(e) => handleCloseSnackbar(e, undefined)}
+                    severity={snackbar.severity as "success" | "error" | "info" | "warning"}
+                    elevation={6}
+                    variant="filled"
+                    sx={{
+                        width: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        padding: '6px 12px',
+                        paddingBottom: '10px',
+                        fontSize: '13px',
+                        alignItems: 'center',
+                        '& .MuiAlert-icon': {
+                            fontSize: '18px',
+                            marginRight: '8px'
+                        },
+                        '& .MuiAlert-message': {
+                            padding: '4px 0',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        },
+                        '& .MuiAlert-action': {
+                            padding: '0 0 0 8px',
+                            marginRight: '-4px'
+                        }
+                    }}
+                >
+                    {snackbar.message}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: '3px',
+                            backgroundColor: 'rgba(255,255,255,0.5)',
+                            animation: snackbar.open ? 'shrink 6s linear forwards' : 'none',
+                            '@keyframes shrink': {
+                                '0%': { width: '100%' },
+                                '100%': { width: '0%' }
+                            }
+                        }}
+                    />
+                </MuiAlert>
+            </Snackbar>
         </div>
     );
 }

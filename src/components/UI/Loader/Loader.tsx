@@ -66,8 +66,8 @@ export default function Loader({ fullScreen = true }: LoaderProps) {
                         height: 80,
                         borderRadius: '50%',
                         border: '3px solid transparent',
-                        borderTopColor: '#6c35de',
-                        borderBottomColor: '#6c35de',
+                        borderTopColor: 'rgb(29, 45, 91)',
+                        borderBottomColor: 'rgb(29, 45, 91)',
                         animation: `${rotate} 1.5s linear infinite`,
                     }}
                 />
@@ -76,7 +76,7 @@ export default function Loader({ fullScreen = true }: LoaderProps) {
                 <SchoolRoundedIcon
                     sx={{
                         fontSize: 45,
-                        color: '#6c35de',
+                        color: 'rgb(29, 45, 91)',
                         animation: `${pulse} 1.8s ease-in-out infinite`,
                     }}
                 />

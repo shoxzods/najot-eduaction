@@ -17,8 +17,8 @@
 }
 
 .lms__icon {
-    height: 75px;
-    width: 75px;
+    height: 45%;
+    width: 45%;
     display: block;
     margin: auto;
 }
@@ -29,21 +29,22 @@
     gap: 16px;
 
     &__label {
-        font-weight: 600;
-        font-size: 13px;
-        color: #4a5568;
-        letter-spacing: 0.3px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #1e293b;
     }
 
     &__input {
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
+        padding: 12px 14px;
+        border-radius: 4px;
+        border: 1px solid #cbd5e1;
         outline: none;
         font-size: 14px;
         color: #2d3748;
-        background-color: #ffffff;
+        background-color: #e8effa;
         transition: all 0.2s ease-in-out;
+        width: 100%;
+        box-sizing: border-box;
 
         &::placeholder {
             font-size: 14px;
@@ -52,7 +53,6 @@
 
         &:focus {
             border-color: rgb(29, 45, 91);
-            box-shadow: 0 0 0 3px rgba(29, 45, 91, 0.15);
         }
     }
 
@@ -63,30 +63,62 @@
         background: rgb(29, 45, 91);
         border: none;
         color: white;
-        padding: 11px 16px;
-        border-radius: 8px;
+        padding: 12px 16px;
+        border-radius: 4px;
         cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
+        font-size: 15px;
+        font-weight: 500;
         transition: all 0.2s ease-in-out;
         margin-top: 8px;
-        box-shadow: 0 4px 6px -1px rgba(29, 45, 91, 0.2), 0 2px 4px -1px rgba(29, 45, 91, 0.1);
 
         &:hover:not(:disabled) {
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 8px -1px rgba(29, 45, 91, 0.25), 0 3px 6px -1px rgba(29, 45, 91, 0.15);
-        }
-
-        &:active:not(:disabled) {
-            transform: translateY(0);
+            opacity: 0.9;
         }
 
         &:disabled {
             background: #cbd5e1;
             cursor: not-allowed;
-            box-shadow: none;
+        }
+    }
+
+    &__oneid_button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid rgb(29, 45, 91);
+        color: rgb(29, 45, 91);
+        padding: 10px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+            background-color: #f8fafc;
+        }
+
+        .oneid_logo {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+            font-weight: 800;
+            color: rgb(29, 45, 91);
+
+            .one {
+                font-size: 9px;
+                transform: rotate(-90deg);
+                line-height: 1;
+            }
+
+            .id {
+                font-size: 22px;
+                line-height: 1;
+                border-left: 3px solid rgb(29, 45, 91);
+                padding-left: 3px;
+                margin-left: -3px;
+            }
         }
     }
 }
@@ -95,6 +127,54 @@
     display: flex;
     gap: 6px;
     flex-direction: column;
+}
+
+.passwordWrapper {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background-color: #e8effa;
+    overflow: hidden;
+    transition: border-color 0.2s;
+
+    &:focus-within {
+        border-color: rgb(29, 45, 91);
+    }
+
+    input {
+        flex: 1;
+        width: 100%;
+        padding: 12px 14px;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        color: #2d3748;
+        box-sizing: border-box;
+
+        &::placeholder {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+    }
+}
+
+.eyeIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    background-color: #ffffff;
+    border-left: 1px solid #cbd5e1;
+    cursor: pointer;
+    color: #4a5568;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #f8fafc;
+    }
 }
 
 .right_side {
@@ -115,10 +195,12 @@
     max-width: 400px;
     padding: 24px;
     box-sizing: border-box;
+    zoom: 0.9;
 }
 
 .title {
-    margin-bottom: 12px;
+    // margin-bottom: 12px;
+    padding-bottom: 0;
     color: #1d2d5b;
     font-weight: 700;
     font-size: 11px;
@@ -128,10 +210,9 @@
 }
 
 .lms_login {
-    margin-top: 24px;
     margin-bottom: 24px;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 16px;
     color: #1d2d5b;
     text-transform: uppercase;
     text-align: center;
@@ -171,6 +252,34 @@
 
 .shake {
     animation: shake 0.4s ease-in-out;
+}
+
+.fieldError {
+    font-size: 12px;
+    color: #e53e3e;
+    margin-top: 2px;
+    display: block;
+    animation: fadeIn 0.2s ease-in;
+}
+
+.inputError {
+    border-color: #e53e3e !important;
+
+    &:focus-within {
+        border-color: #e53e3e !important;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 

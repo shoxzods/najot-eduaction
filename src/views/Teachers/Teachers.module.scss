@@ -40,7 +40,7 @@
     align-items: center;
     justify-content: center;
     gap: 2px;
-    background: #6c35de;
+    background: rgb(29, 45, 91);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -53,7 +53,7 @@
     white-space: nowrap;
 
     &:hover {
-        background: #5a2cc0;
+        background: rgb(22, 34, 69);
     }
 
     &:active {
@@ -148,7 +148,7 @@
     transition: all 0.2s ease;
 
     &:focus {
-        border-color: #6c35de;
+        border-color: rgb(29, 45, 91);
         background: #ffffff;
     }
 
@@ -327,7 +327,7 @@
     justify-content: center;
     font-size: 14px;
     font-weight: 600;
-    color: #6c35de;
+    color: rgb(29, 45, 91);
     background: #f1f3f5;
 }
 
@@ -380,15 +380,15 @@
 
     &:hover {
         background: #f8f9fa;
-        color: #6c35de;
+        color: rgb(29, 45, 91);
     }
 }
 
 .editBtn {
-    color: #6c35de;
+    color: rgb(29, 45, 91);
 
     &:hover {
-        color: #5a2cc0;
+        color: rgb(22, 34, 69);
     }
 }
 
@@ -448,7 +448,7 @@
     }
 
     &.active {
-        background: #6c35de;
+        background: rgb(29, 45, 91);
         color: #ffffff;
     }
 
