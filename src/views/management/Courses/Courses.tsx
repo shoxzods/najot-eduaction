@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import styles from "./Courses.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
@@ -56,10 +56,10 @@ export default function Courses() {
         request.then(
             res => {
                 console.log(res.status);
-                
+
                 if (selectedCourse?.id) {
                     // Update locally instead of fetching all again
-                    setCourses(prev => prev.map(course => 
+                    setCourses(prev => prev.map(course =>
                         course.id === selectedCourse.id ? { ...course, ...courseData } : course
                     ));
                 } else {
@@ -98,8 +98,12 @@ export default function Courses() {
         setCourseData(defaultCourseData);
     };
 
+    const fetchedRef = useRef(false);
     useEffect(() => {
-        fetchCourses();
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            fetchCourses();
+        }
     }, []);
 
     return (

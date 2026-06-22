@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef } from "react";
 
 import { api } from "../../../api/api";
@@ -16,6 +16,8 @@ import Box from '@mui/material/Box';
 export default function UygaVazifa() {
     const { id } = useParams();
     const router = useRouter();
+    const pathname = usePathname();
+    const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
     const [homeworkData, setHomeworkData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const homeworkFetchedRef = useRef(false);
@@ -106,7 +108,7 @@ export default function UygaVazifa() {
                         key={`${lesson.id}-${idx}`}
                         onClick={() => {
                             const hwId = lesson.homework?.[0]?.id;
-                            if (hwId) router.push(`/dashboard/groups/${id}/homework/${hwId}/results`);
+                            if (hwId) router.push(`${basePath}/${id}/homework/${hwId}/results?lessonId=${lesson.id}`);
                         }}
                         style={{ cursor: lesson.homework?.[0]?.id ? "pointer" : "default" }}
                     >

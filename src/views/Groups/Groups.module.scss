@@ -368,10 +368,6 @@
         }
 
         &:nth-child(7) {
-            flex: 1.8 1 140px;
-        }
-
-        &:nth-child(8) {
             flex: 1 1 70px;
             justify-content: center;
 
@@ -380,7 +376,7 @@
             }
         }
 
-        &:nth-child(9) {
+        &:nth-child(8) {
             flex: 0 0 40px;
             justify-content: flex-end;
         }

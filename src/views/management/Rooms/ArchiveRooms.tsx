@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import styles from "./Rooms.module.scss";
 import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
@@ -17,6 +17,7 @@ export default function ArchiveRooms() {
     const [rooms, setRooms] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [restoreConfirm, setRestoreConfirm] = useState({ isOpen: false, roomId: null });
+    const fetchedRef = useRef(false);
 
     const fetchArchivedRooms = () => {
         setIsLoading(true);
@@ -34,7 +35,10 @@ export default function ArchiveRooms() {
     };
 
     useEffect(() => {
-        fetchArchivedRooms();
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            fetchArchivedRooms();
+        }
     }, []);
 
     function actualRestoreRoom(id) {

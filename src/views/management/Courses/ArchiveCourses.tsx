@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import styles from "./Courses.module.scss";
 import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
@@ -19,6 +19,7 @@ export default function ArchiveCourses() {
     const [isLoading, setIsLoading] = useState(false);
     const [restoreConfirm, setRestoreConfirm] = useState({ isOpen: false, courseId: null });
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, courseId: null });
+    const fetchedRef = useRef(false);
 
     const fetchArchivedCourses = () => {
         setIsLoading(true);
@@ -36,7 +37,10 @@ export default function ArchiveCourses() {
     };
 
     useEffect(() => {
-        fetchArchivedCourses();
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            fetchArchivedCourses();
+        }
     }, []);
 
     function actualRestoreCourse(id) {
@@ -73,14 +77,14 @@ export default function ArchiveCourses() {
         <div className={styles.coursesContainer}>
             <div className={styles.header}>
                 <div className={styles.headerLeft}>
-                        <Link
-                            href="/management/courses"
-                            className={styles.backIconBtn}
-                            title="Kurslarga qaytish"
-                            style={{ display: 'inline-flex', textDecoration: 'none', color: 'inherit' }}
-                        >
-                            <KeyboardArrowLeftRoundedIcon fontSize="small" />
-                        </Link>
+                    <Link
+                        href="/management/courses"
+                        className={styles.backIconBtn}
+                        title="Kurslarga qaytish"
+                        style={{ display: 'inline-flex', textDecoration: 'none', color: 'inherit' }}
+                    >
+                        <KeyboardArrowLeftRoundedIcon fontSize="small" />
+                    </Link>
                     <h2 className={styles.title}>Kurslar (Arxiv)</h2>
                 </div>
             </div>

@@ -208,7 +208,6 @@
     background: rgb(29, 45, 91);
     color: #ffffff;
     font-weight: 600;
-    /* Biroz yumshoqroq soya */
 
     .itemIcon {
         color: #ffffff;
@@ -222,6 +221,59 @@
             color: #ffffff;
         }
     }
+}
+
+.itemActiveTeacher {
+    background: #6d28d9; /* Purple background from screenshot */
+    color: #ffffff;
+    font-weight: 600;
+
+    .itemIcon {
+        color: #ffffff;
+    }
+
+    &:hover {
+        background: #5b21b6;
+        color: #ffffff;
+
+        .itemIcon {
+            color: #ffffff;
+        }
+    }
+}
+
+.subMenu {
+    display: flex;
+    flex-direction: column;
+    padding-left: 36px;
+    margin-top: 4px;
+    gap: 4px;
+}
+
+.subMenuItem {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+    cursor: pointer;
+    text-transform: none;
+
+    &:hover {
+        background: #f8fafc;
+        color: #0f172a;
+    }
+}
+
+.subMenuItemActive {
+    color: #0f172a;
+    font-weight: 600;
 }
 
 .itemIcon {

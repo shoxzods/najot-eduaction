@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import React, { useState, useEffect } from "react";
 
@@ -12,6 +12,8 @@ export default function StudentImtihonDetail() {
   const { id, examId, resultId } = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
 
   const tabLabel = searchParams.get("tab") || "Kutayotganlar";
 
@@ -22,7 +24,7 @@ export default function StudentImtihonDetail() {
   const sliderColor = ballValue >= 60 ? '#22c55e' : '#ef4444';
 
   const handleSubmit = async () => {
-    router.push(`/dashboard/groups/${id}/exam/${examId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`);
+    router.push(`${basePath}/${id}/exam/${examId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`);
   };
 
   const formatDateTime = (dateStr) => {
@@ -47,7 +49,7 @@ export default function StudentImtihonDetail() {
         <div className={styles.breadcrumb}>
           <button
             className={styles.breadcrumbLink}
-            onClick={() => router.push(`/dashboard/groups/${id}/exam/${examId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
+            onClick={() => router.push(`${basePath}/${id}/exam/${examId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
           >
             {tabLabel}
           </button>
@@ -160,7 +162,7 @@ export default function StudentImtihonDetail() {
         <div className={styles.actionButtons}>
           <button
             className={styles.cancelBtn}
-            onClick={() => router.push(`/dashboard/groups/${id}/exam/${examId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
+            onClick={() => router.push(`${basePath}/${id}/exam/${examId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
           >
             Bekor qilish
           </button>

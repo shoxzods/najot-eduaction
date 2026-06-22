@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import styles from './Login.module.scss';
 
 import { api } from '../../api/api';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -30,6 +30,170 @@ export default function Login() {
     const [loading, setLoading] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
+    // ─── Forgot password modal (step 1) ─────────────────────────────────────
+    const [forgotOpen, setForgotOpen] = useState<boolean>(false);
+    const [forgotPhone, setForgotPhone] = useState<string>('');
+    const [forgotError, setForgotError] = useState<string | null>(null);
+    const [forgotLoading, setForgotLoading] = useState<boolean>(false);
+
+    // ─── SMS verification modal (step 2) ─────────────────────────────────────
+    const [smsOpen, setSmsOpen] = useState<boolean>(false);
+    const [smsCode, setSmsCode] = useState<string>('');
+    const [smsError, setSmsError] = useState<string | null>(null);
+    const [smsLoading, setSmsLoading] = useState<boolean>(false);
+    const [countdown, setCountdown] = useState<number>(60);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    // ─── New password modal (step 3) ─────────────────────────────────────
+    const [newPassOpen, setNewPassOpen] = useState<boolean>(false);
+    const [newPass, setNewPass] = useState<string>('');
+    const [confirmPass, setConfirmPass] = useState<string>('');
+    const [newPassError, setNewPassError] = useState<string | null>(null);
+    const [newPassLoading, setNewPassLoading] = useState<boolean>(false);
+    const [showNewPass, setShowNewPass] = useState<boolean>(false);
+    const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
+
+    function startCountdown() {
+        setCountdown(60);
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+            setCountdown(prev => {
+                if (prev <= 1) {
+                    clearInterval(timerRef.current!);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    }
+
+    useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+
+    function openForgot() {
+        setForgotPhone('');
+        setForgotError(null);
+        setForgotOpen(true);
+    }
+
+    function closeForgot() {
+        setForgotOpen(false);
+    }
+
+    function closeSms() {
+        setSmsOpen(false);
+        setSmsCode('');
+        setSmsError(null);
+        if (timerRef.current) clearInterval(timerRef.current);
+    }
+
+    function closeNewPass() {
+        setNewPassOpen(false);
+        setNewPass('');
+        setConfirmPass('');
+        setNewPassError(null);
+        setShowNewPass(false);
+        setShowConfirmPass(false);
+    }
+
+    function closeAll() {
+        closeForgot();
+        closeSms();
+        closeNewPass();
+    }
+
+    async function handleForgotSubmit() {
+        if (!forgotPhone.trim()) {
+            setForgotError('Telefon raqamni kiriting');
+            return;
+        }
+
+        const phone = '+' + forgotPhone.replace(/\D/g, '');
+
+        setForgotLoading(true);
+        setForgotError(null);
+        try {
+            await api.post('/auth/send-otp', { phone });
+            setForgotOpen(false);
+            setSmsCode('');
+            setSmsError(null);
+            setSmsOpen(true);
+            startCountdown();
+        } catch (err: any) {
+            const msg = err.response?.data?.message || err.response?.data?.error;
+            setForgotError(typeof msg === 'string' ? msg : "Xatolik yuz berdi. Qayta urinib ko'ring.");
+        } finally {
+            setForgotLoading(false);
+        }
+    }
+
+    async function handleSmsSubmit() {
+        if (!smsCode.trim()) {
+            setSmsError('SMS kodni kiriting');
+            return;
+        }
+
+        const phone = '+' + forgotPhone.replace(/\D/g, '');
+
+        setSmsLoading(true);
+        setSmsError(null);
+        try {
+            await api.post('/auth/verify-otp', { phone, otp: smsCode });
+            closeSms();
+            setNewPass('');
+            setConfirmPass('');
+            setNewPassError(null);
+            setNewPassOpen(true);
+        } catch (err: any) {
+            const msg = err.response?.data?.message || err.response?.data?.error;
+            setSmsError(typeof msg === 'string' ? msg : "Kod noto'g'ri yoki muddati o'tgan.");
+        } finally {
+            setSmsLoading(false);
+        }
+    }
+
+    async function handleNewPassSubmit() {
+        if (!newPass.trim()) {
+            setNewPassError('Yangi parol kiritilishi shart');
+            return;
+        }
+        if (newPass.length < 6) {
+            setNewPassError('Parol kamida 6 ta belgidan iborat bo\'lishi kerak');
+            return;
+        }
+        if (newPass !== confirmPass) {
+            setNewPassError('Parollar mos kelmaydi');
+            return;
+        }
+
+        const phone = '+' + forgotPhone.replace(/\D/g, '');
+
+        setNewPassLoading(true);
+        setNewPassError(null);
+        try {
+            await api.put('/auth/change-password', { phone, password: newPass });
+            closeAll();
+            setSuccess('Parol muvaffaqiyatli o\'zgartirildi!');
+        } catch (err: any) {
+            const msg = err.response?.data?.message || err.response?.data?.error;
+            setNewPassError(typeof msg === 'string' ? msg : "Xatolik yuz berdi. Qayta urinib ko'ring.");
+        } finally {
+            setNewPassLoading(false);
+        }
+    }
+
+    async function handleResend() {
+        if (countdown > 0) return;
+        const phone = '+' + forgotPhone.replace(/\D/g, '');
+        try {
+            await api.post('/auth/send-otp', { phone });
+            startCountdown();
+            setSuccess("Kod qayta yuborildi");
+        } catch (err: any) {
+            const msg = err.response?.data?.message || err.response?.data?.error;
+            setSmsError(typeof msg === 'string' ? msg : "Xatolik yuz berdi.");
+        }
+    }
+
     const router = useRouter();
 
     const {
@@ -53,9 +217,11 @@ export default function Login() {
                 // Backend "data" obyektini ichida qaytarishi mumkin
                 const auth = res.data?.accessToken || res.data?.data?.accessToken || res.data?.token;
                 const refresh = res.data?.refreshToken || res.data?.data?.refreshToken;
+                const role = res.data?.role || res.data?.data?.role || 'STUDENT'; // default to STUDENT if not provided
 
                 if (auth) {
                     localStorage.setItem("accessToken", auth);
+                    localStorage.setItem("userRole", role);
                     if (refresh) {
                         localStorage.setItem("refreshToken", refresh);
                     }
@@ -260,6 +426,17 @@ export default function Login() {
                             </div>
                         </div>
 
+                        {/* Forgot password link */}
+                        <div className={styles.forgotPassword}>
+                            <button
+                                type="button"
+                                className={styles.forgotPasswordLink}
+                                onClick={openForgot}
+                            >
+                                Parolni unutdingizmi?
+                            </button>
+                        </div>
+
                         {/* Submit button */}
                         <button
                             type="submit"
@@ -291,6 +468,207 @@ export default function Login() {
                     Copyright © {new Date().getFullYear()} Najot Eduaction
                 </p>
             </div>
+
+            {/* ─── Step 1: Parolni tiklash ────────────────────────────────── */}
+            {forgotOpen && (
+                <div className={styles.modalOverlay} onClick={closeForgot}>
+                    <div className={styles.modalBox} onClick={e => e.stopPropagation()}>
+                        <h3 className={styles.modalTitle}>Parolni tiklash</h3>
+                        <p className={styles.modalDesc}>
+                            Tizimda ro'yxatdan o'tgan telefon raqamingizni kiriting. Biz
+                            sizga tasdiqlash kodini yuboramiz.
+                        </p>
+
+                        <div className={styles.modalField}>
+                            <label className={styles.modalLabel} htmlFor="forgot-phone">
+                                Telefon raqam
+                            </label>
+                            <input
+                                id="forgot-phone"
+                                type="text"
+                                placeholder="998XXXXXXXXX"
+                                value={forgotPhone}
+                                onChange={e => { setForgotPhone(e.target.value); setForgotError(null); }}
+                                className={`${styles.modalInput} ${forgotError ? styles.modalInputError : ''}`}
+                                autoFocus
+                            />
+                            {forgotError && (
+                                <span className={styles.modalError}>{forgotError}</span>
+                            )}
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className={styles.modalCancelBtn}
+                                onClick={closeForgot}
+                                disabled={forgotLoading}
+                            >
+                                Bekor qilish
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.modalSendBtn}
+                                onClick={handleForgotSubmit}
+                                disabled={forgotLoading}
+                            >
+                                {forgotLoading ? (
+                                    <CircularProgress size={14} color="inherit" sx={{ mr: 0.8 }} />
+                                ) : null}
+                                Kodni yuborish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ─── Step 2: SMS kodni tasdiqlash ───────────────────────────── */}
+            {smsOpen && (
+                <div className={styles.modalOverlay} onClick={closeAll}>
+                    <div className={styles.modalBox} onClick={e => e.stopPropagation()}>
+                        <h3 className={styles.modalTitle}>SMS kodni tasdiqlash</h3>
+                        <p className={styles.modalDesc}>
+                            Tasdiqlash kodi quyidagi raqamga yuborildi:{' '}
+                            <strong>{forgotPhone}</strong>{' '}
+                            <button
+                                type="button"
+                                className={styles.changePhoneBtn}
+                                onClick={() => { closeSms(); setForgotOpen(true); }}
+                            >
+                                O'zgartirish
+                            </button>
+                        </p>
+
+                        <div className={styles.modalField}>
+                            <input
+                                id="sms-code"
+                                type="text"
+                                placeholder="SMS Kodi"
+                                value={smsCode}
+                                onChange={e => { setSmsCode(e.target.value); setSmsError(null); }}
+                                className={`${styles.modalInput} ${smsError ? styles.modalInputError : ''}`}
+                                autoFocus
+                                maxLength={6}
+                            />
+                            {smsError && (
+                                <span className={styles.modalError}>{smsError}</span>
+                            )}
+                        </div>
+
+                        <div className={styles.resendRow}>
+                            <span className={styles.resendText}>
+                                Kodni qayta yuborish:{' '}
+                                <button
+                                    type="button"
+                                    className={`${styles.resendBtn} ${countdown > 0 ? styles.resendDisabled : ''}`}
+                                    onClick={handleResend}
+                                    disabled={countdown > 0}
+                                >
+                                    {countdown > 0 ? `${countdown} soniya` : 'Qayta yuborish'}
+                                </button>
+                            </span>
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className={styles.modalCancelBtn}
+                                onClick={closeAll}
+                                disabled={smsLoading}
+                            >
+                                Bekor qilish
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.modalSendBtn}
+                                onClick={handleSmsSubmit}
+                                disabled={smsLoading}
+                            >
+                                {smsLoading ? (
+                                    <CircularProgress size={14} color="inherit" sx={{ mr: 0.8 }} />
+                                ) : null}
+                                Kodni tasdiqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* ─── Step 3: Yangi parol o'rnatish ──────────────────────────── */}
+            {newPassOpen && (
+                <div className={styles.modalOverlay} onClick={closeAll}>
+                    <div className={styles.modalBox} onClick={e => e.stopPropagation()}>
+                        <h3 className={styles.modalTitle}>Yangi parol o'rnatish</h3>
+                        <p className={styles.modalDesc}>
+                            Hisobingiz uchun yangi xavfsiz parol kiriting.
+                        </p>
+
+                        <div className={styles.modalField}>
+                            {/* New password */}
+                            <div className={styles.newPassWrapper}>
+                                <input
+                                    id="new-password"
+                                    type={showNewPass ? 'text' : 'password'}
+                                    placeholder="Yangi parol"
+                                    value={newPass}
+                                    onChange={e => { setNewPass(e.target.value); setNewPassError(null); }}
+                                    className={`${styles.modalInput} ${newPassError ? styles.modalInputError : ''}`}
+                                    autoFocus
+                                />
+                                <span
+                                    className={styles.newPassEye}
+                                    onClick={() => setShowNewPass(p => !p)}
+                                >
+                                    {showNewPass ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                                </span>
+                            </div>
+
+                            {/* Confirm password */}
+                            <div className={styles.newPassWrapper}>
+                                <input
+                                    id="confirm-password"
+                                    type={showConfirmPass ? 'text' : 'password'}
+                                    placeholder="Parolni tasdiqlash"
+                                    value={confirmPass}
+                                    onChange={e => { setConfirmPass(e.target.value); setNewPassError(null); }}
+                                    className={`${styles.modalInput} ${newPassError ? styles.modalInputError : ''}`}
+                                />
+                                <span
+                                    className={styles.newPassEye}
+                                    onClick={() => setShowConfirmPass(p => !p)}
+                                >
+                                    {showConfirmPass ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                                </span>
+                            </div>
+
+                            {newPassError && (
+                                <span className={styles.modalError}>{newPassError}</span>
+                            )}
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className={styles.modalCancelBtn}
+                                onClick={closeAll}
+                                disabled={newPassLoading}
+                            >
+                                Bekor qilish
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.modalSendBtn}
+                                onClick={handleNewPassSubmit}
+                                disabled={newPassLoading}
+                            >
+                                {newPassLoading ? (
+                                    <CircularProgress size={14} color="inherit" sx={{ mr: 0.8 }} />
+                                ) : null}
+                                Parolni saqlash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

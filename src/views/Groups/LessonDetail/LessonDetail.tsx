@@ -1,6 +1,6 @@
 "use client";
-import { useRouter, useParams } from 'next/navigation';
-import { useState, useEffect } from "react";
+import { useRouter, useParams, usePathname } from 'next/navigation';
+import { useState, useEffect, useRef } from "react";
 
 import { api } from "../../../api/api";
 import styles from "./LessonDetail.module.scss";
@@ -13,6 +13,8 @@ import { toast } from '../../../utils/toast';
 export default function LessonDetail() {
   const { id, date } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
 
   const [activeTab, setActiveTab] = useState("Teacher");
   const [topicType, setTopicType] = useState("Boshqa");
@@ -37,8 +39,12 @@ export default function LessonDetail() {
     }
   }, [date]);
 
+  const schedulesFetchedRef = useRef(false);
+  const studentsFetchedRef = useRef(false);
+
   useEffect(() => {
     const fetchSchedules = async () => {
+      schedulesFetchedRef.current = true;
       try {
         const res = await api.get(`/groups/${id}/schedules`);
         const data = res.data;
@@ -63,26 +69,31 @@ export default function LessonDetail() {
         setSchedules(formattedSchedules);
       } catch (err) {
         console.error("Error fetching schedules:", err);
+        schedulesFetchedRef.current = false;
       }
     };
-    if (id) {
+    if (id && !schedulesFetchedRef.current) {
       fetchSchedules();
     }
   }, [id]);
 
   useEffect(() => {
-    const fetchGroupOne = async () => {
+    const fetchTeachers = async () => {
       try {
-        const res = await api.get(`/groups/one/${id}`);
-        setTeachers(res.data?.data?.teachers || []);
+        const res = await api.get(`/groups/${id}`);
+        const data = res.data?.data || res.data || {};
+        if (data.teachers && Array.isArray(data.teachers)) {
+          setTeachers(data.teachers);
+        }
       } catch (err) {
-        console.error("Error fetching group details:", err);
+        console.error("Error fetching teachers:", err);
       }
     };
     if (id) {
-      fetchGroupOne();
+      fetchTeachers();
     }
   }, [id]);
+
 
   useEffect(() => {
     if (schedules.length === 0 || !date) return;
@@ -149,6 +160,7 @@ export default function LessonDetail() {
 
   useEffect(() => {
     const fetchStudents = async () => {
+      studentsFetchedRef.current = true;
       try {
         const res = await api.get(`/groups/${id}/lesson?date=${date}`);
         const mainData = res.data?.data || res.data || {};
@@ -168,10 +180,11 @@ export default function LessonDetail() {
         );
       } catch (err) {
         console.error("Error fetching students:", err);
+        studentsFetchedRef.current = false;
       }
     };
 
-    if (id && date) {
+    if (id && date && !studentsFetchedRef.current) {
       fetchStudents();
     }
   }, [id, date]);
@@ -244,7 +257,7 @@ export default function LessonDetail() {
   return (
     <div className={styles.container}>
       <div className={styles.pageHeader}>
-        <button className={styles.backBtn} onClick={() => router.push(`/dashboard/groups/${id}`)}>
+        <button className={styles.backBtn} onClick={() => router.push(`${basePath}/${id}`)}>
           <ArrowBackIosNewRoundedIcon fontSize="small" />
         </button>
         <h2>Dars tafsilotlari</h2>
@@ -319,7 +332,7 @@ export default function LessonDetail() {
                 className={chipClass}
                 onClick={() => {
                   if (!isFuture) {
-                    router.push(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                    router.push(`${basePath}/${id}/lesson/${dateStr}`);
                   }
                 }}
                 style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}

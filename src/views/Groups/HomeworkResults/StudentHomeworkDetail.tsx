@@ -1,7 +1,7 @@
 "use client";
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { api } from "../../../api/api";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -26,20 +26,22 @@ const STATUS_COLORS = {
 
 const TAB_TO_STATUS = {
   "Kutayotganlar": "PENDING",
-  "Qaytarilganlar": "REJECTED",
   "Qabul qilinganlar": "ACCEPTED",
-  "Bajarilmagan": "CHECKED",
+  "Qaytarilganlar": "REJECTED",
+  "Tekshirilganlar": "CHECKED"
 };
 
 export default function StudentHomeworkDetail() {
   const { id, homeworkId, resultId } = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
 
-  const tabLabel = searchParams.get("tab") || "Natijalar";
+  const tabLabel = searchParams.get("tab") || "Kutayotganlar";
 
-  const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [detail, setDetail] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [lightboxImg, setLightboxImg] = useState(null);
   const [ballValue, setBallValue] = useState(60);
@@ -49,12 +51,23 @@ export default function StudentHomeworkDetail() {
 
   const sliderColor = ballValue >= 60 ? '#22c55e' : '#ef4444';
 
+  const detailFetchedRef = useRef(null);
+  const hwFetchedRef = useRef(null);
+
   useEffect(() => {
     const fetchDetail = async () => {
+      // Yangi api formati bo'yicha lessonId kerak:
+      const queryLessonId = searchParams.get("lessonId");
+      const finalLessonId = queryLessonId || homeworkDetails?.id;
+      
+      if (!finalLessonId) return;
+      if (detailFetchedRef.current === finalLessonId) return;
+      detailFetchedRef.current = finalLessonId;
+
       setLoading(true);
       try {
         const res = await api.get(
-          `/group/${id}/homework/${homeworkId}/result/${resultId}`
+          `/group/${id}/lesson/${finalLessonId}/homework/${homeworkId}/student/${resultId}`
         );
         const raw = res.data?.data || res.data || {};
         setDetail(raw);
@@ -67,10 +80,12 @@ export default function StudentHomeworkDetail() {
     if (id && homeworkId && resultId) {
       fetchDetail();
     }
-  }, [id, homeworkId, resultId]);
+  }, [id, homeworkId, resultId, homeworkDetails, searchParams]);
 
   useEffect(() => {
     const fetchHomeworkDetails = async () => {
+      if (hwFetchedRef.current === id) return;
+      hwFetchedRef.current = id;
       try {
         const res = await api.get(`/homework/${id}`);
         const data = res.data?.data || res.data || [];
@@ -122,17 +137,16 @@ export default function StudentHomeworkDetail() {
       }
     }
   }, [detail, homeworkDetails, searchParams]);
-
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
       const payload = {
-        grade: ballValue,
-        title: checkComment,
-        homework_answer_id: detail?.id || Number(resultId),
+        grade: Number(ballValue || 0),
+        title: checkComment ? String(checkComment) : "Tekshirildi",
+        homework_answer_id: Number(detail?.id || resultId),
       };
       await api.post(`/group/${id}/homework/${homeworkId}/check`, payload);
-      router.push(`/dashboard/groups/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`);
+      router.push(`${basePath}/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`);
     } catch (err) {
       console.error("Error submitting check:", err);
       toast.error("Xatolik yuz berdi");
@@ -193,7 +207,7 @@ export default function StudentHomeworkDetail() {
         <div className={styles.breadcrumb}>
           <button
             className={styles.breadcrumbLink}
-            onClick={() => router.push(`/dashboard/groups/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
+            onClick={() => router.push(`${basePath}/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
           >
             {tabLabel}
           </button>
@@ -350,7 +364,7 @@ export default function StudentHomeworkDetail() {
             <div className={styles.actionButtons}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => router.push(`/dashboard/groups/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
+                onClick={() => router.push(`${basePath}/${id}/homework/${homeworkId}/results?tab=${searchParams.get('tab') || 'Kutayotganlar'}`)}
                 disabled={submitting}
               >
                 Bekor qilish

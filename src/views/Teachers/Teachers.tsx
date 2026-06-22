@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 
 import styles from "./Teachers.module.scss";
 import { api, getFileUrl } from '../../api/api';
@@ -70,9 +70,13 @@ export default function Teachers() {
         });
     }, []);
 
+    const fetchedRef = useRef(false);
     useEffect(() => {
-        fetchTeachers();
-    }, []);
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            fetchTeachers();
+        }
+    }, [fetchTeachers]);
 
     const handleTeacherSubmit = (payload, teacherToEdit, localData) => {
         setIsLoading(true);

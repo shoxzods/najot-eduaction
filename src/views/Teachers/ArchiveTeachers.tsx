@@ -191,12 +191,12 @@ export default function ArchiveTeachers() {
 
                     </div>
                     <div className={styles.searchWrapper}>
-                        <input 
-                            type="text" 
-                            placeholder="Search" 
+                        <input
+                            type="text"
+                            placeholder="Search"
                             className={styles.searchInput}
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)} 
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                 </div>
@@ -346,27 +346,27 @@ export default function ArchiveTeachers() {
                 teacherToEdit={selectedTeacher}
             />
 
-            <Snackbar 
-                open={snackbar.open} 
-                autoHideDuration={6000} 
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                sx={{ 
-                    top: '20px !important', 
+                sx={{
+                    top: '20px !important',
                     right: '20px !important',
                     width: 'calc(25vw - 40px)',
                     maxWidth: '400px'
                 }}
             >
-                <MuiAlert 
-                    onClose={(e) => handleCloseSnackbar(e, undefined)} 
-                    severity={snackbar.severity as "success" | "error" | "info" | "warning"} 
-                    elevation={6} 
+                <MuiAlert
+                    onClose={(e) => handleCloseSnackbar(e, undefined)}
+                    severity={snackbar.severity as "success" | "error" | "info" | "warning"}
+                    elevation={6}
                     variant="filled"
-                    sx={{ 
-                        width: '100%', 
-                        position: 'relative', 
-                        overflow: 'hidden', 
+                    sx={{
+                        width: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
                         padding: '6px 12px',
                         paddingBottom: '10px',
                         fontSize: '13px',
@@ -391,7 +391,7 @@ export default function ArchiveTeachers() {
                     }}
                 >
                     {snackbar.message}
-                    <Box 
+                    <Box
                         sx={{
                             position: 'absolute',
                             bottom: 0,
@@ -403,7 +403,7 @@ export default function ArchiveTeachers() {
                                 '0%': { width: '100%' },
                                 '100%': { width: '0%' }
                             }
-                        }} 
+                        }}
                     />
                 </MuiAlert>
             </Snackbar>

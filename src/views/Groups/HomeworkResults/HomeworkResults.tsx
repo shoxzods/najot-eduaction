@@ -1,6 +1,6 @@
 "use client";
-import { useRouter, useParams } from 'next/navigation';
-import React, { useState, useEffect } from "react";
+import { useRouter, useParams, usePathname } from 'next/navigation';
+import React, { useState, useEffect, useRef } from "react";
 
 import { api } from "../../../api/api";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
@@ -16,6 +16,8 @@ const STATUS_MAP = {
 export default function HomeworkResults() {
   const { id, homeworkId } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
 
   const [activeTab, setActiveTab] = useState("Kutayotganlar");
   const [resultsData, setResultsData] = useState(null);
@@ -27,8 +29,10 @@ export default function HomeworkResults() {
   });
   const [loading, setLoading] = useState(false);
 
+  const allDataFetchedRef = useRef(false);
   useEffect(() => {
     const fetchAllData = async () => {
+      allDataFetchedRef.current = true;
       setLoading(true);
       try {
         const fetchDataForTab = async (tabName) => {
@@ -78,19 +82,22 @@ export default function HomeworkResults() {
         });
       } catch (err) {
         console.error("Error fetching all tab data:", err);
+        allDataFetchedRef.current = false;
       } finally {
         setLoading(false);
       }
     };
-    if (id && homeworkId) {
+    if (id && homeworkId && !allDataFetchedRef.current) {
       fetchAllData();
     }
   }, [id, homeworkId]);
 
   const [homeworkDetails, setHomeworkDetails] = useState(null);
 
+  const detailsFetchedRef = useRef(false);
   useEffect(() => {
     const fetchHomeworkDetails = async () => {
+      detailsFetchedRef.current = true;
       try {
         const res = await api.get(`/homework/${id}`);
         const data = res.data?.data || res.data || [];
@@ -108,9 +115,10 @@ export default function HomeworkResults() {
         }
       } catch (err) {
         console.error("Error fetching homework details:", err);
+        detailsFetchedRef.current = false;
       }
     };
-    if (id && homeworkId) {
+    if (id && homeworkId && !detailsFetchedRef.current) {
       fetchHomeworkDetails();
     }
   }, [id, homeworkId]);
@@ -148,7 +156,7 @@ export default function HomeworkResults() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={() => router.push(`/dashboard/groups/${id}?tab=1`)} title="Orqaga qaytish">
+        <button className={styles.backButton} onClick={() => router.push(`${basePath}/${id}?tab=1`)} title="Orqaga qaytish">
           <ChevronLeftRoundedIcon fontSize="small" />
         </button>
         <h1>{homeworkDetails?.topic || resultsData?.topic || resultsData?.homework?.topic || "Uyga vazifa"}</h1>
@@ -204,7 +212,7 @@ export default function HomeworkResults() {
                 onClick={() => {
                   if (activeTab !== "Kutayotganlar") return;
                   const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
-                  router.push(`/dashboard/groups/${id}/homework/${homeworkId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
+                  router.push(`${basePath}/${id}/homework/${homeworkId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}&lessonId=${homeworkDetails?.id || searchParams?.get("lessonId") || ""}`);
                 }}
                 className={activeTab !== "Kutayotganlar" ? "" : styles.clickableRow}
                 style={activeTab !== "Kutayotganlar" ? { cursor: "default" } : {}}

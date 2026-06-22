@@ -32,9 +32,13 @@ export default function CreateHomework() {
     const [error, setError] = useState("");
     const fileInputRef = useRef(null);
 
+    const fetchedRef = useRef(null);
+
     // Fetch lessons for this group to populate Mavzu dropdown
     useEffect(() => {
         const fetchLessons = async () => {
+            if (fetchedRef.current === groupId) return;
+            fetchedRef.current = groupId;
             try {
                 const res = await api.get(`/lessons/my/group/${groupId}`);
                 const data = res.data.data || res.data || [];

@@ -2,9 +2,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 0;
-    background: transparent;
+    padding: 8px 24px 8px 0;
+    background: #f4f6f9; /* Set solid background so content doesn't show behind */
     height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
 .left,

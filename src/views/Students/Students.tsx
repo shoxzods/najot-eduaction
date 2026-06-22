@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useState, useTransition, useCallback, useMemo } from "react";
+import { useEffect, useState, useTransition, useCallback, useMemo, useRef } from "react";
 
 import styles from "./Students.module.scss";
 import { api, getFileUrl } from '../../api/api';
@@ -108,10 +108,14 @@ export default function Students() {
         }
     }
 
+    const fetchedRef = useRef(false);
     useEffect(() => {
-        startTransition(async () => {
-            await fetchStudents(1);
-        });
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            startTransition(async () => {
+                await fetchStudents(1);
+            });
+        }
     }, []);
 
     const getPaginationGroup = useCallback(() => {

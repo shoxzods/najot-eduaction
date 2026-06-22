@@ -28,14 +28,16 @@ export default function GroupDetail() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
+
     const [currentMonth, setCurrentMonth] = useState(0);
     const [showAllMonths, setShowAllMonths] = useState(false);
-    const [OverallLessons] = useState([]);
-    const [schedules, setSchedules] = useState([]);
+    const [OverallLessons, setOverallLessons] = useState([]);
+    const [schedules, setSchedules] = useState<any[]>([]);
     const [groupDetails, setGroupDetails] = useState<any>(null);
     const [videoRefresh, setVideoRefresh] = useState(0);
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-    const [selectedVideoFile, setSelectedVideoFile] = useState(null);
+    const [selectedVideoFile, setSelectedVideoFile] = useState<any>(null);
     const [videoFileName, setVideoFileName] = useState("");
     const [selectedLessonId, setSelectedLessonId] = useState("");
     const [isUploadingVideo, setIsUploadingVideo] = useState(false);
@@ -88,6 +90,9 @@ export default function GroupDetail() {
                             }))
                         });
                     });
+
+
+
                 });
                 setSchedules(formattedSchedules);
             } catch (err) {
@@ -104,9 +109,18 @@ export default function GroupDetail() {
         const fetchBasicDetails = async () => {
             groupDetailsFetchedRef.current = true;
             try {
+                const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
                 const res = await api.get(`/groups/${id}`).catch(() => ({ data: {} }));
                 const dataBasic = res.data?.data || res.data || {};
-                setGroupDetails(prev => ({ ...prev, ...dataBasic }));
+
+                if (userRole === 'SUPERADMIN') {
+                    const res2 = await api.get(`/groups/one/${id}`).catch(() => ({ data: {} }));
+                    const dataOne = res2.data?.data || res2.data || {};
+                    // Merge all data from the entity API for SUPERADMIN
+                    setGroupDetails(prev => ({ ...prev, ...dataBasic, ...dataOne }));
+                } else {
+                    setGroupDetails(prev => ({ ...prev, ...dataBasic }));
+                }
             } catch (err) {
                 console.error("Error fetching basic group details:", err);
                 groupDetailsFetchedRef.current = false;
@@ -117,25 +131,6 @@ export default function GroupDetail() {
 
         if (id && isTab0 && !groupDetailsFetchedRef.current) {
             fetchBasicDetails();
-        }
-    }, [id, searchParams]);
-
-    const detailedFetchedRef = useRef(false);
-    useEffect(() => {
-        const fetchDetailedInfo = async () => {
-            detailedFetchedRef.current = true;
-            try {
-                const res = await api.get(`/groups/one/${id}`).catch(() => ({ data: {} }));
-                const dataOne = res.data?.data || res.data || {};
-                setGroupDetails(prev => ({ ...prev, ...dataOne }));
-            } catch (err) {
-                console.error("Error fetching detailed info:", err);
-                detailedFetchedRef.current = false;
-            }
-        };
-        const isTab0 = searchParams.get("tab") !== "1" && searchParams.get("tab") !== "2";
-        if (id && isTab0 && !detailedFetchedRef.current) {
-            fetchDetailedInfo();
         }
     }, [id, searchParams]);
 
@@ -346,7 +341,7 @@ export default function GroupDetail() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTitle}>
-                    <button className={styles.backBtn} onClick={() => router.push("/dashboard/groups")}>
+                    <button className={styles.backBtn} onClick={() => router.push(basePath)}>
                         <ArrowBackIosNewRoundedIcon fontSize="small" />
                     </button>
                     <h1>{groupDetails?.name || ""}</h1>
@@ -393,7 +388,7 @@ export default function GroupDetail() {
                             </div>
                             <div className={`${styles.cardBodyWrapper} ${isMentorsOpen ? styles.open : ''}`}>
                                 <div className={styles.cardBody}>
-                                    {groupDetails?.teachers?.map((mentor, index) => (
+                                    {groupDetails?.teachers?.length > 0 ? groupDetails.teachers.map((mentor, index) => (
                                         <div key={index} className={styles.mentorItem}>
                                             <img
                                                 src={getFileUrl(mentor.photo) || `https://ui-avatars.com/api/?name=${mentor.full_name || mentor.name || 'MO'}&background=f8fafc&color=3b82f6&size=128`}
@@ -403,7 +398,9 @@ export default function GroupDetail() {
                                             <span className={styles.mentorRole}>Teacher</span>
                                             <span className={styles.mentorName}>{mentor.full_name || mentor.name}</span>
                                         </div>
-                                    ))}
+                                    )) : (
+                                        <div style={{ textAlign: "center", padding: "10px", color: "#64748b" }}>O'qituvchi topilmadi</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -466,7 +463,7 @@ export default function GroupDetail() {
                                         days: translateDays(groupDetails?.week_day),
                                         time: groupDetails?.start_time ? `${groupDetails.start_time} dan - ${calculateEndTime(groupDetails.start_time, 2)} gacha` : "",
                                         period: groupDetails?.start_date ? `${formatDate(groupDetails.start_date)} - ${formatDate(calculateEndDate(groupDetails.start_date, groupDetails.course?.duration_month))}` : "",
-                                        room: groupDetails?.room || "Noma'lum"
+                                        room: groupDetails?.room ? `${groupDetails.room} // ${groupDetails.student_count || 0}` : "Noma'lum"
                                     };
                                     return (
                                         <div key={item.id} className={styles.scheduleItem}>
@@ -564,7 +561,7 @@ export default function GroupDetail() {
                                                 className={`${styles.calendarChip} ${isFuture ? styles.disabledDate : ""}`}
                                                 onClick={() => {
                                                     if (!isFuture) {
-                                                        router.push(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                                                        router.push(`${basePath}/${id}/lesson/${dateStr}`);
                                                     }
                                                 }}
                                                 style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
@@ -631,7 +628,7 @@ export default function GroupDetail() {
                                 if (activeSubTab === "Videolar") {
                                     setIsVideoModalOpen(true);
                                 } else {
-                                    router.push(`/dashboard/groups/${id}/homework/create`);
+                                    router.push(`${basePath}/${id}/homework/create`);
                                 }
                             }}
                         >
@@ -705,7 +702,7 @@ export default function GroupDetail() {
                                         className={`${styles.calendarDay} ${item.active && !isFuture ? styles.activeDay : ""} ${isFuture ? styles.disabledDate : ""}`}
                                         onClick={() => {
                                             if (!isFuture) {
-                                                router.push(`/dashboard/groups/${id}/lesson/${dateStr}`);
+                                                router.push(`${basePath}/${id}/lesson/${dateStr}`);
                                             }
                                         }}
                                         style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}

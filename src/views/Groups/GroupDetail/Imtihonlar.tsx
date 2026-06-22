@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import React from "react";
 
 import styles from "./GroupDetail.module.scss";
@@ -13,6 +13,8 @@ import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 export default function Imtihonlar() {
     const { id } = useParams();
     const router = useRouter();
+    const pathname = usePathname();
+    const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
 
     // Fake data for Imtihonlar
     const fakeImtihonlarData = [
@@ -95,7 +97,7 @@ export default function Imtihonlar() {
                             style={{ cursor: "pointer" }}
                             onClick={() => {
                                 const examId = lesson.homework?.[0]?.id;
-                                if (examId) router.push(`/dashboard/groups/${id}/exam/${examId}/results`);
+                                if (examId) router.push(`${basePath}/${id}/exam/${examId}/results`);
                             }}
                         >
                             <td>{idx + 1}</td>

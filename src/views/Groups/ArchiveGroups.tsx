@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from "react";
 
 import { api } from '../../api/api';
@@ -22,6 +22,8 @@ import EditGroupSidebar from '../../components/UI/ManagementSidebar/EditGroupSid
 
 export default function ArchiveGroups() {
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
   const [groupData, setGroupData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [restoreConfirm, setRestoreConfirm] = useState({ isOpen: false, groupId: null });
@@ -115,7 +117,7 @@ export default function ArchiveGroups() {
       <div className={styles.tabs}>
         <button
           className={styles.tab}
-          onClick={() => router.push('/dashboard/groups')}
+          onClick={() => router.push(basePath)}
         >
           <GroupsRoundedIcon fontSize="small" />
           Guruhlar

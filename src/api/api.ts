@@ -9,6 +9,46 @@ export const getFileUrl = (photo: string | null | undefined): string | null => {
   return `https://najot-edu.softwareengineer.uz/files/${cleanPhoto}`;
 };
 
+let profilePromise: Promise<any> | null = null;
+
+export const fetchMyProfile = (forceRefresh = false) => {
+  if (profilePromise && !forceRefresh) return profilePromise;
+  
+  const role = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
+
+  if (role === 'TEACHER') {
+    profilePromise = api.get('/teachers/my/profile')
+      .then(res => res.data?.data || res.data);
+  } else {
+    profilePromise = Promise.resolve({ 
+      full_name: role === 'STUDENT' ? 'Student' : 'User'
+    });
+  }
+
+  return profilePromise;
+};
+
+export const clearProfileCache = () => {
+  profilePromise = null;
+};
+
+const groupsPromiseCache: Record<string, Promise<any>> = {};
+
+export const fetchGroupsCached = (endpoint: string, forceRefresh = false) => {
+  if (groupsPromiseCache[endpoint] && !forceRefresh) {
+    return groupsPromiseCache[endpoint];
+  }
+  
+  groupsPromiseCache[endpoint] = api.get(endpoint)
+    .then(res => res.data?.data || res.data)
+    .catch(err => {
+      delete groupsPromiseCache[endpoint];
+      throw err;
+    });
+
+  return groupsPromiseCache[endpoint];
+};
+
 export const api = axios.create({
   baseURL: endpoint,
   timeout: 10000,

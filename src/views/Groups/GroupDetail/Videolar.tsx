@@ -34,9 +34,12 @@ export default function Videolar({ refreshTrigger }) {
         }
     };
 
+    const prevRefreshRef = useRef(0);
     useEffect(() => {
-        if (id) {
+        if (!id) return;
+        if (!videosFetchedRef.current || prevRefreshRef.current !== refreshTrigger) {
             fetchVideos();
+            prevRefreshRef.current = refreshTrigger;
         }
     }, [id, refreshTrigger]);
 

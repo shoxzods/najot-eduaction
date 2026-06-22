@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import styles from "./Rooms.module.scss";
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
@@ -42,8 +42,12 @@ export default function Rooms() {
         );
     };
 
+    const fetchedRef = useRef(false);
     useEffect(() => {
-        fetchRooms();
+        if (!fetchedRef.current) {
+            fetchedRef.current = true;
+            fetchRooms();
+        }
     }, []);
 
     function handleRoomInputChange(e) {
@@ -176,16 +180,16 @@ export default function Rooms() {
                     request.then(
                         res => {
                             console.log(res.status);
-                            
+
                             if (selectedRoom?.id) {
-                                setRooms(prev => prev.map(room => 
+                                setRooms(prev => prev.map(room =>
                                     room.id === selectedRoom.id ? { ...room, ...payload } : room
                                 ));
                             } else {
                                 const newRoom = res.data?.data?.id ? res.data.data : (res.data?.id ? res.data : { ...payload, id: Date.now() });
                                 setRooms(prev => [...prev, newRoom]);
                             }
-                            
+
                             closeModal();
                         }
                     ).catch(

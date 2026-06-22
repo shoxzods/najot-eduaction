@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import React, { useState } from "react";
 
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
@@ -56,6 +56,8 @@ const fakeImtihonlarData = [
 export default function ImtihonResults() {
   const { id, examId } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
   const [activeTab, setActiveTab] = useState("Kutayotganlar");
 
   const resultsData = fakeImtihonlarData.find(hw => String(hw.id) === String(examId)) || fakeImtihonlarData[0];
@@ -82,7 +84,7 @@ export default function ImtihonResults() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={() => router.push(`/dashboard/groups/${id}?tab=1&subtab=Imtihonlar`)} title="Orqaga qaytish">
+        <button className={styles.backButton} onClick={() => router.push(`${basePath}/${id}?tab=1&subtab=Imtihonlar`)} title="Orqaga qaytish">
           <ChevronLeftRoundedIcon fontSize="small" />
         </button>
         <h1>{resultsData.topic}</h1>
@@ -136,7 +138,7 @@ export default function ImtihonResults() {
                 onClick={() => {
                   if (activeTab !== "Kutayotganlar") return;
                   const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
-                  router.push(`/dashboard/groups/${id}/exam/${examId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
+                  router.push(`${basePath}/${id}/exam/${examId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
                 }}
                 className={activeTab !== "Kutayotganlar" ? "" : styles.clickableRow}
                 style={activeTab !== "Kutayotganlar" ? { cursor: "default" } : {}}

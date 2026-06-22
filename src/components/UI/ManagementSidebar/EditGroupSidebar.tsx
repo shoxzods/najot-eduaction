@@ -316,6 +316,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
         api.patch(`/groups/${groupData.id}`, payload).then(
             res => {
                 console.log("Group updated successfully:", res.status);
+                toast.success("Guruh muvaffaqiyatli tahrirlandi!");
                 if (onSave) {
                     const selectedCourse = courses.find(c => String(c.id) === String(courseId));
                     const selectedRoom = rooms.find(r => String(r.id) === String(roomId));

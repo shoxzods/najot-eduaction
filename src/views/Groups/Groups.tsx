@@ -1,9 +1,10 @@
 "use client";
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useState, useEffect } from "react";
 
-import { api } from '../../api/api';
+import { api, fetchGroupsCached } from '../../api/api';
+import { toast } from '../../utils/toast';
 
 import styles from "./Groups.module.scss";
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
@@ -54,8 +55,16 @@ const switchSx = {
 
 export default function Groups() {
     const router = useRouter();
+    const pathname = usePathname();
+    const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
     const [activeTab, setActiveTab] = useState("groups");
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [userRole, setUserRole] = useState<string>('');
+
+    useEffect(() => {
+        const role = localStorage.getItem('userRole');
+        if (role) setUserRole(role);
+    }, []);
     const [editGroupData, setEditGroupData] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groups, setGroup] = useState([]);
@@ -66,11 +75,12 @@ export default function Groups() {
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-    const fetchGroups = () => {
+    const fetchGroups = (forceRefresh = false) => {
         setIsLoading(true);
-        api.get(`/groups/all`).then(
-            res => {
-                setGroup(res.data.data)
+        const endpoint = pathname?.startsWith('/teacher') ? '/teachers/my/groups' : '/groups/all';
+        fetchGroupsCached(endpoint, forceRefresh).then(
+            data => {
+                setGroup(data || []);
                 setIsLoading(false);
             }
         ).catch(
@@ -121,9 +131,13 @@ export default function Groups() {
     const actualDeleteGroup = (groupId) => {
         api.delete(`/groups/${groupId}`)
             .then(() => {
-                fetchGroups();
+                toast.success("Guruh muvaffaqiyatli o'chirildi!");
+                fetchGroups(true);
             })
-            .catch(err => console.log(err.message));
+            .catch(err => {
+                console.log(err.message);
+                toast.error(err.response?.data?.message || "O'chirishda xatolik yuz berdi");
+            });
     };
 
     return (
@@ -150,61 +164,63 @@ export default function Groups() {
                     <GroupsRoundedIcon fontSize="small" />
                     Guruhlar
                 </button>
-                <Link href="/dashboard/groups/archive" className={`${styles.tab} ${activeTab === "archive" ? styles.activeTab : ""}`} style={{ textDecoration: 'none' }}>
+                <Link href={`${basePath}/archive`} className={`${styles.tab} ${activeTab === "archive" ? styles.activeTab : ""}`} style={{ textDecoration: 'none' }}>
                     <ArchiveOutlinedIcon fontSize="small" />
                     Arxiv
                 </Link>
             </div>
 
-            <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                    <div className={styles.statHeader}>
-                        <div className={`${styles.statIconWrapper} ${styles.statIconGroups}`}>
-                            <GroupsRoundedIcon />
+            {!pathname?.startsWith('/teacher') && (
+                <div className={styles.statsGrid}>
+                    <div className={styles.statCard}>
+                        <div className={styles.statHeader}>
+                            <div className={`${styles.statIconWrapper} ${styles.statIconGroups}`}>
+                                <GroupsRoundedIcon />
+                            </div>
+                            <MoreVertRoundedIcon className={styles.moreIcon} />
                         </div>
-                        <MoreVertRoundedIcon className={styles.moreIcon} />
+                        <div className={styles.statInfo}>
+                            <p className={styles.statLabel}>Jami guruhlar</p>
+                            <h2 className={styles.statValue}>{groups.length}</h2>
+                        </div>
                     </div>
-                    <div className={styles.statInfo}>
-                        <p className={styles.statLabel}>Jami guruhlar</p>
-                        <h2 className={styles.statValue}>{groups.length}</h2>
-                    </div>
-                </div>
 
-                <div className={styles.statCard}>
-                    <div className={styles.statHeader}>
-                        <div className={`${styles.statIconWrapper} ${styles.statIconTeachers}`}>
-                            <PersonRoundedIcon />
+                    <div className={styles.statCard}>
+                        <div className={styles.statHeader}>
+                            <div className={`${styles.statIconWrapper} ${styles.statIconTeachers}`}>
+                                <PersonRoundedIcon />
+                            </div>
+                            <MoreVertRoundedIcon className={styles.moreIcon} />
                         </div>
-                        <MoreVertRoundedIcon className={styles.moreIcon} />
+                        <div className={styles.statInfo}>
+                            <p className={styles.statLabel}>O'qituvchilar</p>
+                            <h2 className={styles.statValue}>
+                                {uniqueTeachers}
+                            </h2>
+                        </div>
                     </div>
-                    <div className={styles.statInfo}>
-                        <p className={styles.statLabel}>O'qituvchilar</p>
-                        <h2 className={styles.statValue}>
-                            {uniqueTeachers}
-                        </h2>
-                    </div>
-                </div>
 
-                <div className={styles.statCard}>
-                    <div className={styles.statHeader}>
-                        <div className={`${styles.statIconWrapper} ${styles.statIconStudents}`}>
-                            <SchoolRoundedIcon />
+                    <div className={styles.statCard}>
+                        <div className={styles.statHeader}>
+                            <div className={`${styles.statIconWrapper} ${styles.statIconStudents}`}>
+                                <SchoolRoundedIcon />
+                            </div>
+                            <MoreVertRoundedIcon className={styles.moreIcon} />
                         </div>
-                        <MoreVertRoundedIcon className={styles.moreIcon} />
-                    </div>
-                    <div className={styles.statInfo}>
-                        <p className={styles.statLabel}>O'quvchilar</p>
-                        <h2 className={styles.statValue}>
-                            {uniqueStudents}
-                        </h2>
-                    </div>
-                    <div className={styles.studentAvatars}>
-                        <div className={styles.smallAvatar} style={{ backgroundColor: '#1e293b' }}>I</div>
-                        <div className={styles.smallAvatar} style={{ backgroundColor: '#ea580c' }}>M</div>
-                        <div className={styles.smallAvatar} style={{ backgroundColor: '#ec4899' }}>S</div>
+                        <div className={styles.statInfo}>
+                            <p className={styles.statLabel}>O'quvchilar</p>
+                            <h2 className={styles.statValue}>
+                                {uniqueStudents}
+                            </h2>
+                        </div>
+                        <div className={styles.studentAvatars}>
+                            <div className={styles.smallAvatar} style={{ backgroundColor: '#1e293b' }}>I</div>
+                            <div className={styles.smallAvatar} style={{ backgroundColor: '#ea580c' }}>M</div>
+                            <div className={styles.smallAvatar} style={{ backgroundColor: '#ec4899' }}>S</div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             <div className={styles.tableCard}>
                 <div className={styles.tableWrapper} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px' }}>
@@ -233,16 +249,17 @@ export default function Groups() {
                                 <th>Davomiyligi</th>
                                 <th>Dars vaqti</th>
                                 <th>Xona</th>
-                                <th>O'qituvchi</th>
                                 <th>Talabalar</th>
                                 <th style={{ textAlign: 'right' }}>
-                                    <RefreshRoundedIcon className={styles.refreshIcon} fontSize="small" onClick={fetchGroups} />
+                                    {userRole === 'SUPERADMIN' && (
+                                        <RefreshRoundedIcon className={styles.refreshIcon} fontSize="small" onClick={() => fetchGroups(true)} />
+                                    )}
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             {groups.map((group) => (
-                                <tr key={group.id} onClick={() => router.push(`/dashboard/groups/${group.id}`)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                <tr key={group.id} onClick={() => router.push(`${basePath}/${group.id}`)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                                     <td>
                                         <div className={styles.statusCell}>
                                             <Switch
@@ -264,29 +281,24 @@ export default function Groups() {
                                     <td>
                                         <div className={styles.timeInfo}>
                                             <span className={styles.time}>{group.start_time}</span>
-                                            <span className={styles.days}>{group.week_day.map(
+                                            <span className={styles.days}>{group.week_day?.map(
                                                 item => item.toLowerCase().slice(0, 3)
                                             ).join(',')} <br /></span>
                                         </div>
                                     </td>
                                     <td><span className={styles.room}>{group.room}</span></td>
-                                    <td>
-                                        <div className={styles.teachersList}>
-                                            {group.teachers.map(
-                                                teacher => <span key={teacher.id} className={styles.teacherTag}>{teacher.full_name}</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td><span className={styles.studentCount}>{group.students.length}</span></td>
+                                    <td><span className={styles.studentCount}>{group.students?.length || 0}</span></td>
                                     <td style={{ textAlign: 'right' }}>
-                                        <MoreVertRoundedIcon
-                                            className={styles.rowMoreIcon}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleMenuOpen(e, group);
-                                            }}
-                                            style={{ cursor: 'pointer' }}
-                                        />
+                                        {userRole === 'SUPERADMIN' && (
+                                            <MoreVertRoundedIcon
+                                                className={styles.rowMoreIcon}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleMenuOpen(e, group);
+                                                }}
+                                                style={{ cursor: 'pointer' }}
+                                            />
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -365,9 +377,8 @@ export default function Groups() {
                 onSave={(optimisticData) => {
                     if (optimisticData) {
                         setGroup(prev => prev.map(g => g.id === editGroupData.id ? { ...g, ...optimisticData } : g));
-                    } else {
-                        fetchGroups();
                     }
+                    fetchGroups(true);
                 }}
             />
 
@@ -375,7 +386,7 @@ export default function Groups() {
                 isOpen={isModalOpen}
                 onClose={toggleModal}
                 onSave={() => {
-                    fetchGroups();
+                    fetchGroups(true);
                 }}
             />
 

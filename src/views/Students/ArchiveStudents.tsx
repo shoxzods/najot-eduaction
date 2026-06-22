@@ -96,12 +96,12 @@ export default function ArchiveStudents() {
             <div className={styles.tableCard}>
                 <div className={styles.tableHeader}>
                     <div className={styles.searchWrapper}>
-                        <input 
-                            type="text" 
-                            placeholder="Search" 
+                        <input
+                            type="text"
+                            placeholder="Search"
                             className={styles.searchInput}
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)} 
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                     <div className={styles.tableActions}>
@@ -174,7 +174,7 @@ export default function ArchiveStudents() {
                                                     style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', marginRight: '10px' }}
                                                 />
                                             ) : (
-                                                <div 
+                                                <div
                                                     className={styles.initialAvatar}
                                                     style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f0f0f0', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginRight: '10px' }}
                                                 >
