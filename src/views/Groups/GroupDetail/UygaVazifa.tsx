@@ -110,6 +110,10 @@ export default function UygaVazifa() {
                             const hwId = lesson.homework?.[0]?.id;
                             if (hwId) router.push(`${basePath}/${id}/homework/${hwId}/results?lessonId=${lesson.id}`);
                         }}
+                        onMouseEnter={() => {
+                            const hwId = lesson.homework?.[0]?.id;
+                            if (hwId) router.prefetch(`${basePath}/${id}/homework/${hwId}/results?lessonId=${lesson.id}`);
+                        }}
                         style={{ cursor: lesson.homework?.[0]?.id ? "pointer" : "default" }}
                     >
                         <td>{idx + 1}</td>

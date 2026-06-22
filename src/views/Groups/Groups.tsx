@@ -259,7 +259,7 @@ export default function Groups() {
                         </thead>
                         <tbody>
                             {groups.map((group) => (
-                                <tr key={group.id} onClick={() => router.push(`${basePath}/${group.id}`)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                <tr key={group.id} onClick={() => router.push(`${basePath}/${group.id}`)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f8fafc'; router.prefetch(`${basePath}/${group.id}`); }} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                                     <td>
                                         <div className={styles.statusCell}>
                                             <Switch

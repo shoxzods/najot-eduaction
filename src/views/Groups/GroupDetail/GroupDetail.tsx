@@ -564,6 +564,9 @@ export default function GroupDetail() {
                                                         router.push(`${basePath}/${id}/lesson/${dateStr}`);
                                                     }
                                                 }}
+                                                onMouseEnter={() => {
+                                                    if (!isFuture) router.prefetch(`${basePath}/${id}/lesson/${dateStr}`);
+                                                }}
                                                 style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
                                             >
                                                 <span className={styles.chipMonth}>{item.month}</span>

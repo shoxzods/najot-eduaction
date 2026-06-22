@@ -99,6 +99,10 @@ export default function Imtihonlar() {
                                 const examId = lesson.homework?.[0]?.id;
                                 if (examId) router.push(`${basePath}/${id}/exam/${examId}/results`);
                             }}
+                            onMouseEnter={() => {
+                                const examId = lesson.homework?.[0]?.id;
+                                if (examId) router.prefetch(`${basePath}/${id}/exam/${examId}/results`);
+                            }}
                         >
                             <td>{idx + 1}</td>
                             <td>
