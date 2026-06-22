@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams, usePathname } from 'next/navigation';
+import { useRouter, useParams, usePathname, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect, useRef } from "react";
 
 import { api } from "../../../api/api";
@@ -17,6 +17,7 @@ export default function HomeworkResults() {
   const { id, homeworkId } = useParams();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
 
   const [activeTab, setActiveTab] = useState("Kutayotganlar");
