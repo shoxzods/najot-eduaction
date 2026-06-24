@@ -72,7 +72,17 @@ export default function HomeworkResults() {
         const kutList = processRes(resKut);
         const qayList = processRes(resQay);
         const qabList = processRes(resQab);
-        const bajList = processRes(resBaj);
+        let bajList = processRes(resBaj);
+
+        // Filter out students from "Bajarilmagan" if they are already in the other tabs
+        const getStudentId = (s) => s?.student?.id || s?.student_id || s?.id;
+        const submittedIds = new Set([
+           ...kutList.map(getStudentId),
+           ...qayList.map(getStudentId),
+           ...qabList.map(getStudentId)
+        ].filter(Boolean));
+
+        bajList = bajList.filter(s => !submittedIds.has(getStudentId(s)));
 
         if (metaData) setResultsData(metaData);
         setTabData({
@@ -220,7 +230,7 @@ export default function HomeworkResults() {
               >
                 <td>{student.full_name || student.name || student.student?.full_name || "-"}</td>
                 <td style={{ textAlign: "right" }}>
-                  {formatDateTime(student.submitted_at || student.created_at || student.sent_at)}
+                  {activeTab === "Bajarilmagan" ? "-" : formatDateTime(student.submitted_at || student.created_at || student.sent_at)}
                 </td>
               </tr>
             ))}

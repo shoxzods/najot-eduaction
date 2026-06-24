@@ -177,16 +177,6 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                         </div>
                     );
                 })}
-
-                {/* Divider */}
-                <div className={styles.navDivider} />
-
-                {/* Logout */}
-                <button className={styles.logoutNavItem} onClick={() => setIsLogoutConfirmOpen(true)}>
-                    <span className={styles.itemIcon}><LogoutRoundedIcon /></span>
-                    {!isCollapsed && <span className={styles.itemLabel}>Chiqish</span>}
-                    {isCollapsed && <span className={styles.tooltip}>Chiqish</span>}
-                </button>
             </nav>
 
             <div className={styles.subscription}>
