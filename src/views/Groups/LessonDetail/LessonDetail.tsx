@@ -39,60 +39,8 @@ export default function LessonDetail() {
     }
   }, [date]);
 
-  const schedulesFetchedRef = useRef(false);
+  const mainFetchedRef = useRef(false);
   const studentsFetchedRef = useRef(false);
-
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      schedulesFetchedRef.current = true;
-      try {
-        const res = await api.get(`/groups/${id}/schedules`);
-        const data = res.data;
-        const formattedSchedules = [];
-        data.forEach((item) => {
-          const keys = Object.keys(item).sort((a, b) => Number(a) - Number(b));
-          keys.forEach((key) => {
-            const value = item[key];
-            formattedSchedules.push({
-              id: key,
-              label: `${key}-o'quv oyi`,
-              isCurrent: value.isActive,
-              days: value.days.map((d, dIdx) => ({
-                id: `${key}-${dIdx}`,
-                day: d.day,
-                month: d.month,
-                isCompleted: d.isCompleted
-              }))
-            });
-          });
-        });
-        setSchedules(formattedSchedules);
-      } catch (err) {
-        console.error("Error fetching schedules:", err);
-        schedulesFetchedRef.current = false;
-      }
-    };
-    if (id && !schedulesFetchedRef.current) {
-      fetchSchedules();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      try {
-        const res = await api.get(`/groups/${id}`);
-        const data = res.data?.data || res.data || {};
-        if (data.teachers && Array.isArray(data.teachers)) {
-          setTeachers(data.teachers);
-        }
-      } catch (err) {
-        console.error("Error fetching teachers:", err);
-      }
-    };
-    if (id) {
-      fetchTeachers();
-    }
-  }, [id]);
 
 
   useEffect(() => {
@@ -159,17 +107,51 @@ export default function LessonDetail() {
   }, [id, topicType, curriculumLessons.length]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      studentsFetchedRef.current = true;
+    if (!id || !date) return;
+    if (mainFetchedRef.current) return;
+    mainFetchedRef.current = true;
+    studentsFetchedRef.current = true;
+
+    const fetchAll = async () => {
       try {
-        const res = await api.get(`/groups/${id}/lesson?date=${date}`);
-        const mainData = res.data?.data || res.data || {};
+        const [schedulesRes, groupRes, studentsRes] = await Promise.all([
+          api.get(`/groups/${id}/schedules`),
+          api.get(`/groups/${id}`).catch(() => ({ data: {} })),
+          api.get(`/groups/${id}/lesson?date=${date}`).catch(() => ({ data: {} })),
+        ]);
+
+        // Schedules
+        const formattedSchedules = [];
+        (schedulesRes.data || []).forEach((item) => {
+          Object.keys(item).sort((a, b) => Number(a) - Number(b)).forEach((key) => {
+            const value = item[key];
+            formattedSchedules.push({
+              id: key,
+              label: `${key}-o'quv oyi`,
+              isCurrent: value.isActive,
+              days: value.days.map((d, dIdx) => ({
+                id: `${key}-${dIdx}`,
+                day: d.day,
+                month: d.month,
+                isCompleted: d.isCompleted
+              }))
+            });
+          });
+        });
+        setSchedules(formattedSchedules);
+
+        // Teachers
+        const groupData = groupRes.data?.data || groupRes.data || {};
+        if (groupData.teachers && Array.isArray(groupData.teachers)) {
+          setTeachers(groupData.teachers);
+        }
+
+        // Students / attendance
+        const mainData = studentsRes.data?.data || studentsRes.data || {};
         const lessonData = mainData.lesson || null;
         const attendanceData = mainData.attendance || mainData.attendances || [];
-
         setTopic(lessonData?.topic || mainData.topic || "");
         setDescription(lessonData?.description || mainData.description || "");
-
         setStudents(
           attendanceData.map(s => ({
             id: s.student_id,
@@ -179,14 +161,13 @@ export default function LessonDetail() {
           }))
         );
       } catch (err) {
-        console.error("Error fetching students:", err);
+        console.error("Error fetching lesson data:", err);
+        mainFetchedRef.current = false;
         studentsFetchedRef.current = false;
       }
     };
 
-    if (id && date && !studentsFetchedRef.current) {
-      fetchStudents();
-    }
+    fetchAll();
   }, [id, date]);
 
   const handleToggleStudent = (studentId) => {
@@ -332,7 +313,7 @@ export default function LessonDetail() {
                 className={chipClass}
                 onClick={() => {
                   if (!isFuture) {
-                    router.push(`${basePath}/${id}/lesson/${dateStr}`);
+                    router.replace(`${basePath}/${id}/lesson/${dateStr}`);
                   }
                 }}
                 style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}

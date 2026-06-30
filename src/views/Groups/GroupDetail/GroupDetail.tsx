@@ -49,8 +49,7 @@ export default function GroupDetail() {
     const fileInputRef = useRef(null);
 
     // Refs to prevent duplicate fetching on re-renders
-    const schedulesFetchedRef = useRef(false);
-    const groupDetailsFetchedRef = useRef(false);
+    const mainFetchedRef = useRef(false);
     const lessonsFetchedRef = useRef(false);
 
     const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,15 +68,26 @@ export default function GroupDetail() {
     }, []);
 
     useEffect(() => {
-        const fetchSchedules = async () => {
-            schedulesFetchedRef.current = true;
+        if (!id || searchParams.get("tab") === "1" || searchParams.get("tab") === "2") return;
+        if (mainFetchedRef.current) return;
+        mainFetchedRef.current = true;
+
+        const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
+
+        const fetchAll = async () => {
             try {
-                const res = await api.get(`/groups/${id}/schedules`);
-                const data = res.data;
+                const requests: [Promise<any>, Promise<any>, Promise<any>?] = [
+                    api.get(`/groups/${id}/schedules`),
+                    api.get(`/groups/${id}`).catch(() => ({ data: {} })),
+                    ...(userRole === 'SUPERADMIN' ? [api.get(`/groups/one/${id}`).catch(() => ({ data: {} }))] : []),
+                ];
+
+                const [schedulesRes, basicRes, oneRes] = await Promise.all(requests);
+
+                // Process schedules
                 const formattedSchedules = [];
-                data.forEach((item) => {
-                    const keys = Object.keys(item).sort((a, b) => Number(a) - Number(b));
-                    keys.forEach((key) => {
+                (schedulesRes.data || []).forEach((item) => {
+                    Object.keys(item).sort((a, b) => Number(a) - Number(b)).forEach((key) => {
                         const value = item[key];
                         formattedSchedules.push({
                             id: key,
@@ -91,48 +101,24 @@ export default function GroupDetail() {
                             }))
                         });
                     });
-
-
-
                 });
                 setSchedules(formattedSchedules);
-            } catch (err) {
-                console.error("Error fetching schedules:", err);
-                schedulesFetchedRef.current = false;
-            }
-        };
-        if (id && searchParams.get("tab") !== "1" && searchParams.get("tab") !== "2" && !schedulesFetchedRef.current) {
-            fetchSchedules();
-        }
-    }, [id, searchParams]);
 
-    useEffect(() => {
-        const fetchBasicDetails = async () => {
-            groupDetailsFetchedRef.current = true;
-            try {
-                const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
-                const res = await api.get(`/groups/${id}`).catch(() => ({ data: {} }));
-                const dataBasic = res.data?.data || res.data || {};
-
-                if (userRole === 'SUPERADMIN') {
-                    const res2 = await api.get(`/groups/one/${id}`).catch(() => ({ data: {} }));
-                    const dataOne = res2.data?.data || res2.data || {};
-                    // Merge all data from the entity API for SUPERADMIN
+                // Process group details
+                const dataBasic = basicRes.data?.data || basicRes.data || {};
+                if (userRole === 'SUPERADMIN' && oneRes) {
+                    const dataOne = oneRes.data?.data || oneRes.data || {};
                     setGroupDetails(prev => ({ ...prev, ...dataBasic, ...dataOne }));
                 } else {
                     setGroupDetails(prev => ({ ...prev, ...dataBasic }));
                 }
             } catch (err) {
-                console.error("Error fetching basic group details:", err);
-                groupDetailsFetchedRef.current = false;
+                console.error("Error fetching group data:", err);
+                mainFetchedRef.current = false;
             }
         };
 
-        const isTab0 = searchParams.get("tab") !== "1" && searchParams.get("tab") !== "2";
-
-        if (id && isTab0 && !groupDetailsFetchedRef.current) {
-            fetchBasicDetails();
-        }
+        fetchAll();
     }, [id, searchParams]);
 
     const tabIndex = searchParams.get("tab") || "0";
@@ -143,14 +129,22 @@ export default function GroupDetail() {
     const activeSubTab = searchParams.get("subtab") || "Uyga vazifa";
     const [showAllSchedules, setShowAllSchedules] = useState(false);
 
+    // Prefetch all tabs on mount for instant switching
+    useEffect(() => {
+        if (!id) return;
+        router.prefetch(`${pathname}?tab=0`);
+        router.prefetch(`${pathname}?tab=1`);
+        router.prefetch(`${pathname}?tab=2`);
+    }, [id, pathname, router]);
+
     const setActiveSubTab = useCallback((subtab: string) => {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set("subtab", subtab);
-        router.push(`${pathname}?${newParams.toString()}`);
+        router.replace(`${pathname}?${newParams.toString()}`);
     }, [searchParams, router, pathname]);
 
     const handleTabChange = useCallback((index: string) => {
-        router.push(`${pathname}?tab=${index}`);
+        router.replace(`${pathname}?tab=${index}`);
     }, [router, pathname]);
 
     useEffect(() => {

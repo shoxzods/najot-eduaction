@@ -952,7 +952,7 @@
   background: white;
   border-radius: 12px;
   width: 100%;
-  max-width: 700px;
+  max-width: 560px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   display: flex;
@@ -963,12 +963,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 14px 20px;
   border-bottom: 1px solid #f1f5f9;
 
   h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
     color: #1e293b;
   }
@@ -993,13 +993,13 @@
 }
 
 .modalBody {
-  padding: 32px 48px;
+  padding: 20px 24px;
 }
 
 .uploadBox {
   border: 1px dashed #cbd5e1;
-  border-radius: 12px;
-  padding: 40px 20px;
+  border-radius: 10px;
+  padding: 24px 16px;
   text-align: center;
   background-color: #fcfcfd;
   cursor: pointer;
@@ -1011,30 +1011,30 @@
   }
 
   .uploadIcon {
-    font-size: 48px;
+    font-size: 36px;
     color: #22c55e;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .uploadTitle {
     font-weight: 600;
-    font-size: 15px;
+    font-size: 13px;
     color: #1e293b;
-    margin: 0 0 12px 0;
+    margin: 0 0 6px 0;
   }
 
   .uploadDesc {
     color: #94a3b8;
-    font-size: 13px;
+    font-size: 11px;
     margin: 0;
   }
 }
 
 .modalFooter {
-  padding: 16px 24px;
+  padding: 12px 20px;
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   background-color: #fcfcfd;
   border-top: 1px solid #f1f5f9;
 
@@ -1071,7 +1071,7 @@
 }
 
 .selectedVideoContainer {
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .selectedVideoTable {
@@ -1080,19 +1080,29 @@
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   overflow: hidden;
+  table-layout: fixed;
+
+  // Column widths: file name 28%, dars 30%, video nomi 32%, actions 10%
+  th:nth-child(1), td:nth-child(1) { width: 28%; }
+  th:nth-child(2), td:nth-child(2) { width: 30%; }
+  th:nth-child(3), td:nth-child(3) { width: 32%; }
+  th:nth-child(4), td:nth-child(4) { width: 10%; }
 
   th,
   td {
-    padding: 16px;
+    padding: 10px 12px;
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   th {
     background-color: #f8fafc;
     color: #475569;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
 
     span {
       color: #ef4444;
@@ -1101,11 +1111,14 @@
 
   td {
     color: #1e293b;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .fileNameCol {
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .actionsCol {
@@ -1115,23 +1128,25 @@
   .darsSelect,
   .videoNameInput {
     width: 100%;
-    padding: 10px 12px;
+    padding: 7px 10px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     outline: none;
     color: #1e293b;
-    font-size: 14px;
+    font-size: 13px;
     transition: border-color 0.2s;
+    font-family: inherit;
 
     &:focus {
-      border-color: #3b82f6;
+      border-color: var(--primary);
     }
   }
 
   .darsSelect {
     appearance: none;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 12px center;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 8px center;
     background-color: white;
+    padding-right: 28px;
   }
 
   .deleteIconBtn {
