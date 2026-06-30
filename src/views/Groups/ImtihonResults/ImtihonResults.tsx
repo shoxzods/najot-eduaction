@@ -133,12 +133,17 @@ export default function ImtihonResults() {
           </thead>
           <tbody>
             {students.map((student, idx) => (
-              <tr 
+              <tr
                 key={student.id || idx}
                 onClick={() => {
                   if (activeTab !== "Kutayotganlar") return;
                   const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
                   router.push(`${basePath}/${id}/exam/${examId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
+                }}
+                onMouseEnter={() => {
+                  if (activeTab !== "Kutayotganlar") return;
+                  const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
+                  router.prefetch(`${basePath}/${id}/exam/${examId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}`);
                 }}
                 className={activeTab !== "Kutayotganlar" ? "" : styles.clickableRow}
                 style={activeTab !== "Kutayotganlar" ? { cursor: "default" } : {}}

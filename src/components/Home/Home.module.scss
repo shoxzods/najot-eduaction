@@ -58,14 +58,14 @@
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 4px rgba(0, 0, 0, 0.03);
-        border-color: rgb(29, 45, 91);
+        border-color: var(--primary);
     }
 
     .statIcon {
         display: flex;
         align-items: center;
         justify-content: center;
-        color: rgb(29, 45, 91);
+        color: var(--primary);
         flex-shrink: 0;
         margin-bottom: 4px;
         transition: transform 0.2s ease;

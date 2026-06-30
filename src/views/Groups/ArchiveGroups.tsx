@@ -104,32 +104,7 @@ export default function ArchiveGroups() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.title}>Guruhlar Archive</h1>
-        </div>
-        <p className={styles.subtitle}>
-          Arxivlangan guruhlar ro'yxati. Bu yerda o'chirilgan yoki arxivga ko'chirilgan guruhlarni ko'rishingiz mumkin.
-        </p>
-      </div>
-
-      <div className={styles.tabs}>
-        <button
-          className={styles.tab}
-          onClick={() => router.push(basePath)}
-        >
-          <GroupsRoundedIcon fontSize="small" />
-          Guruhlar
-        </button>
-        <button
-          className={`${styles.tab} ${styles.activeTab}`}
-        >
-          <ArchiveOutlinedIcon fontSize="small" />
-          Arxiv
-        </button>
-      </div>
-
+    <>
       <div className={styles.tableCard}>
         <div className={styles.tableWrapper} style={{ position: 'relative', opacity: isLoading ? 0.6 : 1, transition: 'opacity 0.2s', minHeight: '150px' }}>
           {isLoading && (
@@ -145,7 +120,7 @@ export default function ArchiveGroups() {
               backgroundColor: 'rgba(255, 255, 255, 0.4)',
               zIndex: 10
             }}>
-              <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
+              <CircularProgress sx={{ color: 'var(--primary)' }} />
             </Box>
           )}
           <table className={styles.table}>
@@ -326,6 +301,6 @@ export default function ArchiveGroups() {
           fetchArchivedGroups();
         }}
       />
-    </div>
+    </>
   );
 }

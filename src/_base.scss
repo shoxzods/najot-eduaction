@@ -1,5 +1,14 @@
+:root {
+    --primary:          rgb(29, 45, 91);
+    --primary-dark:     rgb(22, 34, 69);
+    --primary-deeper:   rgb(16, 25, 52);
+    --primary-light:    rgba(29, 45, 91, 0.08);
+    --primary-border:   rgba(29, 45, 91, 0.18);
+}
+
 * {
     padding: 0;
     margin: 0;
+    
     box-sizing: border-box;
 }

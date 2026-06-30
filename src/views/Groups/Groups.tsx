@@ -1,20 +1,18 @@
 "use client";
 import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
 import { useState, useEffect } from "react";
 
 import { api, fetchGroupsCached } from '../../api/api';
 import { toast } from '../../utils/toast';
+import { useGroupsStore } from '@/store/groupsStore';
 
 import styles from "./Groups.module.scss";
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import EditGroupSidebar from '../../components/UI/ManagementSidebar/EditGroupSidebar';
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import Switch from '@mui/material/Switch';
 import GroupModal from "../../components/UI/GroupModal/GroupModal";
 import ConfirmDialog from "../../components/UI/ConfirmDialog/ConfirmDialog";
@@ -66,14 +64,12 @@ export default function Groups() {
         if (role) setUserRole(role);
     }, []);
     const [editGroupData, setEditGroupData] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { isModalOpen, closeModal } = useGroupsStore();
     const [groups, setGroup] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [activeGroup, setActiveGroup] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, group: null });
-
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
 
     const fetchGroups = (forceRefresh = false) => {
         setIsLoading(true);
@@ -141,35 +137,7 @@ export default function Groups() {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <div className={styles.headerTop}>
-                    <h1 className={styles.title}>Guruhlar</h1>
-                    <button className={styles.addBtn} onClick={toggleModal}>
-                        <AddRoundedIcon fontSize="small" />
-                        <span className={styles.addBtnText}>Guruh qo'shish</span>
-                    </button>
-                </div>
-                <p className={styles.subtitle}>
-                    Ushbu sahifada siz guruhlar ro'yxatini va ularning ma'lumotlarini topasiz.
-                    Har bir guruhning nomi, kursi va dars vaqti ma'lumotlari keltirilgan.
-                </p>
-            </div>
-
-            <div className={styles.tabs}>
-                <button
-                    className={`${styles.tab} ${activeTab === "groups" ? styles.activeTab : ""}`}
-                    onClick={() => setActiveTab("groups")}
-                >
-                    <GroupsRoundedIcon fontSize="small" />
-                    Guruhlar
-                </button>
-                <Link href={`${basePath}/archive`} className={`${styles.tab} ${activeTab === "archive" ? styles.activeTab : ""}`} style={{ textDecoration: 'none' }}>
-                    <ArchiveOutlinedIcon fontSize="small" />
-                    Arxiv
-                </Link>
-            </div>
-
+        <>
             {!pathname?.startsWith('/teacher') && (
                 <div className={styles.statsGrid}>
                     <div className={styles.statCard}>
@@ -237,7 +205,7 @@ export default function Groups() {
                             backgroundColor: 'rgba(255, 255, 255, 0.4)',
                             zIndex: 10
                         }}>
-                            <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
+                            <CircularProgress sx={{ color: 'var(--primary)' }} />
                         </Box>
                     )}
                     <table className={styles.table}>
@@ -384,7 +352,7 @@ export default function Groups() {
 
             <GroupModal
                 isOpen={isModalOpen}
-                onClose={toggleModal}
+                onClose={closeModal}
                 onSave={() => {
                     fetchGroups(true);
                 }}
@@ -401,6 +369,6 @@ export default function Groups() {
                 title="Guruhni o'chirish"
                 message="Rostdan ham o'chirishni hohlaysizmi?"
             />
-        </div>
+        </>
     );
 }

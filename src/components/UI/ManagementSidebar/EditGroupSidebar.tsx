@@ -419,7 +419,7 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                             ))}
                         </select>
                         {form.courseId && (
-                            <div className={styles.durationInfo} style={{ marginTop: '6px', fontSize: '13px', color: 'rgb(29, 45, 91)', fontWeight: '500' }}>
+                            <div className={styles.durationInfo} style={{ marginTop: '6px', fontSize: '13px', color: 'var(--primary)', fontWeight: '500' }}>
                                 Kurs davomiyligi: {courses.find(c => String(c.id) === String(form.courseId))?.duration_month || 0} oy
                             </div>
                         )}
@@ -598,8 +598,8 @@ export default function EditGroupSidebar({ isOpen, onClose, groupData, onSave })
                     </div>
                     <div className={styles.logoWrapper}>
                         <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M50 20L80 35V65L50 80L20 65V35L50 20Z" stroke="rgb(29, 45, 91)" strokeOpacity="0.1" strokeWidth="1" />
-                            <path d="M50 30L70 40V60L50 70L30 60V40L50 30Z" stroke="rgb(29, 45, 91)" strokeOpacity="0.1" strokeWidth="1" />
+                            <path d="M50 20L80 35V65L50 80L20 65V35L50 20Z" stroke="var(--primary)" strokeOpacity="0.1" strokeWidth="1" />
+                            <path d="M50 30L70 40V60L50 70L30 60V40L50 30Z" stroke="var(--primary)" strokeOpacity="0.1" strokeWidth="1" />
                         </svg>
                     </div>
                 </div>

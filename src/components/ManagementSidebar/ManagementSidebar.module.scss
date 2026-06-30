@@ -79,7 +79,7 @@
 }
 
 .itemActive {
-    background: rgb(29, 45, 91);
+    background: var(--primary);
     color: #ffffff;
     font-weight: 600;
 
@@ -88,7 +88,7 @@
     }
 
     &:hover {
-        background: rgb(22, 34, 69);
+        background: var(--primary-dark);
         color: #ffffff;
 
         .icon {

@@ -103,7 +103,7 @@ export default function ArchiveCourses() {
                         backgroundColor: 'rgba(255, 255, 255, 0.4)',
                         zIndex: 10
                     }}>
-                        <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
+                        <CircularProgress sx={{ color: 'var(--primary)' }} />
                     </Box>
                 )}
 

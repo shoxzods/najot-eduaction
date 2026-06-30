@@ -42,7 +42,7 @@ export default function ToastProvider() {
                     paddingBottom: '10px',
                     fontSize: '13px',
                     alignItems: 'center',
-                    backgroundColor: options.type === 'error' ? '#ef4444' : options.type === 'success' ? '#22c55e' : 'rgb(29, 45, 91)',
+                    backgroundColor: options.type === 'error' ? '#ef4444' : options.type === 'success' ? '#22c55e' : 'var(--primary)',
                     color: '#fff',
                     '& .MuiAlert-icon': {
                         fontSize: '18px',

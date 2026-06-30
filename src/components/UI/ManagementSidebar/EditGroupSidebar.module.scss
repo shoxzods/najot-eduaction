@@ -119,7 +119,7 @@
         }
 
         .countBadge {
-            color: rgb(29, 45, 91);
+            color: var(--primary);
             font-weight: 500;
             font-size: 13px;
         }
@@ -142,7 +142,7 @@
         transition: border-color 0.2s;
 
         &:focus {
-            border-color: rgb(29, 45, 91);
+            border-color: var(--primary);
         }
 
         &::placeholder {
@@ -204,7 +204,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     background: #ffffff;
-    color: #a855f7;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -213,7 +213,7 @@
 
     &:hover {
         background: #faf5ff;
-        border-color: #a855f7;
+        border-color: var(--primary);
     }
 }
 
@@ -241,7 +241,7 @@
         width: 18px;
         height: 18px;
         cursor: pointer;
-        accent-color: rgb(29, 45, 91);
+        accent-color: var(--primary);
     }
 
     span {
@@ -297,7 +297,7 @@
     flex: 1;
     padding: 12px;
     border: none;
-    background: rgb(29, 45, 91);
+    background: var(--primary);
     color: #ffffff;
     font-size: 14px;
     font-weight: 600;
@@ -306,7 +306,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: rgb(22, 34, 69);
+        background: var(--primary-dark);
     }
 }
 
@@ -342,7 +342,7 @@
     transition: border-color 0.2s;
 
     &:focus-within {
-        border-color: rgb(29, 45, 91);
+        border-color: var(--primary);
     }
 }
 
@@ -354,7 +354,7 @@
 
 .groupTag {
     background: #f3effd;
-    color: rgb(29, 45, 91);
+    color: var(--primary);
     font-size: 13px;
     font-weight: 500;
     padding: 4px 8px;
@@ -373,7 +373,7 @@
 .removeGroupBtn {
     background: none;
     border: none;
-    color: rgb(29, 45, 91);
+    color: var(--primary);
     cursor: pointer;
     padding: 0;
     display: flex;
@@ -387,7 +387,7 @@
     transition: background 0.2s, color 0.2s;
 
     &:hover {
-        background: rgb(29, 45, 91);
+        background: var(--primary);
         color: #ffffff;
     }
 }
@@ -397,7 +397,7 @@
     gap: 4px;
     background: none;
     border: none;
-    color: rgb(29, 45, 91);
+    color: var(--primary);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -406,7 +406,7 @@
     transition: color 0.2s;
 
     &:hover {
-        color: rgb(22, 34, 69);
+        color: var(--primary-dark);
     }
 }
 

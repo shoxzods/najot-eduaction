@@ -23,7 +23,7 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: rgb(29, 45, 91);
+    background: var(--primary);
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -31,7 +31,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: rgb(22, 34, 69);
+        background: var(--primary-dark);
     }
 }
 
@@ -59,7 +59,7 @@
     gap: 6px;
     height: 38px;
     padding: 0 16px;
-    background: rgb(29, 45, 91);
+    background: var(--primary);
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -69,7 +69,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: rgb(22, 34, 69);
+        background: var(--primary-dark);
     }
 }
 
@@ -86,7 +86,7 @@
     transition: border-color 0.2s;
 
     &:focus-within {
-        border-color: rgb(29, 45, 91);
+        border-color: var(--primary);
     }
 
     .searchIcon {
@@ -140,7 +140,7 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: rgb(29, 45, 91);
+    background: var(--primary);
     color: #ffffff;
     border-radius: 50%;
     font-weight: 600;
@@ -173,14 +173,14 @@
     right: 14px;
     width: 12px;
     height: 12px;
-    background: #1c274c; /* Matches the dark header */
+    background: var(--primary); /* Matches the dark header */
     transform: rotate(45deg);
     border-radius: 2px;
     z-index: -1;
 }
 
 .dropdownHeader {
-    background: #1c274c; /* Dark blue background */
+    background: var(--primary); /* Dark blue background */
     color: #ffffff;
     padding: 12px 16px;
     font-size: 15px;

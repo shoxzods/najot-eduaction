@@ -125,7 +125,7 @@
     }
 
     &.activeTab {
-      color: rgb(29, 45, 91);
+      color: var(--primary);
 
       &::after {
         content: '';
@@ -134,7 +134,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background-color: rgb(29, 45, 91);
+        background-color: var(--primary);
       }
     }
   }
@@ -154,7 +154,7 @@
     flex: 1;
 
     .cardHeader {
-      background-color: #3b82f6;
+      background-color: var(--primary);
       color: #fff;
       padding: 16px 20px;
       display: flex;
@@ -1156,9 +1156,9 @@
 // Video Player Modal
 .videoPlayerModalContent {
   background: #0f172a;
-  border-radius: 12px;
+  border-radius: 10px;
   width: 100%;
-  max-width: 820px;
+  max-width: 560px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
   display: flex;
@@ -1168,18 +1168,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 20px;
+    padding: 10px 14px;
     background: #1e293b;
 
     h2 {
       margin: 0;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 500;
       color: #e2e8f0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 680px;
+      max-width: 460px;
     }
 
     .closeBtn {
@@ -1190,7 +1190,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 6px;
+      padding: 4px;
       border-radius: 6px;
       transition: background-color 0.2s, color 0.2s;
       flex-shrink: 0;
@@ -1208,11 +1208,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 200px;
 
     video {
       width: 100%;
-      max-height: 72vh;
+      max-height: 50vh;
       outline: none;
       display: block;
     }

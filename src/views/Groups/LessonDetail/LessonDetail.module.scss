@@ -368,7 +368,7 @@
   margin-top: 24px;
 
   button {
-    background-color: #8b5cf6;
+    background-color: var(--primary);
     color: white;
     border: none;
     padding: 12px 32px;
@@ -379,7 +379,7 @@
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: #7c3aed;
+      background-color:#1e293b;
     }
   }
 }

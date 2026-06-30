@@ -218,12 +218,17 @@ export default function HomeworkResults() {
           </thead>
           <tbody>
             {!loading && students.map((student, idx) => (
-              <tr 
+              <tr
                 key={student.id || idx}
                 onClick={() => {
                   if (activeTab !== "Kutayotganlar") return;
                   const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
                   router.push(`${basePath}/${id}/homework/${homeworkId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}&lessonId=${homeworkDetails?.id || searchParams?.get("lessonId") || ""}`);
+                }}
+                onMouseEnter={() => {
+                  if (activeTab !== "Kutayotganlar") return;
+                  const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";
+                  router.prefetch(`${basePath}/${id}/homework/${homeworkId}/results/${student.id || student.student?.id || idx}?tab=${activeTab}&date=${dateToPass}&lessonId=${homeworkDetails?.id || searchParams?.get("lessonId") || ""}`);
                 }}
                 className={activeTab !== "Kutayotganlar" ? "" : styles.clickableRow}
                 style={activeTab !== "Kutayotganlar" ? { cursor: "default" } : {}}

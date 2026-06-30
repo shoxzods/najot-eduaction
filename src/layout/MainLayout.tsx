@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar/Sidebar";
 import Header from "../components/header/Header";
 import ManagementSidebar from "../components/ManagementSidebar/ManagementSidebar";
 import Loader from "../components/UI/Loader/Loader";
+import PageTransition from "../components/UI/PageTransition/PageTransition";
 import styles from "./MainLayout.module.scss";
 
 interface MainLayoutProps {
@@ -48,7 +49,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <Header />
                 <main className={styles.content}>
                     <Suspense fallback={<Loader fullScreen={false} />}>
-                        {children}
+                        <PageTransition>
+                            {children}
+                        </PageTransition>
                     </Suspense>
                 </main>
             </div>

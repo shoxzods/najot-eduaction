@@ -1,6 +1,7 @@
 "use client";
 import { useRouter, useParams, usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 import { api, getFileUrl } from "../../../api/api";
 import styles from "./GroupDetail.module.scss";
@@ -708,6 +709,9 @@ export default function GroupDetail() {
                                                 router.push(`${basePath}/${id}/lesson/${dateStr}`);
                                             }
                                         }}
+                                        onMouseEnter={() => {
+                                            if (!isFuture) router.prefetch(`${basePath}/${id}/lesson/${dateStr}`);
+                                        }}
                                         style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
                                     >
                                         <span className={styles.month}>{item.month}</span>
@@ -724,8 +728,8 @@ export default function GroupDetail() {
                 </div>
             )}
 
-            {/* Video Modal */}
-            {isVideoModalOpen && (
+            {/* Video Modal via Portal */}
+            {isVideoModalOpen && createPortal(
                 <div className={styles.modalOverlay} onClick={handleModalClose}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
@@ -815,7 +819,8 @@ export default function GroupDetail() {
                             )}
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

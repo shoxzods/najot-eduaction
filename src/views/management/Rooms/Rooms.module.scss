@@ -21,19 +21,19 @@
 .title {
     font-size: 20px;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--primary-dark);
     margin: 0;
 }
 
 .refreshIcon {
-    color: #4a4a6a;
+    color: var(--primary-muted, #4a4a6a);
     cursor: pointer;
     font-size: 20px;
     transition: transform 0.3s;
 
     &:hover {
         transform: rotate(180deg);
-        color: rgb(29, 45, 91);
+        color: var(--primary);
     }
 }
 
@@ -41,7 +41,7 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    background: rgb(29, 45, 91);
+    background: var(--primary);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -52,7 +52,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: rgb(22, 34, 69);
+        background: var(--primary-dark);
     }
 
     svg {
@@ -132,7 +132,7 @@
 .roomName {
     font-size: 16px;
     font-weight: 700;
-    color: #1a1a2e;
+    color: var(--primary-dark);
     margin: 0;
 }
 
@@ -166,7 +166,7 @@
 }
 
 .editBtn {
-    color: rgb(29, 45, 91);
+    color: var(--primary);
 
     &:hover {
         background: rgba(29, 45, 91, 0.1);
@@ -175,7 +175,7 @@
 
 .capacity {
     font-size: 13px;
-    color: #4a4a6a;
+    color: var(--primary-muted, #4a4a6a);
     margin: 0;
 }
 
@@ -211,7 +211,7 @@
 
         &:focus {
             outline: none;
-            border-color: rgb(29, 45, 91);
+            border-color: var(--primary);
         }
 
         &::placeholder {
@@ -237,7 +237,7 @@
 }
 
 .saveBtn {
-    background: #9333ea;
+    background: var(--primary);
     color: #ffffff;
     border: none;
     padding: 8px 24px;
@@ -248,7 +248,7 @@
     transition: background 0.2s;
 
     &:hover {
-        background: #7e22ce;
+        background: var(--primary-dark);
     }
 }
 
@@ -262,7 +262,7 @@
     width: 34px;
     height: 34px;
     cursor: pointer;
-    color: #4a4a6a;
+    color: var(--primary-muted, #4a4a6a);
     transition: background 0.2s;
 
     &:hover {
@@ -275,7 +275,7 @@
     align-items: center;
     gap: 4px;
     background: #f5f5f7;
-    color: #4a4a6a;
+    color: var(--primary-muted, #4a4a6a);
     border: none;
     border-radius: 10px;
     padding: 10px 20px;

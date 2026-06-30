@@ -1,6 +1,7 @@
 "use client";
 import { useParams } from 'next/navigation';
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 import { api } from "../../../api/api";
 import styles from "./GroupDetail.module.scss";
@@ -80,7 +81,7 @@ export default function Videolar({ refreshTrigger }) {
                         backgroundColor: 'rgba(255, 255, 255, 0.4)',
                         zIndex: 10
                     }}>
-                        <CircularProgress sx={{ color: 'rgb(29, 45, 91)' }} />
+                        <CircularProgress sx={{ color: 'var(--primary)' }} />
                     </Box>
                 )}
                 <table className={styles.lessonsTable}>
@@ -127,8 +128,8 @@ export default function Videolar({ refreshTrigger }) {
             </table>
             </div>
 
-            {/* Video Player Modal */}
-            {selectedPlayVideo && (
+            {/* Video Player Modal via Portal */}
+            {selectedPlayVideo && createPortal(
                 <div className={styles.modalOverlay} onClick={() => setSelectedPlayVideo(null)}>
                     <div className={styles.videoPlayerModalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.videoPlayerHeader}>
@@ -145,7 +146,8 @@ export default function Videolar({ refreshTrigger }) {
                             />
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
