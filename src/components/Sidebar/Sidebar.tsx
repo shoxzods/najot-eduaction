@@ -9,7 +9,6 @@ import DiamondRoundedIcon from '@mui/icons-material/DiamondRounded';
 import CardGiftcardRoundedIcon from '@mui/icons-material/CardGiftcardRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
 import LeaderboardRoundedIcon from '@mui/icons-material/LeaderboardRounded';
@@ -35,7 +34,6 @@ const menuItems: MenuItem[] = [
     { label: "Boshqarish", icon: <SettingsRoundedIcon />, path: "/management" },
 ];
 
-import LayersRoundedIcon from '@mui/icons-material/LayersRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 
