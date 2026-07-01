@@ -90,7 +90,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
         <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ""}`}>
             <div className={styles.logo}>
                 <img className={styles.logo_icon} src="/najot_edu.svg" alt="" />
-                {!isCollapsed && <p className={styles.logo_title}>Najot Edu</p>}
+                <p className={styles.logo_title}>Najot Edu</p>
                 <button className={styles.toggleBtn} onClick={toggleSidebar}>
                     <ChevronLeftRoundedIcon
                         fontSize="small"
@@ -127,8 +127,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                     const renderItem = (
                         <div className={`${styles.item}${shouldBeActive && !hasChildren ? (userRole === 'TEACHER' ? ` ${styles.itemActiveTeacher}` : ` ${styles.itemActive}`) : ""}`} style={{ marginBottom: 0 }}>
                             <span className={styles.itemIcon} style={{ color: (hasChildren && isExpanded) ? '#0f172a' : '' }}>{item.icon}</span>
-                            {!isCollapsed && <span className={styles.itemLabel} style={{ fontWeight: (hasChildren && isExpanded) ? 600 : 500, color: (hasChildren && isExpanded) ? '#0f172a' : '' }}>{item.label}</span>}
-                            {isCollapsed && <span className={styles.tooltip}>{item.label}</span>}
+                            <span className={styles.itemLabel} style={{ fontWeight: (hasChildren && isExpanded) ? 600 : 500, color: (hasChildren && isExpanded) ? '#0f172a' : '' }}>{item.label}</span>
+                            <span className={styles.tooltip}>{item.label}</span>
                             {hasChildren && !isCollapsed && (
                                 <span style={{ marginLeft: 'auto', display: 'flex', color: isExpanded ? '#0f172a' : '#475569' }}>
                                     {isExpanded ? <KeyboardArrowUpRoundedIcon fontSize="small" /> : <KeyboardArrowDownRoundedIcon fontSize="small" />}
