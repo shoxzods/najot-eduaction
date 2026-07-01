@@ -33,7 +33,22 @@
     color: var(--primary-muted, #4a4a6a);
     cursor: pointer;
     position: relative;
-    transition: color 0.2s;
+    text-decoration: none;
+    transition: color 0.25s ease;
+
+    &::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--primary);
+        border-radius: 2px;
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.25s ease;
+    }
 
     &:hover {
         color: var(--primary);
@@ -44,21 +59,20 @@
     color: var(--primary);
 
     &::after {
-        content: "";
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: var(--primary);
-        border-radius: 2px;
+        transform: scaleX(1);
     }
+}
+
+@keyframes contentFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .content {
     flex: 1;
     position: relative;
     min-height: 400px;
+    animation: contentFade 0.25s ease both;
 }
 
 .placeholder {

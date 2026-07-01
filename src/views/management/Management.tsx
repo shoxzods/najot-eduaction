@@ -1,46 +1,41 @@
 "use client";
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 import { Suspense } from "react";
 import Loader from "../../components/UI/Loader/Loader";
 import styles from "./Management.module.scss";
 
 const tabs = [
-    { label: "Kurslar", slug: "courses" },
-    { label: "Xonalar", slug: "rooms" },
-    { label: "Xodimlar", slug: "staff" },
+    { label: "Kurslar", id: "courses" },
+    { label: "Xonalar", id: "rooms" },
+    { label: "Xodimlar", id: "staff" },
 ];
 
 export default function Management({ children }) {
     const pathname = usePathname() || '';
-    const router = useRouter();
+    const searchParams = useSearchParams();
+    const activeTab = searchParams.get("tab") || "courses";
 
-    const pathParts = pathname.split("/").filter(Boolean);
-    const managementIndex = pathParts.indexOf("management");
-    const currentTab = managementIndex >= 0 ? pathParts[managementIndex + 1] : "courses";
-
-    const handleTabChange = (slug) => {
-        router.push(`/management/${slug}`);
-    };
+    // Check if we are on the main management page (not an archive subpage)
+    const isMainPage = pathname === "/management";
 
     return (
         <div className={styles.managementPage}>
-            {pathname !== "/management" && (
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Boshqarish</h1>
-                    <div className={styles.tabs}>
-                        {tabs.map((item) => (
-                            <button
-                                key={item.slug}
-                                className={`${styles.tab} ${currentTab === item.slug ? styles.tabActive : ""}`}
-                                onClick={() => handleTabChange(item.slug)}
-                            >
-                                {item.label}
-                            </button>
-                        ))}
-                    </div>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Boshqarish</h1>
+                <div className={styles.tabs}>
+                    {tabs.map((item) => (
+                        <Link
+                            key={item.id}
+                            href={`/management?tab=${item.id}`}
+                            className={`${styles.tab} ${isMainPage && activeTab === item.id ? styles.tabActive : ""}`}
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
                 </div>
-            )}
+            </div>
 
             <div className={styles.content}>
                 <Suspense fallback={<Loader fullScreen={false} />}>

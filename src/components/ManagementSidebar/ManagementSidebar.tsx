@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ButtonBase from '@mui/material/ButtonBase';
 import styles from "./ManagementSidebar.module.scss";
@@ -33,11 +33,20 @@ interface ManagementSidebarProps {
 export default function ManagementSidebar({ isOpen, isCollapsed, onClose }: ManagementSidebarProps) {
     const router = useRouter();
     const pathname = usePathname() || '';
+    const searchParams = useSearchParams();
 
     // Determine current active sub-page slug
     const pathParts = pathname.split("/").filter(Boolean);
     const managementIndex = pathParts.indexOf("management");
-    const currentSlug = managementIndex >= 0 ? pathParts[managementIndex + 1] : "courses";
+    
+    let currentSlug = "";
+    if (pathname === '/management') {
+        currentSlug = searchParams.get('tab') || 'courses';
+    } else if (managementIndex >= 0 && pathParts.length > managementIndex + 1) {
+        currentSlug = pathParts[managementIndex + 1];
+    } else {
+        currentSlug = "courses";
+    }
 
     return (
         <div className={`${styles.subSidebar} ${isOpen ? styles.open : ""} ${isCollapsed ? styles.collapsed : ""}`}>
@@ -47,10 +56,12 @@ export default function ManagementSidebar({ isOpen, isCollapsed, onClose }: Mana
             <div className={styles.content}>
                 {subMenuItems.map((item, index) => {
                     const isActive = currentSlug === item.slug;
+                    const isTab = ['courses', 'rooms', 'staff'].includes(item.slug);
+                    const href = isTab ? `/management?tab=${item.slug}` : `/management/${item.slug}`;
                     return (
                         <ButtonBase
                             component={Link}
-                            href={`/management/${item.slug}`}
+                            href={href}
                             key={index}
                             style={{ 
                                 width: '100%', 

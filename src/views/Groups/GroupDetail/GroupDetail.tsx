@@ -154,13 +154,17 @@ export default function GroupDetail() {
 
     useEffect(() => {
         if (!subTabsRef.current) return;
-        const activeBtn = subTabsRef.current.querySelector(`.${styles.activeSubTab}`) as HTMLElement;
-        if (activeBtn) {
-            const container = subTabsRef.current.getBoundingClientRect();
-            const btn = activeBtn.getBoundingClientRect();
-            setSliderStyle({ left: btn.left - container.left, width: btn.width, ready: true });
-        }
-    }, [activeSubTab]);
+        // Small delay to ensure the layout has settled before calculating positions
+        const timer = setTimeout(() => {
+            const activeBtn = subTabsRef.current?.querySelector(`.${styles.activeSubTab}`) as HTMLElement;
+            if (activeBtn && subTabsRef.current) {
+                const container = subTabsRef.current.getBoundingClientRect();
+                const btn = activeBtn.getBoundingClientRect();
+                setSliderStyle({ left: btn.left - container.left, width: btn.width, ready: true });
+            }
+        }, 50);
+        return () => clearTimeout(timer);
+    }, [activeSubTab, activeTab]);
 
 
     useEffect(() => {
