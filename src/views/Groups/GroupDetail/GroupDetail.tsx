@@ -78,13 +78,16 @@ export default function GroupDetail() {
 
         const fetchAll = async () => {
             try {
-                const requests: [Promise<any>, Promise<any>, Promise<any>?] = [
+                const baseRequests = [
                     api.get(`/groups/${id}/schedules`),
                     api.get(`/groups/${id}`).catch(() => ({ data: {} })),
-                    ...(userRole === 'SUPERADMIN' ? [api.get(`/groups/one/${id}`).catch(() => ({ data: {} }))] : []),
-                ];
+                ] as const;
 
-                const [schedulesRes, basicRes, oneRes] = await Promise.all(requests);
+                const optionalRequest = userRole === 'SUPERADMIN'
+                    ? api.get(`/groups/one/${id}`).catch(() => ({ data: {} }))
+                    : Promise.resolve({ data: {} });
+
+                const [schedulesRes, basicRes, oneRes] = await Promise.all([...baseRequests, optionalRequest]);
 
                 // Process schedules
                 const formattedSchedules = [];
