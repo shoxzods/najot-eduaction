@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useParams, usePathname, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 import { api, getFileUrl } from "../../../api/api";
@@ -48,6 +48,8 @@ export default function GroupDetail() {
     const [isParamsOpen, setIsParamsOpen] = useState(true);
     const [activeSubTab, setActiveSubTab] = useState("Uyga vazifa");
     const fileInputRef = useRef(null);
+    const subTabsRef = useRef<HTMLDivElement>(null);
+    const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0, ready: false });
 
     // Refs to prevent duplicate fetching on re-renders
     const mainFetchedRef = useRef(false);
@@ -143,6 +145,16 @@ export default function GroupDetail() {
     const handleTabChange = useCallback((index: string) => {
         router.replace(`${pathname}?tab=${index}`);
     }, [router, pathname]);
+
+    useLayoutEffect(() => {
+        if (!subTabsRef.current) return;
+        const activeBtn = subTabsRef.current.querySelector(`.${styles.activeSubTab}`) as HTMLElement;
+        if (activeBtn) {
+            const container = subTabsRef.current.getBoundingClientRect();
+            const btn = activeBtn.getBoundingClientRect();
+            setSliderStyle({ left: btn.left - container.left, width: btn.width, ready: true });
+        }
+    }, [activeSubTab]);
 
 
     useEffect(() => {
@@ -590,7 +602,10 @@ export default function GroupDetail() {
                     <div className={styles.lessonsHeader}>
                         <div className={styles.lessonsTabsAndTitle}>
                             <h2>Guruh darsliklari</h2>
-                            <div className={styles.subTabs}>
+                            <div className={styles.subTabs} ref={subTabsRef}>
+                                {sliderStyle.ready && (
+                                    <div className={styles.subTabSlider} style={{ left: sliderStyle.left, width: sliderStyle.width }} />
+                                )}
                                 <button
                                     className={`${styles.subTab} ${activeSubTab === "Uyga vazifa" ? styles.activeSubTab : ""}`}
                                     onClick={() => setActiveSubTab("Uyga vazifa")}
