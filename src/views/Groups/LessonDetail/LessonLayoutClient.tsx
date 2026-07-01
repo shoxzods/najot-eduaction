@@ -7,6 +7,7 @@ import styles from "./LessonLayout.module.scss";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import KeyboardArrowLeftRoundedIcon from "@mui/icons-material/KeyboardArrowLeftRounded";
 import KeyboardArrowRightRoundedIcon from "@mui/icons-material/KeyboardArrowRightRounded";
+import LessonDetail from "./LessonDetail";
 
 const MONTH_MAP: Record<string, number> = {
   "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3,
@@ -37,6 +38,11 @@ export default function LessonLayoutClient({ children }: { children: React.React
 
   const { schedules, loadedGroupId, setSchedules } = useLessonStore();
   const [currentMonth, setCurrentMonth] = useState(0);
+  const [optimisticDate, setOptimisticDate] = useState(date as string);
+
+  useEffect(() => {
+    setOptimisticDate(date as string);
+  }, [date]);
 
   // Fetch schedules once per group
   useEffect(() => {
@@ -71,8 +77,8 @@ export default function LessonLayoutClient({ children }: { children: React.React
 
   // Sync currentMonth to active date
   useEffect(() => {
-    if (!date || schedules.length === 0) return;
-    const [, m, d] = (date as string).split("-");
+    if (!optimisticDate || schedules.length === 0) return;
+    const [, m, d] = optimisticDate.split("-");
     const mIndex = parseInt(m, 10) - 1;
     const dayInt = parseInt(d, 10);
     const found = schedules.findIndex((sm) =>
@@ -82,7 +88,7 @@ export default function LessonLayoutClient({ children }: { children: React.React
       })
     );
     if (found !== -1) setCurrentMonth(found);
-  }, [schedules, date]);
+  }, [schedules, optimisticDate]);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -127,7 +133,7 @@ export default function LessonLayoutClient({ children }: { children: React.React
             const itemDate = new Date(year, mIndex, parseInt(d.day, 10));
             const isFuture = itemDate > today;
             const dateStr = buildDateStr(d.day, d.month, year);
-            const isActive = date === dateStr;
+            const isActive = optimisticDate === dateStr;
 
             let chipClass = styles.dateChip;
             if (isActive) chipClass += ` ${styles.active}`;
@@ -139,7 +145,12 @@ export default function LessonLayoutClient({ children }: { children: React.React
                 key={index}
                 className={chipClass}
                 style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
-                onClick={() => { if (!isFuture && dateStr) router.replace(`${basePath}/${id}/lesson/${dateStr}`); }}
+                onClick={() => { 
+                  if (!isFuture && dateStr) {
+                    setOptimisticDate(dateStr);
+                    router.replace(`${basePath}/${id}/lesson/${dateStr}`, { scroll: false });
+                  } 
+                }}
                 onMouseEnter={() => { if (!isFuture && dateStr) router.prefetch(`${basePath}/${id}/lesson/${dateStr}`); }}
               >
                 <span className={styles.chipMonth}>{d.month}</span>
@@ -150,9 +161,9 @@ export default function LessonLayoutClient({ children }: { children: React.React
         </div>
       </div>
 
-      {/* Animated page content — remounts on date change */}
-      <div key={pathname} className={styles.pageContent}>
-        {children}
+      {/* Page content */}
+      <div className={styles.pageContent}>
+        <LessonDetail optimisticDate={optimisticDate} />
       </div>
     </div>
   );

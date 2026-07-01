@@ -8,8 +8,10 @@ import styles from "./LessonDetail.module.scss";
 import Switch from '@mui/material/Switch';
 import { toast } from '../../../utils/toast';
 
-export default function LessonDetail() {
-  const { id, date } = useParams();
+export default function LessonDetail({ optimisticDate }: { optimisticDate?: string }) {
+  const params = useParams();
+  const id = params.id;
+  const date = optimisticDate || params.date;
 
   const { schedules } = useLessonStore();
 
@@ -32,9 +34,7 @@ export default function LessonDetail() {
     }
   }, [date]);
 
-  const mainFetchedRef = useRef(false);
-  const studentsFetchedRef = useRef(false);
-
+  const lastFetchedDateRef = useRef("");
 
   useEffect(() => {
     const fetchCurriculumLessons = async () => {
@@ -52,9 +52,8 @@ export default function LessonDetail() {
 
   useEffect(() => {
     if (!id || !date) return;
-    if (mainFetchedRef.current) return;
-    mainFetchedRef.current = true;
-    studentsFetchedRef.current = true;
+    if (lastFetchedDateRef.current === date) return;
+    lastFetchedDateRef.current = date as string;
 
     const fetchAll = async () => {
       try {
@@ -85,8 +84,7 @@ export default function LessonDetail() {
         );
       } catch (err) {
         console.error("Error fetching lesson data:", err);
-        mainFetchedRef.current = false;
-        studentsFetchedRef.current = false;
+        lastFetchedDateRef.current = "";
       }
     };
 
