@@ -46,9 +46,8 @@ export default function GroupDetail() {
     const [groupStudents, setGroupStudents] = useState([]);
     const [isMentorsOpen, setIsMentorsOpen] = useState(true);
     const [isParamsOpen, setIsParamsOpen] = useState(true);
+    const [activeSubTab, setActiveSubTab] = useState("Uyga vazifa");
     const fileInputRef = useRef(null);
-    const subTabsRef = useRef<HTMLDivElement>(null);
-    const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0, ready: false });
 
     // Refs to prevent duplicate fetching on re-renders
     const mainFetchedRef = useRef(false);
@@ -131,7 +130,6 @@ export default function GroupDetail() {
     if (tabIndex === "1") activeTab = "Guruh darsliklari";
     if (tabIndex === "2") activeTab = "Akademik davomati";
 
-    const activeSubTab = searchParams.get("subtab") || "Uyga vazifa";
     const [showAllSchedules, setShowAllSchedules] = useState(false);
 
     // Prefetch all tabs on mount for instant switching
@@ -142,29 +140,9 @@ export default function GroupDetail() {
         router.prefetch(`${pathname}?tab=2`);
     }, [id, pathname, router]);
 
-    const setActiveSubTab = useCallback((subtab: string) => {
-        const newParams = new URLSearchParams(searchParams.toString());
-        newParams.set("subtab", subtab);
-        router.replace(`${pathname}?${newParams.toString()}`);
-    }, [searchParams, router, pathname]);
-
     const handleTabChange = useCallback((index: string) => {
         router.replace(`${pathname}?tab=${index}`);
     }, [router, pathname]);
-
-    useEffect(() => {
-        if (!subTabsRef.current) return;
-        // Small delay to ensure the layout has settled before calculating positions
-        const timer = setTimeout(() => {
-            const activeBtn = subTabsRef.current?.querySelector(`.${styles.activeSubTab}`) as HTMLElement;
-            if (activeBtn && subTabsRef.current) {
-                const container = subTabsRef.current.getBoundingClientRect();
-                const btn = activeBtn.getBoundingClientRect();
-                setSliderStyle({ left: btn.left - container.left, width: btn.width, ready: true });
-            }
-        }, 50);
-        return () => clearTimeout(timer);
-    }, [activeSubTab, activeTab]);
 
 
     useEffect(() => {
@@ -612,10 +590,7 @@ export default function GroupDetail() {
                     <div className={styles.lessonsHeader}>
                         <div className={styles.lessonsTabsAndTitle}>
                             <h2>Guruh darsliklari</h2>
-                            <div className={styles.subTabs} ref={subTabsRef}>
-                                {sliderStyle.ready && (
-                                    <div className={styles.subTabSlider} style={{ left: sliderStyle.left, width: sliderStyle.width }} />
-                                )}
+                            <div className={styles.subTabs}>
                                 <button
                                     className={`${styles.subTab} ${activeSubTab === "Uyga vazifa" ? styles.activeSubTab : ""}`}
                                     onClick={() => setActiveSubTab("Uyga vazifa")}
