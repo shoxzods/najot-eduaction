@@ -1,32 +1,25 @@
 "use client";
-import { useRouter, useParams, usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState, useEffect, useRef } from "react";
 
 import { api } from "../../../api/api";
+import { useLessonStore } from "../../../store/lessonStore";
 import styles from "./LessonDetail.module.scss";
-import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
-import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
-import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import Switch from '@mui/material/Switch';
 import { toast } from '../../../utils/toast';
 
 export default function LessonDetail() {
   const { id, date } = useParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const basePath = pathname?.startsWith('/teacher') ? '/teacher/groups' : '/dashboard/groups';
+
+  const { schedules } = useLessonStore();
 
   const [activeTab, setActiveTab] = useState("Teacher");
   const [topicType, setTopicType] = useState("Boshqa");
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
-
   const [students, setStudents] = useState([]);
   const [curriculumLessons, setCurriculumLessons] = useState([]);
-
-  const [schedules, setSchedules] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(0);
   const [isPast, setIsPast] = useState(false);
 
   useEffect(() => {
@@ -42,55 +35,6 @@ export default function LessonDetail() {
   const mainFetchedRef = useRef(false);
   const studentsFetchedRef = useRef(false);
 
-
-  useEffect(() => {
-    if (schedules.length === 0 || !date) return;
-    const dateObj = new Date(date as string);
-    if (isNaN(dateObj.getTime())) return;
-    const m = dateObj.getMonth();
-    const d = dateObj.getDate();
-
-    let foundIndex = schedules.findIndex(sm => {
-      return sm.days.some(item => {
-        const monthMap = {
-          "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
-          "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
-          "noy": 10, "nov": 10, "dek": 11, "dec": 11
-        };
-        let mIndex = -1;
-        for (const [key, val] of Object.entries(monthMap)) {
-          if (item.month && item.month.toLowerCase().startsWith(key)) {
-            mIndex = val; break;
-          }
-        }
-        return mIndex === m && parseInt(item.day, 10) === d;
-      });
-    });
-
-    if (foundIndex !== -1) {
-      setCurrentMonth(foundIndex);
-    } else {
-      foundIndex = schedules.findIndex(sm => {
-        return sm.days.some(item => {
-          const monthMap = {
-            "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
-            "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
-            "noy": 10, "nov": 10, "dek": 11, "dec": 11
-          };
-          let mIndex = -1;
-          for (const [key, val] of Object.entries(monthMap)) {
-            if (item.month && item.month.toLowerCase().startsWith(key)) {
-              mIndex = val; break;
-            }
-          }
-          return mIndex === m;
-        });
-      });
-      if (foundIndex !== -1) {
-        setCurrentMonth(foundIndex);
-      }
-    }
-  }, [schedules, date]);
 
   useEffect(() => {
     const fetchCurriculumLessons = async () => {
@@ -114,31 +58,10 @@ export default function LessonDetail() {
 
     const fetchAll = async () => {
       try {
-        const [schedulesRes, groupRes, studentsRes] = await Promise.all([
-          api.get(`/groups/${id}/schedules`),
+        const [groupRes, studentsRes] = await Promise.all([
           api.get(`/groups/${id}`).catch(() => ({ data: {} })),
           api.get(`/groups/${id}/lesson?date=${date}`).catch(() => ({ data: {} })),
         ]);
-
-        // Schedules
-        const formattedSchedules = [];
-        (schedulesRes.data || []).forEach((item) => {
-          Object.keys(item).sort((a, b) => Number(a) - Number(b)).forEach((key) => {
-            const value = item[key];
-            formattedSchedules.push({
-              id: key,
-              label: `${key}-o'quv oyi`,
-              isCurrent: value.isActive,
-              days: value.days.map((d, dIdx) => ({
-                id: `${key}-${dIdx}`,
-                day: d.day,
-                month: d.month,
-                isCompleted: d.isCompleted
-              }))
-            });
-          });
-        });
-        setSchedules(formattedSchedules);
 
         // Teachers
         const groupData = groupRes.data?.data || groupRes.data || {};
@@ -236,96 +159,7 @@ export default function LessonDetail() {
   const isCompleted = currentDayInfo?.isCompleted || false;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.pageHeader}>
-        <button className={styles.backBtn} onClick={() => router.push(`${basePath}/${id}`)}>
-          <ArrowBackIosNewRoundedIcon fontSize="small" />
-        </button>
-        <h2>Dars tafsilotlari</h2>
-      </div>
-
-      <div className={styles.dateNavigatorContainer}>
-        <div className={styles.monthNavRow}>
-          <button
-            className={styles.navArrow}
-            onClick={() => setCurrentMonth(Math.max(0, currentMonth - 1))}
-            disabled={currentMonth === 0}
-          >
-            <KeyboardArrowLeftRoundedIcon fontSize="small" />
-          </button>
-          <span className={styles.monthLabel}>
-            {schedules[currentMonth]?.label || "1-o'quv oyi"}
-          </span>
-          <button
-            className={styles.navArrow}
-            onClick={() => setCurrentMonth(Math.min(schedules.length - 1, currentMonth + 1))}
-            disabled={schedules.length === 0 || currentMonth === schedules.length - 1}
-          >
-            <KeyboardArrowRightRoundedIcon fontSize="small" />
-          </button>
-        </div>
-
-        <div className={styles.dateChips}>
-          {schedules[currentMonth]?.days.map((d, index) => {
-            const { isFuture, dateStr } = (() => {
-              if (!d.month || !d.day) return { isFuture: false, dateStr: `2026-05-${String(d.day).padStart(2, '0')}` };
-              const monthMap = {
-                "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
-                "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
-                "noy": 10, "nov": 10, "dek": 11, "dec": 11
-              };
-              let mIndex = -1;
-              for (const [key, val] of Object.entries(monthMap)) {
-                if (d.month.toLowerCase().startsWith(key)) {
-                  mIndex = val; break;
-                }
-              }
-              if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(d.day).padStart(2, '0')}` };
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              let year = today.getFullYear();
-              if (today.getMonth() === 0 && mIndex === 11) year -= 1;
-              if (today.getMonth() === 11 && mIndex === 0) year += 1;
-              const itemDate = new Date(year, mIndex, parseInt(d.day, 10));
-
-              const paddedMonth = String(mIndex + 1).padStart(2, '0');
-              const paddedDay = String(d.day).padStart(2, '0');
-              return {
-                isFuture: itemDate > today,
-                dateStr: `${year}-${paddedMonth}-${paddedDay}`
-              };
-            })();
-
-            const isActive = date === dateStr;
-
-            let chipClass = styles.dateChip;
-            if (isActive) {
-              chipClass += ` ${styles.active}`;
-            } else if (!isFuture) {
-              chipClass += ` ${styles.past}`;
-            } else {
-              chipClass += ` ${styles.future} ${styles.disabled}`;
-            }
-
-            return (
-              <div
-                key={index}
-                className={chipClass}
-                onClick={() => {
-                  if (!isFuture) {
-                    router.replace(`${basePath}/${id}/lesson/${dateStr}`);
-                  }
-                }}
-                style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
-              >
-                <span className={styles.chipMonth}>{d.month}</span>
-                <span className={styles.chipDay}>{d.day}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
+    <>
       <div className={styles.tabsContainer}>
         <button
           className={`${styles.tab} ${activeTab === "Assistant" ? styles.active : ""}`}
@@ -518,6 +352,6 @@ export default function LessonDetail() {
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

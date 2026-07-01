@@ -17,9 +17,9 @@
 }
 
 .modal {
-    width: 480px;
+    width: 380px;
     background: #ffffff;
-    border-radius: 16px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     animation: scaleUp 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -32,7 +32,7 @@
 }
 
 .header {
-    padding: 24px;
+    padding: 16px 20px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -42,18 +42,18 @@
 .headerText {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .title {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: #111827;
     margin: 0;
 }
 
 .subtitle {
-    font-size: 14px;
+    font-size: 13px;
     color: #6b7280;
     margin: 0;
 }
@@ -74,23 +74,23 @@
     }
 
     svg {
-        font-size: 24px;
+        font-size: 20px;
     }
 }
 
 .body {
-    padding: 24px;
+    padding: 16px 20px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .searchInput {
     width: 100%;
-    padding: 12px 16px;
+    padding: 9px 14px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     color: #111827;
     outline: none;
     transition: border-color 0.2s;
@@ -107,10 +107,10 @@
 .listContainer {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    max-height: 240px;
+    gap: 6px;
+    max-height: 200px;
     overflow-y: auto;
-    
+
     &::-webkit-scrollbar {
         width: 6px;
     }
@@ -124,8 +124,8 @@
 .listItem {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 10px;
+    padding: 9px 12px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     cursor: pointer;
@@ -136,32 +136,33 @@
     }
 
     input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         cursor: pointer;
         accent-color: var(--primary);
+        flex-shrink: 0;
     }
 
     span {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
         color: #374151;
     }
 }
 
 .footer {
-    padding: 16px 24px;
+    padding: 12px 20px;
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 10px;
 }
 
 .cancelBtn {
-    padding: 10px 20px;
+    padding: 8px 18px;
     border: none;
     background: none;
     color: #6b7280;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: color 0.2s;
@@ -172,11 +173,11 @@
 }
 
 .saveBtn {
-    padding: 10px 24px;
+    padding: 8px 20px;
     border: none;
     background: var(--primary);
     color: #ffffff;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;

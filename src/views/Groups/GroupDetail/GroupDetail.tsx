@@ -47,6 +47,8 @@ export default function GroupDetail() {
     const [isMentorsOpen, setIsMentorsOpen] = useState(true);
     const [isParamsOpen, setIsParamsOpen] = useState(true);
     const fileInputRef = useRef(null);
+    const subTabsRef = useRef<HTMLDivElement>(null);
+    const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0, ready: false });
 
     // Refs to prevent duplicate fetching on re-renders
     const mainFetchedRef = useRef(false);
@@ -146,6 +148,17 @@ export default function GroupDetail() {
     const handleTabChange = useCallback((index: string) => {
         router.replace(`${pathname}?tab=${index}`);
     }, [router, pathname]);
+
+    useEffect(() => {
+        if (!subTabsRef.current) return;
+        const activeBtn = subTabsRef.current.querySelector(`.${styles.activeSubTab}`) as HTMLElement;
+        if (activeBtn) {
+            const container = subTabsRef.current.getBoundingClientRect();
+            const btn = activeBtn.getBoundingClientRect();
+            setSliderStyle({ left: btn.left - container.left, width: btn.width, ready: true });
+        }
+    }, [activeSubTab]);
+
 
     useEffect(() => {
         const fetchGroupLessons = async () => {
@@ -592,7 +605,10 @@ export default function GroupDetail() {
                     <div className={styles.lessonsHeader}>
                         <div className={styles.lessonsTabsAndTitle}>
                             <h2>Guruh darsliklari</h2>
-                            <div className={styles.subTabs}>
+                            <div className={styles.subTabs} ref={subTabsRef}>
+                                {sliderStyle.ready && (
+                                    <div className={styles.subTabSlider} style={{ left: sliderStyle.left, width: sliderStyle.width }} />
+                                )}
                                 <button
                                     className={`${styles.subTab} ${activeSubTab === "Uyga vazifa" ? styles.activeSubTab : ""}`}
                                     onClick={() => setActiveSubTab("Uyga vazifa")}
@@ -653,71 +669,92 @@ export default function GroupDetail() {
             {activeTab === "Akademik davomati" && (
                 <div className={styles.tabContentScrollable}>
                     <div className={styles.scheduleSection}>
-                        <div className={styles.monthNavigator}>
-                            <button className={styles.navBtn}>
-                                <KeyboardArrowLeftRoundedIcon />
-                            </button>
-                            <span className={styles.monthText}>May 2026</span>
-                            <button className={styles.navBtn}>
-                                <KeyboardArrowRightRoundedIcon />
-                            </button>
-                        </div>
+                        {/* Month navigation — hidden when showing all months */}
+                        {!showAllMonths && (
+                            <div className={styles.monthNav}>
+                                <button
+                                    className={styles.monthNavBtn}
+                                    onClick={() => setCurrentMonth(Math.max(0, currentMonth - 1))}
+                                    disabled={currentMonth === 0}
+                                >
+                                    <KeyboardArrowLeftRoundedIcon fontSize="small" />
+                                </button>
+                                <span className={styles.monthNavLabel}>
+                                    {schedules[currentMonth]?.label || ""}
+                                </span>
+                                <button
+                                    className={styles.monthNavBtn}
+                                    onClick={() => setCurrentMonth(Math.min(schedules.length - 1, currentMonth + 1))}
+                                    disabled={currentMonth >= schedules.length - 1 || schedules.length === 0}
+                                >
+                                    <KeyboardArrowRightRoundedIcon fontSize="small" />
+                                </button>
+                            </div>
+                        )}
 
-                        <div className={styles.calendarList}>
-                            {fakeGroupData.calendarDays.map(item => {
-                                const { isFuture, dateStr } = (() => {
-                                    if (!item.month || !item.day) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
-                                    const monthMap = {
-                                        "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
-                                        "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
-                                        "noy": 10, "nov": 10, "dek": 11, "dec": 11
-                                    };
-                                    let mIndex = -1;
-                                    for (const [key, val] of Object.entries(monthMap)) {
-                                        if (item.month.toLowerCase().startsWith(key)) {
-                                            mIndex = val; break;
-                                        }
-                                    }
-                                    if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
-                                    const today = new Date();
-                                    today.setHours(0, 0, 0, 0);
-                                    let year = today.getFullYear();
-                                    if (today.getMonth() === 0 && mIndex === 11) year -= 1;
-                                    if (today.getMonth() === 11 && mIndex === 0) year += 1;
-                                    const itemDate = new Date(year, mIndex, Number(item.day));
+                        {(() => {
+                            const monthMap = {
+                                "yan": 0, "jan": 0, "fev": 1, "feb": 1, "mar": 2, "apr": 3, "may": 4, "iyun": 5, "jun": 5,
+                                "iyul": 6, "jul": 6, "avg": 7, "aug": 7, "sen": 8, "sep": 8, "okt": 9, "oct": 9,
+                                "noy": 10, "nov": 10, "dek": 11, "dec": 11
+                            };
+                            const resolveDay = (item: any, monthIdx: number) => {
+                                if (!item.month || !item.day) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                let mIndex = -1;
+                                for (const [key, val] of Object.entries(monthMap)) {
+                                    if (item.month.toLowerCase().startsWith(key)) { mIndex = val as number; break; }
+                                }
+                                if (mIndex === -1) return { isFuture: false, dateStr: `2026-05-${String(item.day).padStart(2, '0')}` };
+                                const year = scheduleYears[monthIdx] || new Date().getFullYear();
+                                const today = new Date(); today.setHours(0, 0, 0, 0);
+                                const itemDate = new Date(year, mIndex, parseInt(item.day, 10));
+                                return {
+                                    isFuture: itemDate > today,
+                                    dateStr: `${year}-${String(mIndex + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`
+                                };
+                            };
 
-                                    const paddedMonth = String(mIndex + 1).padStart(2, '0');
-                                    const paddedDay = String(item.day).padStart(2, '0');
-                                    return {
-                                        isFuture: itemDate > today,
-                                        dateStr: `${year}-${paddedMonth}-${paddedDay}`
-                                    };
-                                })();
+                            const monthsToShow = showAllMonths ? schedules : schedules.slice(currentMonth, currentMonth + 1);
 
+                            return monthsToShow.map((schedule, relIdx) => {
+                                const absIdx = showAllMonths ? relIdx : currentMonth;
                                 return (
-                                    <div
-                                        key={item.id}
-                                        className={`${styles.calendarDay} ${item.active && !isFuture ? styles.activeDay : ""} ${isFuture ? styles.disabledDate : ""}`}
-                                        onClick={() => {
-                                            if (!isFuture) {
-                                                router.push(`${basePath}/${id}/lesson/${dateStr}`);
-                                            }
-                                        }}
-                                        onMouseEnter={() => {
-                                            if (!isFuture) router.prefetch(`${basePath}/${id}/lesson/${dateStr}`);
-                                        }}
-                                        style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
-                                    >
-                                        <span className={styles.month}>{item.month}</span>
-                                        <span className={styles.day}>{item.day}</span>
+                                    <div key={schedule.id} className={showAllMonths ? styles.studyMonthBlock : undefined}>
+                                        {showAllMonths && (
+                                            <div className={styles.studyMonthHeader}>
+                                                <span className={styles.studyMonthLabel}>{schedule.label}</span>
+                                                {schedule.isCurrent && <span className={styles.currentMonthBadge}>Joriy oy</span>}
+                                            </div>
+                                        )}
+                                        <div className={styles.calendarList}>
+                                            {(schedule.days || []).map((item: any) => {
+                                                const { isFuture, dateStr } = resolveDay(item, absIdx);
+                                                return (
+                                                    <div
+                                                        key={item.id}
+                                                        className={`${styles.calendarDay} ${item.isCompleted && !isFuture ? styles.activeDay : ""} ${isFuture ? styles.disabledDate : ""}`}
+                                                        onClick={() => { if (!isFuture) router.push(`${basePath}/${id}/lesson/${dateStr}`); }}
+                                                        onMouseEnter={() => { if (!isFuture) router.prefetch(`${basePath}/${id}/lesson/${dateStr}`); }}
+                                                        style={{ cursor: isFuture ? "not-allowed" : "pointer", opacity: isFuture ? 0.5 : 1 }}
+                                                    >
+                                                        <span className={styles.month}>{item.month}</span>
+                                                        <span className={styles.day}>{item.day}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 );
-                            })}
-                        </div>
+                            });
+                        })()}
 
-                        <div className={styles.showAllBtnWrapper}>
-                            <button className={styles.showAllBtn}>Barchasini ko'rish</button>
-                        </div>
+                        {schedules.length > 1 && (
+                            <div className={styles.showAllBtnWrapper}>
+                                <button className={styles.showAllBtn} onClick={() => setShowAllMonths(!showAllMonths)}>
+                                    {showAllMonths ? "Yopish" : "Barchasini ko'rish"}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

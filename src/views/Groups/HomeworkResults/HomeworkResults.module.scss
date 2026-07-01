@@ -1,6 +1,6 @@
 .container {
-  padding: 24px;
-  background-color: #f8fafc;
+  padding: 24px 0 0 0;
+  // background-color: #f8fafc;
   height: 100%;
   overflow-y: auto;
   font-family: 'Inter', sans-serif;
@@ -115,6 +115,18 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: color 0.25s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      right: 50%;
+      height: 2px;
+      background-color: #10b981;
+      transition: left 0.25s ease, right 0.25s ease;
+    }
 
     .badge {
       color: white;
@@ -132,20 +144,26 @@
     &.active {
       color: #10b981;
       &::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
         left: 0;
         right: 0;
-        height: 2px;
-        background-color: #10b981;
       }
     }
-    
+
     &.kutayotganlar .badge { background-color: #f59e0b; }
     &.qaytarilganlar .badge { background-color: #ef4444; }
     &.qabul_qilinganlar .badge { background-color: #10b981; }
-    &.bajarilmagan .badge { background-color: #10b981; } // Assuming from screenshot it's green or gray
+    &.bajarilmagan .badge { background-color: #10b981; }
+  }
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -154,6 +172,7 @@
   border-radius: 12px;
   padding: 0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  animation: tabFadeIn 0.22s ease both;
 
   table {
     width: 100%;

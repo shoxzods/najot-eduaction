@@ -208,7 +208,7 @@ export default function HomeworkResults() {
         ))}
       </div>
 
-      <div className={styles.tableSection}>
+      <div key={activeTab} className={styles.tableSection}>
         <table>
           <thead>
             <tr>
@@ -219,7 +219,7 @@ export default function HomeworkResults() {
           <tbody>
             {!loading && students.map((student, idx) => (
               <tr
-                key={student.id || idx}
+                key={student.student?.id ?? student.id ?? idx}
                 onClick={() => {
                   if (activeTab !== "Kutayotganlar") return;
                   const dateToPass = student.submitted_at || student.created_at || student.sent_at || "";

@@ -1,6 +1,5 @@
 .container {
-  padding: 24px;
-  padding-bottom: 0;
+  padding: 24px 0 0 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -16,6 +15,7 @@
   gap: 24px;
   padding-bottom: 24px;
   padding-right: 8px;
+  animation: tabFadeIn 0.25s ease both;
   /* Slight right padding to separate content from scrollbar */
 
   /* Custom scrollbar for the tab content */
@@ -118,7 +118,18 @@
     color: #64748b;
     cursor: pointer;
     position: relative;
-    transition: color 0.2s;
+    transition: color 0.25s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      right: 50%;
+      height: 2px;
+      background-color: var(--primary);
+      transition: left 0.25s ease, right 0.25s ease;
+    }
 
     &:hover {
       color: #0f172a;
@@ -128,15 +139,21 @@
       color: var(--primary);
 
       &::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
         left: 0;
         right: 0;
-        height: 2px;
-        background-color: var(--primary);
       }
     }
+  }
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -271,7 +288,7 @@
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 24px;
+  padding: 16px 24px;
   margin-top: 16px;
 
   h2 {
@@ -412,8 +429,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: 24px;
-    margin-bottom: 20px;
+    margin-top: 8px;
+    margin-bottom: 16px;
 
     .monthNavBtn {
       display: flex;
@@ -543,8 +560,8 @@
 
   .calendarList {
     display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
+    gap: 8px;
+    margin-bottom: 24px;
     overflow-x: auto;
     padding-bottom: 8px;
     /* For scrollbar */
@@ -573,40 +590,28 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 64px;
-      /* Ensure it doesn't shrink */
-      height: 72px;
+      min-width: 52px;
+      height: 60px;
       border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      background-color: #fff;
+      background-color: #f1f5f9;
       cursor: pointer;
       transition: all 0.2s;
 
       .month {
-        font-size: 12px;
+        font-size: 11px;
         color: #64748b;
-        margin-bottom: 4px;
+        font-weight: 500;
+        margin-bottom: 2px;
       }
 
       .day {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         color: #0f172a;
       }
 
-      &.activeDay {
+      &:hover {
         background-color: #e2e8f0;
-        border-color: #cbd5e1;
-
-        .month,
-        .day {
-          color: #475569;
-        }
-      }
-
-      &:hover:not(.activeDay) {
-        border-color: #cbd5e1;
-        background-color: #f8fafc;
       }
     }
   }
@@ -638,6 +643,7 @@
   flex-direction: column;
   gap: 24px;
   margin-top: 16px;
+  animation: tabFadeIn 0.25s ease both;
 
   .lessonsHeader {
     display: flex;
@@ -658,9 +664,23 @@
 
       .subTabs {
         display: flex;
-        background-color: #f8fafc;
+        background-color: #f1f5f9;
         border-radius: 8px;
         padding: 4px;
+        position: relative;
+
+        .subTabSlider {
+          position: absolute;
+          top: 4px;
+          bottom: 4px;
+          border-radius: 6px;
+          background-color: #fff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          transition: left 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                      width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+          pointer-events: none;
+          will-change: left, width;
+        }
 
         .subTab {
           background: none;
@@ -671,16 +691,16 @@
           font-weight: 500;
           color: #64748b;
           cursor: pointer;
-          transition: all 0.2s;
+          position: relative;
+          z-index: 1;
+          transition: color 0.2s ease;
 
           &:hover:not(.activeSubTab) {
             color: #0f172a;
           }
 
           &.activeSubTab {
-            background-color: #fff;
             color: #0f172a;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
           }
         }
       }
@@ -1057,7 +1077,7 @@
   .uploadSubmitBtn {
     padding: 10px 24px;
     border: none;
-    background-color: #22c55e;
+    background-color: var(--primary);
     color: white;
     font-weight: 600;
     cursor: pointer;
@@ -1082,7 +1102,6 @@
   overflow: hidden;
   table-layout: fixed;
 
-  // Column widths: file name 28%, dars 30%, video nomi 32%, actions 10%
   th:nth-child(1), td:nth-child(1) { width: 28%; }
   th:nth-child(2), td:nth-child(2) { width: 30%; }
   th:nth-child(3), td:nth-child(3) { width: 32%; }
@@ -1104,9 +1123,7 @@
     font-weight: 600;
     font-size: 12px;
 
-    span {
-      color: #ef4444;
-    }
+    span { color: #ef4444; }
   }
 
   td {
@@ -1134,8 +1151,8 @@
     outline: none;
     color: #1e293b;
     font-size: 13px;
-    transition: border-color 0.2s;
     font-family: inherit;
+    transition: border-color 0.2s;
 
     &:focus {
       border-color: var(--primary);
@@ -1148,23 +1165,23 @@
     background-color: white;
     padding-right: 28px;
   }
+}
 
-  .deleteIconBtn {
-    background: none;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.deleteIconBtn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-    &:hover {
-      background-color: #fee2e2;
-      color: #ef4444;
-    }
+  &:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
   }
 }
 

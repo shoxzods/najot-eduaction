@@ -1,6 +1,5 @@
 .container {
-  padding: 24px;
-  background-color: #f8fafc;
+  padding: 24px 0 0 0;
   height: 100%;
   overflow-y: auto;
   display: flex;
@@ -60,15 +59,15 @@
 
 /* Date Navigator */
 .dateNavigatorContainer {
-  background-color: white;
-  padding: 20px 24px;
-  border-radius: 12px;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
   margin-bottom: 24px;
-  border: 1px solid #e2e8f0;
+  border: none;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: none;
 }
 
 .monthNavRow {
@@ -101,10 +100,7 @@
   overflow-x: auto;
   padding-bottom: 4px;
 
-  /* Hide scrollbar */
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -119,7 +115,7 @@
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, color 0.2s ease;
 
   .chipMonth { font-size: 11px; margin-bottom: 4px; font-weight: 500; }
   .chipDay { font-weight: 600; font-size: 15px; }
@@ -127,13 +123,11 @@
   &.active {
     background-color: #10b981;
     color: white;
-    border: 1px solid #10b981;
   }
 
   &.past {
     background-color: #e2e8f0;
     color: #64748b;
-    border: 1px solid transparent;
   }
 
   &.future {
@@ -165,17 +159,24 @@
   color: #64748b;
   cursor: pointer;
   position: relative;
+  transition: color 0.2s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    right: 50%;
+    height: 2px;
+    background-color: #10b981;
+    transition: left 0.25s ease, right 0.25s ease;
+  }
 
   &.active {
     color: #10b981;
     &::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
       left: 0;
       right: 0;
-      height: 2px;
-      background-color: #10b981;
     }
   }
 }
