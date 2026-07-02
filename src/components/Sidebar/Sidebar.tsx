@@ -125,7 +125,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar, isSubSidebarOpen, 
                     };
 
                     const renderItem = (
-                        <div className={`${styles.item}${shouldBeActive && !hasChildren ? (userRole === 'TEACHER' ? ` ${styles.itemActiveTeacher}` : ` ${styles.itemActive}`) : ""}`} style={{ marginBottom: 0 }}>
+                        <div className={`${styles.item}${shouldBeActive && !hasChildren ? ` ${styles.itemActive}` : ""}`} style={{ marginBottom: 0 }}>
                             <span className={styles.itemIcon} style={{ color: (hasChildren && isExpanded) ? '#0f172a' : '' }}>{item.icon}</span>
                             <span className={styles.itemLabel} style={{ fontWeight: (hasChildren && isExpanded) ? 600 : 500, color: (hasChildren && isExpanded) ? '#0f172a' : '' }}>{item.label}</span>
                             <span className={styles.tooltip}>{item.label}</span>

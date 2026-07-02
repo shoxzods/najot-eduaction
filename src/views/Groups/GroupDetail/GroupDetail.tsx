@@ -154,7 +154,7 @@ export default function GroupDetail() {
             const btn = activeBtn.getBoundingClientRect();
             setSliderStyle({ left: btn.left - container.left, width: btn.width, ready: true });
         }
-    }, [activeSubTab]);
+    }, [activeSubTab, activeTab]);
 
 
     useEffect(() => {

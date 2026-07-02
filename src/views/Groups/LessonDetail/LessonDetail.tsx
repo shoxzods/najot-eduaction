@@ -23,6 +23,8 @@ export default function LessonDetail({ optimisticDate }: { optimisticDate?: stri
   const [curriculumLessons, setCurriculumLessons] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [isPast, setIsPast] = useState(false);
+  const [isMavzuOpen, setIsMavzuOpen] = useState(false);
+  const mavzuRef = useRef(null);
 
   useEffect(() => {
     if (date) {
@@ -33,6 +35,16 @@ export default function LessonDetail({ optimisticDate }: { optimisticDate?: stri
       setIsPast(currentLessonDate < todayDate);
     }
   }, [date]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (mavzuRef.current && !mavzuRef.current.contains(e.target)) {
+        setIsMavzuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const lastFetchedDateRef = useRef("");
 
@@ -263,19 +275,34 @@ export default function LessonDetail({ optimisticDate }: { optimisticDate?: stri
             <span className={styles.required}>*</span> Mavzu
           </label>
           {topicType === "O'quv reja bo'yicha" ? (
-            <select
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              style={{ width: "100%", padding: "12px 16px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", outline: "none", backgroundColor: isPast ? "#f1f5f9" : "white" }}
-              disabled={isPast}
-            >
-              <option value="" disabled>Mavzuni tanlang...</option>
-              {curriculumLessons.map((lesson) => (
-                <option key={lesson.id} value={lesson.topic}>
-                  {lesson.topic}
-                </option>
-              ))}
-            </select>
+            <div className={styles.selectWrapper} ref={mavzuRef}>
+              <button
+                type="button"
+                className={`${styles.select} ${isMavzuOpen ? styles.selectOpen : ""}`}
+                onClick={() => !isPast && setIsMavzuOpen((o) => !o)}
+                disabled={isPast}
+              >
+                <span className={topic ? styles.selectValue : styles.selectPlaceholder}>
+                  {topic || "Mavzuni tanlang..."}
+                </span>
+                <span className={styles.selectIcon}></span>
+              </button>
+
+              <div className={`${styles.selectDropdown} ${isMavzuOpen ? styles.selectDropdownOpen : ""}`}>
+                {curriculumLessons.length === 0 && (
+                  <div className={styles.selectEmpty}>Mavzular topilmadi</div>
+                )}
+                {curriculumLessons.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className={`${styles.selectOption} ${lesson.topic === topic ? styles.selectOptionActive : ""}`}
+                    onClick={() => { setTopic(lesson.topic); setIsMavzuOpen(false); }}
+                  >
+                    {lesson.topic}
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <input
               type="text"

@@ -44,8 +44,10 @@ export default function ManagementSidebar({ isOpen, isCollapsed, onClose }: Mana
         currentSlug = searchParams.get('tab') || 'courses';
     } else if (managementIndex >= 0 && pathParts.length > managementIndex + 1) {
         currentSlug = pathParts[managementIndex + 1];
-    } else {
+    } else if (managementIndex >= 0) {
         currentSlug = "courses";
+    } else {
+        currentSlug = "";
     }
 
     return (

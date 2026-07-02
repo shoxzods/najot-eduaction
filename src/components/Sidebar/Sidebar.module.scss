@@ -1,6 +1,6 @@
 .sidebar {
     width: 256px;
-    min-height: calc(100vh / 0.9);
+    height: 100%;
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(12px);
     display: flex;
@@ -14,7 +14,6 @@
     font-family: 'Outfit', 'Inter', sans-serif;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
-    zoom: 0.9;
 }
 
 .collapsed {
@@ -176,6 +175,8 @@
     flex-direction: column;
     gap: 4px;
     padding: 0 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .item {
@@ -225,24 +226,6 @@
     }
 }
 
-.itemActiveTeacher {
-    background: #6d28d9;
-    color: #ffffff;
-    font-weight: 600;
-
-    .itemIcon {
-        color: #ffffff;
-    }
-
-    &:hover {
-        background: #5b21b6;
-        color: #ffffff;
-
-        .itemIcon {
-            color: #ffffff;
-        }
-    }
-}
 
 .subMenu {
     display: flex;

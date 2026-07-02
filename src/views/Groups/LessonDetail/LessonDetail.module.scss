@@ -316,6 +316,141 @@
     resize: vertical;
     min-height: 80px;
   }
+
+  .selectWrapper {
+    position: relative;
+  }
+
+  .select {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 20px 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:hover:not(:disabled) {
+      border-color: #cbd5e1;
+    }
+
+    &:disabled {
+      background-color: #f1f5f9;
+      cursor: not-allowed;
+    }
+
+    &.selectOpen {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+
+      .selectIcon {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .selectPlaceholder {
+    color: #94a3b8;
+  }
+
+  .selectValue {
+    color: #0f172a;
+  }
+
+  .selectIcon {
+    flex-shrink: 0;
+    width: 10px;
+    height: 6px;
+    transition: transform 0.2s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0L5 6L10 0Z' fill='%2364748b'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 10px 6px;
+  }
+
+  .selectDropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+    padding: 6px;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 4px;
+
+      &:hover {
+        background-color: #94a3b8;
+      }
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+      height: 0;
+      width: 0;
+    }
+  }
+
+  .selectDropdownOpen {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .selectOption {
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #0f172a;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: #f1f5f9;
+    }
+
+    &.selectOptionActive {
+      background-color: #ecfdf5;
+      color: #10b981;
+      font-weight: 600;
+    }
+  }
+
+  .selectEmpty {
+    padding: 9px 12px;
+    font-size: 14px;
+    color: #94a3b8;
+  }
 }
 
 /* Students List */

@@ -48,6 +48,7 @@ export default function ArchiveCourses() {
         api.post(`/courses/${id}/restore`)
             .then(() => {
                 setCourses(prev => prev.filter(item => item.id !== id));
+                router.push('/management?tab=courses');
             })
             .catch(err => {
                 const responseData = err.response?.data;
@@ -78,7 +79,7 @@ export default function ArchiveCourses() {
             <div className={styles.header}>
                 <div className={styles.headerLeft}>
                     <Link
-                        href="/management/courses"
+                        href="/management?tab=courses"
                         className={styles.backIconBtn}
                         title="Kurslarga qaytish"
                         style={{ display: 'inline-flex', textDecoration: 'none', color: 'inherit' }}

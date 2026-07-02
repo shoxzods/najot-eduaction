@@ -61,7 +61,7 @@ export default function ArchiveRooms() {
             <div className={styles.header}>
                 <div className={styles.titleWrapper}>
                     <Link
-                        href="/management/rooms"
+                        href="/management?tab=rooms"
                         className={styles.backIconBtn}
                         title="Xonalarga qaytish"
                         style={{ display: 'inline-flex', textDecoration: 'none', color: 'inherit' }}

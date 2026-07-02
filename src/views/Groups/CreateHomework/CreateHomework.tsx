@@ -30,9 +30,21 @@ export default function CreateHomework() {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isMavzuOpen, setIsMavzuOpen] = useState(false);
     const fileInputRef = useRef(null);
+    const mavzuRef = useRef(null);
 
     const fetchedRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (mavzuRef.current && !mavzuRef.current.contains(e.target)) {
+                setIsMavzuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     // Fetch lessons for this group to populate Mavzu dropdown
     useEffect(() => {
@@ -98,29 +110,48 @@ export default function CreateHomework() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <button className={styles.backBtn} onClick={() => router.back()}>
-                    <ArrowBackIosNewRoundedIcon fontSize="small" />
-                </button>
-                <h1>Yangi uyga vazifa yaratish</h1>
-            </div>
-
             <div className={styles.form}>
+              <div className={styles.formInner}>
+                <div className={styles.header}>
+                    <button className={styles.backBtn} onClick={() => router.back()}>
+                        <ArrowBackIosNewRoundedIcon fontSize="small" />
+                    </button>
+                    <h1>Yangi uyga vazifa yaratish</h1>
+                </div>
+
                 {/* Mavzu (lesson) select */}
                 <div className={styles.formGroup}>
                     <label><span>*</span> Mavzu</label>
-                    <select
-                        className={styles.select}
-                        value={lessonId}
-                        onChange={(e) => setLessonId(e.target.value)}
-                    >
-                        <option value="">Mavzuni tanlang...</option>
-                        {lessons.map((lesson) => (
-                            <option key={lesson.id} value={lesson.id}>
-                                {lesson.topic || lesson.title || lesson.name}
-                            </option>
-                        ))}
-                    </select>
+                    <div className={styles.selectWrapper} ref={mavzuRef}>
+                        <button
+                            type="button"
+                            className={`${styles.select} ${isMavzuOpen ? styles.selectOpen : ""}`}
+                            onClick={() => setIsMavzuOpen((o) => !o)}
+                        >
+                            <span className={lessonId ? styles.selectValue : styles.selectPlaceholder}>
+                                {(() => {
+                                    const selected = lessons.find((l) => String(l.id) === String(lessonId));
+                                    return selected ? (selected.topic || selected.title || selected.name) : "Mavzuni tanlang...";
+                                })()}
+                            </span>
+                            <span className={styles.selectIcon}></span>
+                        </button>
+
+                        <div className={`${styles.selectDropdown} ${isMavzuOpen ? styles.selectDropdownOpen : ""}`}>
+                            {lessons.length === 0 && (
+                                <div className={styles.selectEmpty}>Mavzular topilmadi</div>
+                            )}
+                            {lessons.map((lesson) => (
+                                <div
+                                    key={lesson.id}
+                                    className={`${styles.selectOption} ${String(lesson.id) === String(lessonId) ? styles.selectOptionActive : ""}`}
+                                    onClick={() => { setLessonId(lesson.id); setIsMavzuOpen(false); }}
+                                >
+                                    {lesson.topic || lesson.title || lesson.name}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Izoh (title) */}
@@ -215,6 +246,7 @@ export default function CreateHomework() {
                         {loading ? "Yuborilmoqda..." : "E'lon qilish"}
                     </button>
                 </div>
+              </div>
             </div>
         </div>
     );
